@@ -124,12 +124,12 @@ Material:
       data:
         first:
           name: _Color
-        second: {r: 1, g: .98586899, b: .975727081, a: 1}
-      data:
-        first:
-          name: _SpecColor
-        second: {r: 1, g: 1, b: 1, a: 1}
+        second: {r: 1, g: .979805589, b: .965312004, a: 1}
       data:
         first:
           name: _Emission
         second: {r: 0, g: 0, b: 0, a: 0}
+      data:
+        first:
+          name: _SpecColor
+        second: {r: 1, g: 1, b: 1, a: 1}
