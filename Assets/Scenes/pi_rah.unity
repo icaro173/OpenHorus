@@ -30417,7 +30417,6 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 1333200397}
-  - 114: {fileID: 1333200398}
   m_Layer: 0
   m_Name: Level
   m_TagString: Untagged
@@ -30511,27 +30510,6 @@ Transform:
   - {fileID: 117786291}
   m_Father: {fileID: 0}
   m_RootOrder: 2
---- !u!114 &1333200398
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1333200396}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 11fcc8a31b3894ba6981d6ae1ad62f1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  duration: 20
-  MinDensity: .00175000005
-  MaxDensity: .00274999999
-  daylightFogColor: {r: .996078432, g: .968627453, b: .949019611, a: 1}
-  daylightCameraColor: {r: .996078432, g: .968627453, b: .949019611, a: 1}
-  daylightMaterialColor: {r: 1, g: .972603619, b: .952941179, a: 1}
-  nightlightFogColor: {r: .996078432, g: .984313726, b: .972549021, a: 1}
-  nightlightCameraColor: {r: .996078432, g: .984313726, b: .972549021, a: 1}
-  nightlightMaterialColor: {r: 1, g: .986301839, b: .97647059, a: 1}
-  worldTexture: {fileID: 2100000, guid: 03acf91521e9c974ab15800c52af4d45, type: 2}
 --- !u!1001 &1334158064
 Prefab:
   m_ObjectHideFlags: 0

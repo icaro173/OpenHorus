@@ -5,13 +5,11 @@ using UnityEngine;
 
 class LeaderboardViewerScript : MonoBehaviour
 {
-    #pragma warning disable 0649
     public GUISkin Skin;
     GUIStyle RowStyle, MyRowStyle, SingleRowWindowStyle, MultiRowWindowStyle;
 
     public GameObject LeaderboardPrefab;
     NetworkLeaderboard Leaderboard;
-    #pragma warning restore 0649
 
     bool visible;
 
