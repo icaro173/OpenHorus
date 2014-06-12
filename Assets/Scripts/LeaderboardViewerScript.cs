@@ -44,12 +44,7 @@ class LeaderboardViewerScript : MonoBehaviour
 
         GUI.skin = Skin;
 
-        if (!visible)
-        {
-            var height = 32;
-           // GUILayout.Window(2, new Rect(278, 0, /*466*/376, height), BoardRow, string.Empty, SingleRowWindowStyle);
-        }
-        else
+        if (visible)
         {
             var height = Leaderboard.Entries.Count(x => PlayerRegistry.Has(x.NetworkPlayer) && PlayerRegistry.For(x.NetworkPlayer).Spectating) * 32;
             GUILayout.Window(2, new Rect(Screen.width - 445, (  40 ) - height / 2, 376, height), BoardWindow, string.Empty, MultiRowWindowStyle);

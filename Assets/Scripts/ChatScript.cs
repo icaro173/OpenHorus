@@ -289,8 +289,6 @@ public class ChatScript : MonoBehaviour
             }
 			
 			GUILayout.Box( "", new GUIStyle( Skin.box ) { fixedWidth = showChat ? 1 : 184 } );
-			
-			GUIStyle bsty = new GUIStyle( Skin.button ) { fixedWidth = 92 };
             if (GUILayout.Button("Disconnect"))
             {
                 GlobalSoundsScript.PlayButtonPress();

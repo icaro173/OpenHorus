@@ -124,7 +124,7 @@ public class PlayerScript : MonoBehaviour
     [RPC]
     public void Targeted( NetworkPlayer aggressor )
     {
-        if( !networkView.isMine || aggressor == null ) return;
+        if( !networkView.isMine ) return;
 		
 		if( GlobalSoundsScript.soundEnabled )
 		   warningSound.Play(); 
@@ -141,7 +141,7 @@ public class PlayerScript : MonoBehaviour
     [RPC]
     public void Untargeted( NetworkPlayer aggressor )
     {
-        if( !networkView.isMine || aggressor == null  ) return;
+        if( !networkView.isMine ) return;
 		
 		print( "Untargeted by: " + PlayerRegistry.For( aggressor ).Username );
 		
