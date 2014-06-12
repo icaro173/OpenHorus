@@ -1,3 +1,5 @@
+*.csproj
+*.userprefs
 Library
 Temp
 Assembly*
