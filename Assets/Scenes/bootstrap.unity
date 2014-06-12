@@ -105,7 +105,6 @@ Transform:
   - {fileID: 1155878595}
   - {fileID: 2049539268}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
 --- !u!114 &210913192
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -163,7 +162,6 @@ Transform:
   - {fileID: 1050480390}
   - {fileID: 1568228816}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
 --- !u!114 &502558919
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -242,7 +240,6 @@ Transform:
   m_LocalScale: {x: .0822484344, y: .0822484344, z: .0822484344}
   m_Children: []
   m_Father: {fileID: 1198184570}
-  m_RootOrder: 1
 --- !u!23 &650575162
 Renderer:
   m_ObjectHideFlags: 0
@@ -262,8 +259,9 @@ Renderer:
   m_UseLightProbes: 0
   m_LightProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
-  m_SortingLayerID: 0
+  m_SortingLayer: 0
   m_SortingOrder: 0
+  m_SortingLayerID: 0
 --- !u!33 &650575163
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -319,7 +317,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1198184570}
-  m_RootOrder: 0
 --- !u!20 &656731830
 Camera:
   m_ObjectHideFlags: 0
@@ -348,11 +345,8 @@ Camera:
     m_Bits: 4294967295
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 0
   m_HDR: 0
   m_OcclusionCulling: 1
-  m_StereoConvergence: 10
-  m_StereoSeparation: .0219999999
 --- !u!81 &656731831
 AudioListener:
   m_ObjectHideFlags: 0
@@ -439,7 +433,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 502558918}
-  m_RootOrder: 1
 --- !u!114 &1036526809
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -481,7 +474,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 502558918}
-  m_RootOrder: 2
 --- !u!114 &1050480391
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -523,7 +515,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 210913191}
-  m_RootOrder: 1
 --- !u!82 &1155878596
 AudioSource:
   m_ObjectHideFlags: 0
@@ -613,7 +604,6 @@ Transform:
   - {fileID: 650575161}
   - {fileID: 2109275703}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
 --- !u!114 &1198184571
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -655,7 +645,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2049539268}
-  m_RootOrder: 0
 --- !u!82 &1271378267
 AudioSource:
   m_ObjectHideFlags: 0
@@ -743,7 +732,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 210913191}
-  m_RootOrder: 0
 --- !u!148 &1403338310
 NetworkView:
   m_ObjectHideFlags: 0
@@ -801,7 +789,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 502558918}
-  m_RootOrder: 3
 --- !u!148 &1568228817
 NetworkView:
   m_ObjectHideFlags: 0
@@ -855,7 +842,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 502558918}
-  m_RootOrder: 0
 --- !u!148 &1834919051
 NetworkView:
   m_ObjectHideFlags: 0
@@ -912,7 +898,6 @@ Transform:
   m_Children:
   - {fileID: 1271378266}
   m_Father: {fileID: 210913191}
-  m_RootOrder: 2
 --- !u!114 &2049539269
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1017,7 +1002,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1198184570}
-  m_RootOrder: 2
 --- !u!23 &2109275704
 Renderer:
   m_ObjectHideFlags: 0
@@ -1037,8 +1021,9 @@ Renderer:
   m_UseLightProbes: 0
   m_LightProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
-  m_SortingLayerID: 0
+  m_SortingLayer: 0
   m_SortingOrder: 0
+  m_SortingLayerID: 0
 --- !u!33 &2109275705
 MeshFilter:
   m_ObjectHideFlags: 0
