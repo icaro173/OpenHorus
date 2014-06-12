@@ -2,8 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-public class LeaderboardEntry
-{
+public class LeaderboardEntry {
     public NetworkPlayer NetworkPlayer;
     public int Kills;
     public int Deaths;
@@ -11,49 +10,39 @@ public class LeaderboardEntry
     public int ConsecutiveKills;
 }
 
-class NetworkLeaderboard : MonoBehaviour
-{
+class NetworkLeaderboard : MonoBehaviour {
     public List<LeaderboardEntry> Entries = new List<LeaderboardEntry>();
     bool disposed;
 
     static NetworkLeaderboard instance;
-    public static NetworkLeaderboard Instance
-    {
+    public static NetworkLeaderboard Instance {
         get { return instance; }
     }
 
-    void OnNetworkInstantiate(NetworkMessageInfo info)
-    {
+    void OnNetworkInstantiate(NetworkMessageInfo info) {
         instance = this;
 
         DontDestroyOnLoad(gameObject);
-		
-		if( !ServerScript.Instance.ResumingSavedGame )
-		{
-	        if( Network.isServer ) 
-				Entries.Add( new LeaderboardEntry
-	            {
-	                Ping = Network.GetLastPing(Network.player),
-	                NetworkPlayer = Network.player
-	            });
-		} 
-		else
-		{
-			Entries = ServerScript.Instance.SavedLeaderboardEntries;
-			ServerScript.Instance.ResumingSavedGame = false;
-		}
+
+        if (!ServerScript.Instance.ResumingSavedGame) {
+            if (Network.isServer)
+                Entries.Add(new LeaderboardEntry {
+                    Ping = Network.GetLastPing(Network.player),
+                    NetworkPlayer = Network.player
+                });
+        } else {
+            Entries = ServerScript.Instance.SavedLeaderboardEntries;
+            ServerScript.Instance.ResumingSavedGame = false;
+        }
     }
 
-    void Update()
-    {
-        if (disposed)
-        {
+    void Update() {
+        if (disposed) {
             Debug.Log("Disposed leaderboards still updating...?");
             return;
         }
 
-        if (Network.isServer)
-        {
+        if (Network.isServer) {
             foreach (var entry in Entries)
                 entry.Ping = Network.GetLastPing(entry.NetworkPlayer);
         }
@@ -61,8 +50,7 @@ class NetworkLeaderboard : MonoBehaviour
         // update colors
         var isFirst = true;
         var isSecond = false;
-        foreach (var entry in Entries.OrderByDescending(x => x.Kills))
-        {
+        foreach (var entry in Entries.OrderByDescending(x => x.Kills)) {
             if (!PlayerRegistry.Has(Network.player) ||
                 !PlayerRegistry.Has(entry.NetworkPlayer))
                 continue;
@@ -75,20 +63,16 @@ class NetworkLeaderboard : MonoBehaviour
             else
                 player.Color = new Color(226f / 255, 220f / 255, 198f / 255); // blanc cassé
 
-            if (isFirst)
-            {
+            if (isFirst) {
                 isSecond = true;
                 isFirst = false;
-            }
-            else
+            } else
                 isSecond = false;
         }
     }
 
-    void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
-    {
-        if (disposed)
-        {
+    void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info) {
+        if (disposed) {
             Debug.Log("Trying to serialize disposed leaderboards");
             return;
         }
@@ -98,15 +82,13 @@ class NetworkLeaderboard : MonoBehaviour
         stream.Serialize(ref entryCount);
 
         // Tidy up collection size
-        if (stream.isReading)
-        {
+        if (stream.isReading) {
             while (Entries.Count < entryCount) Entries.Add(new LeaderboardEntry());
             while (Entries.Count > entryCount) Entries.RemoveAt(Entries.Count - 1);
         }
 
         // Sync entries
-        foreach (var entry in Entries)
-        {
+        foreach (var entry in Entries) {
             stream.Serialize(ref entry.NetworkPlayer);
             stream.Serialize(ref entry.Kills);
             stream.Serialize(ref entry.Deaths);
@@ -116,18 +98,15 @@ class NetworkLeaderboard : MonoBehaviour
     }
 
     [RPC]
-    public void RegisterKill(NetworkPlayer shooter, NetworkPlayer victim)
-    {
+    public void RegisterKill(NetworkPlayer shooter, NetworkPlayer victim) {
         if (!Network.isServer) return;
 
         var scheduledMessage = 0;
 
         LeaderboardEntry entry;
-        if(shooter != victim)
-        {
+        if (shooter != victim) {
             entry = Entries.FirstOrDefault(x => x.NetworkPlayer == shooter);
-            if (entry != null)
-            {
+            if (entry != null) {
                 entry.Kills++;
                 entry.ConsecutiveKills++;
 
@@ -142,8 +121,7 @@ class NetworkLeaderboard : MonoBehaviour
 
         entry = Entries.FirstOrDefault(x => x.NetworkPlayer == victim);
         var endedSpree = false;
-        if (entry != null)
-        {
+        if (entry != null) {
             entry.Deaths++;
             if (entry.ConsecutiveKills >= 3)
                 endedSpree = true;
@@ -163,22 +141,18 @@ class NetworkLeaderboard : MonoBehaviour
             ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, shooter, "is merciless!", true, false);
     }
 
-    void OnPlayerConnected(NetworkPlayer player)
-    {
-        Entries.Add(new LeaderboardEntry
-        {
+    void OnPlayerConnected(NetworkPlayer player) {
+        Entries.Add(new LeaderboardEntry {
             Ping = Network.GetLastPing(player),
             NetworkPlayer = player
         });
     }
-    void OnPlayerDisconnected(NetworkPlayer player)
-    {
+    void OnPlayerDisconnected(NetworkPlayer player) {
         Entries.RemoveAll(x => x.NetworkPlayer == player);
     }
-    public void Clear()
-    {
+    public void Clear() {
         disposed = true;
-        Destroy( gameObject );
+        Destroy(gameObject);
         instance = null;
     }
 }

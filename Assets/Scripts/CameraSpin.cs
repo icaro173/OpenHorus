@@ -1,8 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class CameraSpin : MonoBehaviour 
-{
+public class CameraSpin : MonoBehaviour {
     public float rotateSpeed = 0.2f;
     public int sign = 1;
 
@@ -10,8 +9,7 @@ public class CameraSpin : MonoBehaviour
     Quaternion camRotOrigin, transRotOrigin;
     bool wasSpectating;
 
-    void Start()
-    {
+    void Start() {
         DontDestroyOnLoad(gameObject);
 
         camPosOrigin = Camera.main.transform.localPosition;
@@ -23,8 +21,7 @@ public class CameraSpin : MonoBehaviour
         Camera.main.depthTextureMode = DepthTextureMode.DepthNormals;
     }
 
-    void Update()
-    {
+    void Update() {
         if (transform.localEulerAngles.y > 150) sign *= -1;
         if (transform.localEulerAngles.y < 100) sign *= -1;
 
@@ -35,14 +32,12 @@ public class CameraSpin : MonoBehaviour
         wasSpectating = ServerScript.Spectating;
     }
 
-    void OnDisconnectedFromServer(NetworkDisconnection mode)
-    {
+    void OnDisconnectedFromServer(NetworkDisconnection mode) {
         if (TaskManager.Instance != null)
             TaskManager.Instance.WaitFor(0.25f).Then(ResetTransforms);
     }
 
-    void ResetTransforms()
-    {
+    void ResetTransforms() {
         // Added a delay, it doesn't seem to work...?
         Camera.main.transform.localPosition = camPosOrigin;
         transform.localPosition = transPosOrigin;

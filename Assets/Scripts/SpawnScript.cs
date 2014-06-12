@@ -4,63 +4,54 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class SpawnScript : MonoBehaviour 
-{	
+public class SpawnScript : MonoBehaviour {
     public static SpawnScript Instance { get; private set; }
 
-	public GameObject PlayerTemplate;
+    public GameObject PlayerTemplate;
     public GameObject PlayerRegistryPrefab;
 
-	string chosenUsername;
-	
-    void Awake()
-    {
+    string chosenUsername;
+
+    void Awake() {
         Instance = this;
     }
 
-	void OnServerInitialized() 
-    {
-        Network.Instantiate( PlayerRegistryPrefab, Vector3.zero, Quaternion.identity, 0 );
-		Spawn();
-	}
+    void OnServerInitialized() {
+        Network.Instantiate(PlayerRegistryPrefab, Vector3.zero, Quaternion.identity, 0);
+        Spawn();
+    }
 
-	void OnConnectedToServer()
-	{
+    void OnConnectedToServer() {
         ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player, "connected", true, false);
-	}
-	
-    public void WaitAndSpawn()
-    {
+    }
+
+    public void WaitAndSpawn() {
         StartCoroutine(Co_WaitAndSpawn());
     }
-    IEnumerator Co_WaitAndSpawn()
-    {
+    IEnumerator Co_WaitAndSpawn() {
         while (ServerScript.IsAsyncLoading)
             yield return new WaitForSeconds(1 / 30f);
         Spawn();
     }
 
-	void Spawn()
-	{
-        if( ServerScript.Spectating ) return;
-		
-        Network.Instantiate( PlayerTemplate, RespawnZone.GetRespawnPoint(), Quaternion.identity, 0 );
-        TaskManager.Instance.WaitUntil(_ => PlayerRegistry.Instance != null).Then(() => PlayerRegistry.RegisterCurrentPlayer( chosenUsername, networkView.owner.guid ) );
-		//player.name = GameObject player =
+    void Spawn() {
+        if (ServerScript.Spectating) return;
+
+        Network.Instantiate(PlayerTemplate, RespawnZone.GetRespawnPoint(), Quaternion.identity, 0);
+        TaskManager.Instance.WaitUntil(_ => PlayerRegistry.Instance != null).Then(() => PlayerRegistry.RegisterCurrentPlayer(chosenUsername, networkView.owner.guid));
+        //player.name = GameObject player =
     }
-	
-	void OnPlayerDisconnected(NetworkPlayer player) 
-    {
+
+    void OnPlayerDisconnected(NetworkPlayer player) {
         if (Network.isServer)
             ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, player, "disconnected", true, false);
 
         Debug.Log("Clean up after player " + player);
-		Network.RemoveRPCs(player);
-		Network.DestroyPlayerObjects(player);
-	}
-	
-	void OnDisconnectedFromServer(NetworkDisconnection info) 
-    {
+        Network.RemoveRPCs(player);
+        Network.DestroyPlayerObjects(player);
+    }
+
+    void OnDisconnectedFromServer(NetworkDisconnection info) {
         if (Network.isServer)
             Debug.Log("Local server connection disconnected");
         else
@@ -72,9 +63,8 @@ public class SpawnScript : MonoBehaviour
         foreach (var p in FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>())
             Destroy(p.gameObject);
     }
-	
-	public void SetChosenUsername(string chosenUsername) 
-	{
-		this.chosenUsername = chosenUsername;
-	}
+
+    public void SetChosenUsername(string chosenUsername) {
+        this.chosenUsername = chosenUsername;
+    }
 }

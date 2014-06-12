@@ -1,31 +1,27 @@
 using System;
 using UnityEngine;
 
-public class CameraScript : MonoBehaviour
-{
+public class CameraScript : MonoBehaviour {
     public Texture2D crosshair;
     public float collisionRadius = 0.7f;
     public float minDistance = 1;
     public float smoothing = 0.1f;
-	
-	bool aimingAtPlayer;
+
+    bool aimingAtPlayer;
     PlayerScript player;
 
     Camera mainCamera;
 
     Quaternion actualCameraRotation;
 
-    void Start()
-    {
+    void Start() {
         player = transform.parent.parent.GetComponent<PlayerScript>();
-        if(player.networkView.isMine)
-        {
+        if (player.networkView.isMine) {
             mainCamera = Camera.main;
         }
     }
-	
-	void FixedUpdate()
-	{
+
+    void FixedUpdate() {
         RaycastHit hitInfo;
 
         player.gameObject.FindChild("PlayerHit").collider.enabled = false;
@@ -35,20 +31,17 @@ public class CameraScript : MonoBehaviour
                                                              (1 << LayerMask.NameToLayer("Player Hit"))) &&
                              hitInfo.transform.gameObject.layer == LayerMask.NameToLayer("Player Hit");
 
-        player.gameObject.FindChild("PlayerHit").collider.enabled = true;	
-	}
+        player.gameObject.FindChild("PlayerHit").collider.enabled = true;
+    }
 
-    void LateUpdate()
-    {
-        if (player.Paused && mainCamera != null)
-        {
+    void LateUpdate() {
+        if (player.Paused && mainCamera != null) {
             mainCamera.transform.localPosition = new Vector3(-85.77416f, 32.8305f, -69.88891f);
             mainCamera.transform.localRotation = Quaternion.Euler(16.48679f, 21.83607f, 6.487632f);
             return;
         }
 
-        if(player.networkView.isMine)
-        {
+        if (player.networkView.isMine) {
 
             actualCameraRotation = Quaternion.Lerp(transform.rotation, actualCameraRotation,
                 Easing.EaseOut(Mathf.Pow(smoothing, Time.deltaTime), EasingType.Quadratic));
@@ -59,13 +52,13 @@ public class CameraScript : MonoBehaviour
             float magnitude = direction.magnitude;
             direction /= magnitude;
 
-           /* RaycastHit hitInfo;
-            if(Physics.SphereCast(player.transform.position, collisionRadius,
-                                  direction, out hitInfo, magnitude))
-            {
-                cameraPosition = player.transform.position +
-                    direction * Mathf.Max(minDistance, hitInfo.distance);
-            }*/
+            /* RaycastHit hitInfo;
+             if(Physics.SphereCast(player.transform.position, collisionRadius,
+                                   direction, out hitInfo, magnitude))
+             {
+                 cameraPosition = player.transform.position +
+                     direction * Mathf.Max(minDistance, hitInfo.distance);
+             }*/
 
             /*var distance = Vector3.Distance(cameraPosition, player.transform.position);
             var o = Mathf.Clamp01((distance - 2) / 8);
@@ -85,10 +78,9 @@ public class CameraScript : MonoBehaviour
                 .CrosshairPosition = GetCrosshairPosition();
         }
     }
-	
-	void Render( float size, Color color )
-	{
-        var scale = ( Screen.height / 1750f ) * size;
+
+    void Render(float size, Color color) {
+        var scale = (Screen.height / 1750f) * size;
 
         Vector2 center = GetCrosshairPosition();
         Rect position = new Rect(
@@ -96,33 +88,29 @@ public class CameraScript : MonoBehaviour
             Screen.height - center.y - crosshair.height / 2f * scale,
             crosshair.width * scale,
             crosshair.height * scale);
-		
-		GUI.color = color;
-		GUI.DrawTexture(position, crosshair);
-	}
 
-    void OnGUI()
-    {
-        if(player.networkView.isMine)
-        {
-			var color = Color.white;
-	        if( aimingAtPlayer )
-	            GUI.color = Color.red;
-			Render( 1.0f, color );
-			Render( 0.75f, Color.black );
+        GUI.color = color;
+        GUI.DrawTexture(position, crosshair);
+    }
+
+    void OnGUI() {
+        if (player.networkView.isMine) {
+            var color = Color.white;
+            if (aimingAtPlayer)
+                GUI.color = Color.red;
+            Render(1.0f, color);
+            Render(0.75f, Color.black);
         }
     }
 
-    public Vector2 GetCrosshairPosition()
-    {
+    public Vector2 GetCrosshairPosition() {
         return Camera.main.WorldToScreenPoint(GetTargetPosition());
     }
 
-    public Vector3 GetTargetPosition()
-    {
+    public Vector3 GetTargetPosition() {
         RaycastHit hitInfo;
-        if(Physics.Raycast(transform.position, transform.forward, out hitInfo,
-                           Mathf.Infinity, 1<<LayerMask.NameToLayer("Default")))
+        if (Physics.Raycast(transform.position, transform.forward, out hitInfo,
+                           Mathf.Infinity, 1 << LayerMask.NameToLayer("Default")))
             return hitInfo.point;
         else
             return transform.position + transform.forward * 1000;

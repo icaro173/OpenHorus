@@ -2,8 +2,7 @@ using System.Linq;
 using UnityEngine;
 using System.Collections;
 
-public class HealthScript : MonoBehaviour
-{
+public class HealthScript : MonoBehaviour {
     public int maxShield = 1;
     public int maxHealth = 2;
     public float shieldRegenTime = 5;
@@ -30,8 +29,7 @@ public class HealthScript : MonoBehaviour
     Renderer bigCell;
     Renderer[] smallCells;
 
-    void Awake()
-    {
+    void Awake() {
         Shield = maxShield;
         Health = maxHealth;
 
@@ -40,32 +38,26 @@ public class HealthScript : MonoBehaviour
         smallCells = new[] { graphics.FindChild("healthsphere_left").GetComponentInChildren<Renderer>(), graphics.FindChild("healthsphere_right").GetComponentInChildren<Renderer>() };
     }
 
-    void Update()
-    {
-        if( networkView.isMine && transform.position.y < -104 )
-        {
-            DoDamage( 1, (NetworkPlayer)GetComponent<PlayerScript>().owner );
+    void Update() {
+        if (networkView.isMine && transform.position.y < -104) {
+            DoDamage(1, (NetworkPlayer)GetComponent<PlayerScript>().owner);
         }
-		
-        if (!firstSet && shieldRenderer != null)
-        {
+
+        if (!firstSet && shieldRenderer != null) {
             shieldRenderer.material.SetColor("_TintColor", DefaultShieldColor);
             firstSet = true;
         }
 
-        if(networkView.isMine)
-        {
+        if (networkView.isMine) {
             timeUntilShieldRegen -= Time.deltaTime;
-            if(timeUntilShieldRegen < 0 && Shield < maxShield)
-            {
+            if (timeUntilShieldRegen < 0 && Shield < maxShield) {
                 timeUntilShieldRegen += shieldRegenTime;
                 if (Shield == 0)
                     networkView.RPC("SetShield", RPCMode.All, true, false);
                 Shield += 1;
             }
 
-            if (invulnerable)
-            {
+            if (invulnerable) {
                 timeSinceRespawn += Time.deltaTime;
                 if (timeSinceRespawn > invulnerabilityTime)
                     invulnerable = false;
@@ -73,23 +65,19 @@ public class HealthScript : MonoBehaviour
         }
     }
 
-    void ShotFired()
-    {
+    void ShotFired() {
         invulnerable = false;
     }
 
     [RPC]
-    void SetShield(bool on, bool immediate)
-    {
-        if (immediate)
-        {
+    void SetShield(bool on, bool immediate) {
+        if (immediate) {
             shieldRenderer.enabled = on;
             shieldRenderer.material.SetColor("_TintColor", DefaultShieldColor);
             return;
         }
 
-        TaskManager.Instance.WaitUntil(t =>
-        {
+        TaskManager.Instance.WaitUntil(t => {
             if (shieldRenderer == null)
                 return true;
 
@@ -100,27 +88,24 @@ public class HealthScript : MonoBehaviour
             shieldRenderer.material.SetColor("_TintColor", on ? Color.Lerp(RecoverShieldColor, DefaultShieldColor, p) : HitShieldColor);
 
             return t >= 1;
-        }).Then(() =>
-        {
-            if (shieldRenderer != null)
-            {
+        }).Then(() => {
+            if (shieldRenderer != null) {
                 shieldRenderer.enabled = on;
                 shieldRenderer.material.SetColor("_TintColor", DefaultShieldColor);
             }
         });
     }
     [RPC]
-    void SetHealth(int health)
-    {
+    void SetHealth(int health) {
         bigCell.enabled = health >= 2;
         foreach (var r in smallCells)
             r.enabled = health >= 2;
     }
 
     //[RPC]
-    public void DoDamage( int damage, NetworkPlayer shootingPlayer ) //, NetworkPlayer hitPlayer 
+    public void DoDamage(int damage, NetworkPlayer shootingPlayer) //, NetworkPlayer hitPlayer 
     {
-        if ( !dead )  //!networkView.isMine &&
+        if (!dead)  //!networkView.isMine &&
         {
             //Debug.Log("Got " + damage + " damage");
             //Debug.Log("Before hit : Shield = " + Shield + ", Health = " + Health);
@@ -131,20 +116,17 @@ public class HealthScript : MonoBehaviour
             int oldShield = Shield;
             Shield -= damage;
             timeUntilShieldRegen = shieldRegenTime;
-            if(Shield < 0)
-            {
+            if (Shield < 0) {
                 Health += Shield;
                 Shield = 0;
             }
-            if(Health <= 0)
-            {
-                if( Network.player == shootingPlayer ) 
-				{
-					NetworkLeaderboard.Instance.networkView.RPC( "RegisterKill", RPCMode.All, shootingPlayer, GetComponent<PlayerScript>().owner );
-               		networkView.RPC("ScheduleRespawn", RPCMode.All,
+            if (Health <= 0) {
+                if (Network.player == shootingPlayer) {
+                    NetworkLeaderboard.Instance.networkView.RPC("RegisterKill", RPCMode.All, shootingPlayer, GetComponent<PlayerScript>().owner);
+                    networkView.RPC("ScheduleRespawn", RPCMode.All,
                         RespawnZone.GetRespawnPoint());
-				}
-				
+                }
+
                 Health = 0;
                 dead = true;
                 Camera.main.GetComponent<WeaponIndicatorScript>().CooldownStep = 0;
@@ -154,8 +136,7 @@ public class HealthScript : MonoBehaviour
 
             networkView.RPC("SetHealth", RPCMode.All, Health);
 
-            if((Shield != 0) != (oldShield != 0))
-            {
+            if ((Shield != 0) != (oldShield != 0)) {
                 networkView.RPC("SetShield", RPCMode.All, Shield > 0, dead);
             }
         }
@@ -163,14 +144,12 @@ public class HealthScript : MonoBehaviour
 
     object respawnLock;
     [RPC]
-    void ScheduleRespawn(Vector3 position)
-    {
+    void ScheduleRespawn(Vector3 position) {
         Hide();
         Instantiate(deathPrefab, transform.position, transform.rotation);
         var thisLock = new object();
         respawnLock = thisLock;
-        TaskManager.Instance.WaitFor(timeUntilRespawn).Then(() =>
-        {
+        TaskManager.Instance.WaitFor(timeUntilRespawn).Then(() => {
             //Debug.Log("Spectating? " + ServerScript.Spectating);
             if (this != null && respawnLock == thisLock && !ServerScript.Spectating && !RoundScript.Instance.RoundStopped)
                 Respawn(position);
@@ -178,13 +157,11 @@ public class HealthScript : MonoBehaviour
     }
 
     [RPC]
-    void ImmediateRespawn()
-    {
+    void ImmediateRespawn() {
         StartCoroutine(WaitAndRespawn());
     }
 
-    IEnumerator WaitAndRespawn()
-    {
+    IEnumerator WaitAndRespawn() {
         Hide();
 
         while (ServerScript.IsAsyncLoading)
@@ -195,8 +172,7 @@ public class HealthScript : MonoBehaviour
         Respawn(RespawnZone.GetRespawnPoint());
     }
 
-    public void Hide()
-    {
+    public void Hide() {
         if (!(ServerScript.hostState == ServerScript.HostingState.Hosting || ServerScript.hostState == ServerScript.HostingState.Connected))
             return;
 
@@ -204,21 +180,19 @@ public class HealthScript : MonoBehaviour
         dead = true;
         foreach (var r in GetComponentsInChildren<Renderer>()) r.enabled = false;
         foreach (var r in GetComponentsInChildren<Collider>()) r.enabled = false;
-        foreach (var r in GetComponentsInChildren<PlayerShootingScript>())
-        {
+        foreach (var r in GetComponentsInChildren<PlayerShootingScript>()) {
             r.CheckTargets();
-			r.targets.Clear();
+            r.targets.Clear();
             r.enabled = false;
         }
     }
-    public void UnHide()
-    {
+    public void UnHide() {
         if (!(ServerScript.hostState == ServerScript.HostingState.Hosting || ServerScript.hostState == ServerScript.HostingState.Connected))
             return;
 
         //Debug.Log("UnHid");
 
-        foreach (var r in GetComponentsInChildren<Renderer>()) if( r.name != "Canon" && r.name != "flag_flag" && r.name != "Cube" && r.name != "flag_pole" ) r.enabled = true; // Reenable non glitched renderers
+        foreach (var r in GetComponentsInChildren<Renderer>()) if (r.name != "Canon" && r.name != "flag_flag" && r.name != "Cube" && r.name != "flag_pole") r.enabled = true; // Reenable non glitched renderers
         foreach (var r in GetComponentsInChildren<Collider>()) r.enabled = true;
         foreach (var r in GetComponentsInChildren<PlayerShootingScript>()) r.enabled = true;
 
@@ -232,18 +206,16 @@ public class HealthScript : MonoBehaviour
     }
 
     [RPC]
-    public void ToggleSpectate(bool isSpectating)
-    {
+    public void ToggleSpectate(bool isSpectating) {
         //Debug.Log("Toggled spectate to " + isSpectating);
 
-        if (isSpectating)   Hide();
-        else                UnHide();
+        if (isSpectating) Hide();
+        else UnHide();
 
         PlayerRegistry.For(networkView.owner).Spectating = isSpectating;
     }
 
-    public void Respawn(Vector3 position)
-    {
+    public void Respawn(Vector3 position) {
         if (!(ServerScript.hostState == ServerScript.HostingState.Hosting || ServerScript.hostState == ServerScript.HostingState.Connected))
             return;
 
@@ -252,7 +224,7 @@ public class HealthScript : MonoBehaviour
         networkView.RPC("ToggleSpectate", RPCMode.All, false);
 
         SendMessage("ResetAnimation");
-		SendMessage("ResetWarnings");
+        SendMessage("ResetWarnings");
 
         transform.position = position;
     }
