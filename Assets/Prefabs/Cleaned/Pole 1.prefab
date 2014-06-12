@@ -25,7 +25,6 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 400002}
-  - 111: {fileID: 11100000}
   m_Layer: 0
   m_Name: Pole 1
   m_TagString: Untagged
@@ -136,7 +135,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100002}
   m_LocalRotation: {x: 0, y: 2.98023188e-08, z: 0, w: 1}
-  m_LocalPosition: {x: 6.82076216, y: -14.5689564, z: 9.38015556}
+  m_LocalPosition: {x: -13577.5771, y: 5556.11572, z: 1091.63342}
   m_LocalScale: {x: .666620076, y: .666620076, z: .666620076}
   m_Children:
   - {fileID: 400000}
@@ -369,20 +368,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 100012}
   m_Mesh: {fileID: 4300008, guid: 9f2d042989ff24ae19a529191a5d7b6d, type: 3}
---- !u!111 &11100000
-Animation:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 100002}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Animation: {fileID: 0}
-  m_Animations: []
-  m_WrapMode: 0
-  m_PlayAutomatically: 1
-  m_AnimatePhysics: 0
-  m_CullingType: 0
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
