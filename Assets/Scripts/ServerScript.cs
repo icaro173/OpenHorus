@@ -34,9 +34,6 @@ public class ServerScript : MonoBehaviour
     static JsonWriter jsonWriter;
     static JsonReader jsonReader;
 
-    public int connectionFacilitatorPort; 
-    public string connectionFacilitatorIPAddress;
-	
 	public Texture Multiply;
 
     IFuture<string> wanIp;
@@ -115,9 +112,7 @@ public class ServerScript : MonoBehaviour
         ReadyToChooseServer,
         ReadyToDiscoverNat,
         ReadyToConnect,
-//        ReadyForIp,
         WaitingForNat,
-//        WaitingForIp,
         ReadyToHost,
         Hosting,
         Connected
@@ -132,8 +127,6 @@ public class ServerScript : MonoBehaviour
     void Start()
     {
         DontDestroyOnLoad(gameObject);
-
-        //Network.natFacilitatorPort = connectionFacilitatorPort; Network.natFacilitatorIP = connectionFacilitatorIPAddress;
 
         chosenUsername = PlayerPrefs.GetString("username", "Anon");
 
@@ -205,11 +198,10 @@ public class ServerScript : MonoBehaviour
 
             case HostingState.ReadyToDiscoverNat:
                 lastStatus = "Looking for UPnP...";
-                if (!natDiscoveryStarted /*|| !wanIp.HasValue*/)
+                if (!natDiscoveryStarted)
                 {
                     Debug.Log("NAT discovery started");
                     StartNatDiscovery();
-//                    GetWanIP();
                 }
                 hostState = LocalMode ? HostingState.ReadyToHost : HostingState.WaitingForNat;
                 break;
@@ -248,18 +240,6 @@ public class ServerScript : MonoBehaviour
                     hostState = HostingState.ReadyToHost;
                 }
                 break;
-
-//            case HostingState.ReadyForIp:
-//                if (wanIp == null || !wanIp.HasValue)
-//                    GetWanIP();
-//                hostState = HostingState.WaitingForIp;
-//                break;
-//
-//            case HostingState.WaitingForIp:
-//                lastStatus = "Determining IP...";
-//                if (wanIp.HasValue)
-//                    hostState = HostingState.ReadyToHost;
-//                break;
 
             case HostingState.ReadyToHost:
                 lastStatus = "Creating server...";
@@ -567,23 +547,6 @@ public class ServerScript : MonoBehaviour
         RoundScript.Instance.networkView.RPC("SyncLevel", player, RoundScript.Instance.CurrentLevel);
     }
 
-//    void GetWanIP()
-//    {
-//        wanIp = ThreadPool.Instance.Evaluate(() =>
-//        {
-//            if (LocalMode)
-//                return "127.0.0.1";
-//
-//            using (var client = new WebClient())
-//            {
-//                var response = client.DownloadString("http://checkip.dyndns.org");
-//                var ip = (new Regex(@"\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b")).Match(response).Value;
-//                Debug.Log("Got IP : " + ip);
-//                return ip;
-//            }
-//        });
-//    }
-
     void StartNatDiscovery()
     {
         natDiscoveryStarted = true;
@@ -596,23 +559,6 @@ public class ServerScript : MonoBehaviour
 
             mappingResults.AddRange(MapPort(ea.Device));
 
-            // -- This is probably useless
-            //string externalIp;
-            //try
-            //{
-            //    externalIp = natDevice.GetExternalIP().ToString();
-            //}
-            //catch (Exception ex)
-            //{
-            //    Debug.Log("Failed to get external IP :\n" + ex.ToString());
-            //    externalIp = "UNKNOWN";
-            //}
-
-            //if (WanIP == "UNKNOWN")
-            //{
-            //    Debug.Log("Reverted to UPnP device's external IP");
-            //    WanIP = externalIp;
-            //}
         };
         NatUtility.DeviceLost += (s, ea) => { mappingResults.RemoveAll(x => x.Device == ea.Device); };
         NatUtility.StartDiscovery();
@@ -733,29 +679,6 @@ public class ServerScript : MonoBehaviour
     {
        	hostState = HostingState.WaitingForInput;
        	lastStatus = "";
-		
-        /*if( Network.isServer )
-        {
-            if( thisServerId.HasValue )
-                DeleteServer();
-        } 
-		else // If I'm not hosting and have lowest guid, then host!
-		{
-			ResumingSavedGame = true;
-			SavedLeaderboardEntries = NetworkLeaderboard.Instance.Entries; // Save Leaderboard
-			
-			string lowestGUID = PlayerRegistry.GetLowestGUID();
-			if( lowestGUID == networkView.owner.guid )
-				hostState = HostingState.ReadyToHost;
-			else if( lowestGUID != "" )
-			{
-				chosenIP = lowestGUID;
-				StartCoroutine( "DelayedJoin" ); // Give the server a second to register
-			}
-		}
-		
-		PlayerRegistry.Instance.Clear(); // Clear registrys now we're finished
-		NetworkLeaderboard.Instance.Clear(); // Clear registry now we're finished*/
     }
 	
 	IEnumerator DelayedJoin()
