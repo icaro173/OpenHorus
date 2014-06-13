@@ -24,7 +24,7 @@ class PlayerRegistry : MonoBehaviour {
 
     public static NetworkPlayer For(Transform player) {
         for (int i = 0; i < PlayerRegistry.Instance.registry.Count; i++) {
-            var otherPlayer = PlayerRegistry.Instance.registry.ElementAt(i).Value;
+            PlayerRegistry.PlayerInfo otherPlayer = PlayerRegistry.Instance.registry.ElementAt(i).Value;
             if (otherPlayer.Location == player) return PlayerRegistry.Instance.registry.ElementAt(i).Key;
         }
 
@@ -50,7 +50,7 @@ class PlayerRegistry : MonoBehaviour {
             return;
         }
 
-        var color = Color.white;
+        Color color = Color.white;
         if (registry.ContainsKey(player)) {
             Debug.Log("Tried to register player " + player + " but was already registered. Current username : " + registry[player].Username + " | wanted username : " + username);
             registry.Remove(player);
@@ -106,15 +106,9 @@ class PlayerRegistry : MonoBehaviour {
     public void OnPlayerConnected(NetworkPlayer player) {
         Debug.Log("Propagating player registry to player " + player);
 
-        /*while( !Has( player ) )
-        {
-            yield return new WaitForSeconds( 0.02f );
-        }*/
-        // IEnumerator
-
-        foreach (var otherPlayer in registry.Keys)
+        foreach (NetworkPlayer otherPlayer in registry.Keys)
             if (otherPlayer != player) {
-                var info = registry[otherPlayer];
+                PlayerInfo info = registry[otherPlayer];
                 if (info.Disconnected)
                     continue;
 
@@ -123,29 +117,11 @@ class PlayerRegistry : MonoBehaviour {
                                 info.Spectating);
 
                 if (info.Spectating)
-                    foreach (var p in FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>())
+                    foreach (PlayerScript p in FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>())
                         if (p.networkView.owner == otherPlayer)
                             p.GetComponent<HealthScript>().networkView.RPC("ToggleSpectate", player, true);
             }
     }
-
-    /*public static string GetLowestGUID()
-    {
-        string lowestGUID = "";
-        long lowestGUIDValue = 1000000000000000;
-		
-        foreach( var otherPlayer in PlayerRegistry.Instance.registry.Keys )
-        {
-            long guidValue = otherPlayer.guid.Sum( c => c - '0' );
-            if( lowestGUIDValue > guidValue )
-            {
-                lowestGUIDValue = guidValue;
-                lowestGUID = otherPlayer.guid;
-            }
-        }
-		
-        return lowestGUID;
-    }*/
 
     public void OnPlayerDisconnected(NetworkPlayer player) {
         networkView.RPC("UnregisterPlayer", RPCMode.All, player);

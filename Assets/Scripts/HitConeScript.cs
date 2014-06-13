@@ -25,7 +25,7 @@ public class HitConeScript : MonoBehaviour {
 
     void Update() {
         sinceAlive += Time.deltaTime;
-        var step = Easing.EaseOut(sinceAlive / Lifetime, EasingType.Cubic);
+        float step = Easing.EaseOut(sinceAlive / Lifetime, EasingType.Cubic);
 
         transform.localScale = new Vector3(baseScale.x, baseScale.y * (1 + step * maxScale), baseScale.z);
 

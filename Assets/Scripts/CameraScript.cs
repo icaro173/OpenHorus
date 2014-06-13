@@ -52,24 +52,6 @@ public class CameraScript : MonoBehaviour {
             float magnitude = direction.magnitude;
             direction /= magnitude;
 
-            /* RaycastHit hitInfo;
-             if(Physics.SphereCast(player.transform.position, collisionRadius,
-                                   direction, out hitInfo, magnitude))
-             {
-                 cameraPosition = player.transform.position +
-                     direction * Mathf.Max(minDistance, hitInfo.distance);
-             }*/
-
-            /*var distance = Vector3.Distance(cameraPosition, player.transform.position);
-            var o = Mathf.Clamp01((distance - 2) / 8);
-            foreach (var r in player.GetComponentsInChildren<Renderer>())
-            {
-                if (!r.material.HasProperty("_Color")) continue;
-                if (r.gameObject.name == "TextBubble") continue;
-                var c = r.material.color;
-                r.material.color = new Color(c.r, c.g, c.b, o);
-            }*/
-
             mainCamera.transform.position = cameraPosition;
             mainCamera.transform.rotation = actualCameraRotation;
 
@@ -80,7 +62,7 @@ public class CameraScript : MonoBehaviour {
     }
 
     void Render(float size, Color color) {
-        var scale = (Screen.height / 1750f) * size;
+        float scale = (Screen.height / 1750f) * size;
 
         Vector2 center = GetCrosshairPosition();
         Rect position = new Rect(
@@ -95,7 +77,7 @@ public class CameraScript : MonoBehaviour {
 
     void OnGUI() {
         if (player.networkView.isMine) {
-            var color = Color.white;
+            Color color = Color.white;
             if (aimingAtPlayer)
                 GUI.color = Color.red;
             Render(1.0f, color);

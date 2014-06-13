@@ -38,33 +38,33 @@ class LeaderboardViewerScript : MonoBehaviour {
         GUI.skin = Skin;
 
         if (visible) {
-            var height = Leaderboard.Entries.Count(x => PlayerRegistry.Has(x.NetworkPlayer) && PlayerRegistry.For(x.NetworkPlayer).Spectating) * 32;
+            int height = Leaderboard.Entries.Count(x => PlayerRegistry.Has(x.NetworkPlayer) && PlayerRegistry.For(x.NetworkPlayer).Spectating) * 32;
             GUILayout.Window(2, new Rect(Screen.width - 445, (40) - height / 2, 376, height), BoardWindow, string.Empty, MultiRowWindowStyle);
         }
     }
 
     void BoardRow(int windowId) {
-        var log = Leaderboard.Entries.FirstOrDefault(x => x.NetworkPlayer == Network.player);
-        if (log == null || !PlayerRegistry.Has(Network.player)) return;
-        {
-            GUIStyle rowStyle = RowStyle;
-            // rowStyle.normal.textColor = PlayerRegistry.For(log.NetworkPlayer).Color;
+        LeaderboardEntry log = Leaderboard.Entries.FirstOrDefault(x => x.NetworkPlayer == Network.player);
+        if (log == null || !PlayerRegistry.Has(Network.player)) 
+            return;
+        
+        GUIStyle rowStyle = RowStyle;
+        // rowStyle.normal.textColor = PlayerRegistry.For(log.NetworkPlayer).Color;
 
-            GUILayout.BeginHorizontal();
-            GUILayout.Box(PlayerRegistry.For(log.NetworkPlayer).Username.ToUpper(), rowStyle, GUILayout.MinWidth(125), GUILayout.MaxWidth(125));
+        GUILayout.BeginHorizontal();
+        GUILayout.Box(PlayerRegistry.For(log.NetworkPlayer).Username.ToUpper(), rowStyle, GUILayout.MinWidth(125), GUILayout.MaxWidth(125));
 
-            //rowStyle.normal.textColor = Color.white;
+        //rowStyle.normal.textColor = Color.white;
 
-            GUILayout.Box(log.Kills.ToString() + " K", rowStyle, GUILayout.MinWidth(90), GUILayout.MaxWidth(90));
-            GUILayout.Box(log.Deaths.ToString() + " D", rowStyle, GUILayout.MinWidth(90), GUILayout.MaxWidth(90));
-            //GUILayout.Label(log.Ratio.ToString() + " R", rowStyle, GUILayout.MinWidth(90), GUILayout.MaxWidth(90));
-            GUILayout.Box(log.Ping.ToString() + " P", rowStyle, GUILayout.MinWidth(90), GUILayout.MaxWidth(90));
-            GUILayout.EndHorizontal();
-        }
+        GUILayout.Box(log.Kills.ToString() + " K", rowStyle, GUILayout.MinWidth(90), GUILayout.MaxWidth(90));
+        GUILayout.Box(log.Deaths.ToString() + " D", rowStyle, GUILayout.MinWidth(90), GUILayout.MaxWidth(90));
+        //GUILayout.Label(log.Ratio.ToString() + " R", rowStyle, GUILayout.MinWidth(90), GUILayout.MaxWidth(90));
+        GUILayout.Box(log.Ping.ToString() + " P", rowStyle, GUILayout.MinWidth(90), GUILayout.MaxWidth(90));
+        GUILayout.EndHorizontal();
     }
 
     void BoardWindow(int windowId) {
-        foreach (var log in Leaderboard.Entries.OrderByDescending(x => x.Kills)) {
+        foreach (LeaderboardEntry log in Leaderboard.Entries.OrderByDescending(x => x.Kills)) {
             if (!PlayerRegistry.Has(Network.player))
                 continue;
             if (!PlayerRegistry.Has(log.NetworkPlayer) || PlayerRegistry.For(log.NetworkPlayer).Spectating)

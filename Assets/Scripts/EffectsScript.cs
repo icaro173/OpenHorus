@@ -28,7 +28,7 @@ public class EffectsScript : MonoBehaviour {
         //sounds disabled? don't play this one then
         exp.GetComponent<AudioSource>().mute = !GlobalSoundsScript.soundEnabled;
 
-        var count = RandomHelper.Random.Next(1, 4);
+        int count = RandomHelper.Random.Next(1, 4);
         for (int i = 0; i < count; i++)
             Instantiate(Instance.hitConePrefab, position, rotation);
     }
@@ -37,7 +37,7 @@ public class EffectsScript : MonoBehaviour {
     public static void ExplosionHit(Vector3 position, Quaternion rotation) {
         Instantiate(Instance.explosionHitPrefab, position, rotation);
 
-        var count = RandomHelper.Random.Next(1, 4);
+        int count = RandomHelper.Random.Next(1, 4);
         for (int i = 0; i < count; i++)
             Instantiate(Instance.hitConePrefab, position, rotation);
     }

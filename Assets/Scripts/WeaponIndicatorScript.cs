@@ -54,14 +54,14 @@ public class WeaponIndicatorScript : MonoBehaviour {
         Vector2 ssPos;
 
         GL.Color(new Color(color.r, color.g, color.b, opacity));
-        var radius = size * Screen.height / 1500f;
+        Vector2 radius = size * Screen.height / 1500f;
         ssPos = CrosshairPosition;
         //ssPos = new Vector2(Screen.width, Screen.height) / 2f;
         for (int i = 0; i < Segments; i++) {
-            var eased = Easing.EaseIn(CooldownStep, EasingType.Quadratic);
+            float eased = Easing.EaseIn(CooldownStep, EasingType.Quadratic);
 
-            var thisA = (i / Segments * Mathf.PI * 2) * eased + Mathf.PI / 2;
-            var nextA = ((i + 1) / Segments * Mathf.PI * 2) * eased + Mathf.PI / 2;
+            float thisA = (i / Segments * Mathf.PI * 2) * eased + Mathf.PI / 2;
+            float nextA = ((i + 1) / Segments * Mathf.PI * 2) * eased + Mathf.PI / 2;
 
             GL.Vertex3(ssPos.x + (float)Math.Cos(thisA) * radius.x, ssPos.y + (float)Math.Sin(thisA) * radius.y, 0);
             GL.Vertex3(ssPos.x + (float)Math.Cos(nextA) * radius.x, ssPos.y + (float)Math.Sin(nextA) * radius.y, 0);
@@ -69,29 +69,28 @@ public class WeaponIndicatorScript : MonoBehaviour {
 
         // Targets
         GL.Color(new Color(1, 1, 1, 1));
-        var edge = 20 * Screen.height / 1500f;
-        var offsetSize = 5;
-        var spacing = 0.8f;
-        var diag = edge;
+        float edge = 20 * Screen.height / 1500f;
+        float offsetSize = 5;
+        float spacing = 0.8f;
+        float diag = edge;
 
         isReady = false;
-        foreach (var t in Targets) {
-            var step = 1 -
-                       Easing.EaseIn(Mathf.Clamp01(t.SinceInCrosshair / PlayerShootingScript.AimingTime),
-                                     EasingType.Cubic);
+        foreach (PlayerData t in Targets) {
+            float step = 1 - Easing.EaseIn(Mathf.Clamp01(t.SinceInCrosshair / PlayerShootingScript.AimingTime),
+                                           EasingType.Cubic);
             isReady |= step == 0;
 
             step *= offsetSize;
 
             ssPos = t.ScreenPosition;
 
-            var p1o = step * new Vector2(-edge / 2f, -diag / 2f);
-            var p2o = step * new Vector2(edge / 2f, -diag / 2f);
-            var p3o = step * new Vector2(0, diag / 2f);
+            Vector2 p1o = step * new Vector2(-edge / 2f, -diag / 2f);
+            Vector2 p2o = step * new Vector2(edge / 2f, -diag / 2f);
+            Vector2 p3o = step * new Vector2(0, diag / 2f);
 
-            var p1 = ssPos + new Vector2(-edge / 2f, -diag / 2f);
-            var p2 = ssPos + new Vector2(edge / 2f, -diag / 2f);
-            var p3 = ssPos + new Vector2(0, diag / 2f);
+            Vector2 p1 = ssPos + new Vector2(-edge / 2f, -diag / 2f);
+            Vector2 p2 = ssPos + new Vector2(edge / 2f, -diag / 2f);
+            Vector2 p3 = ssPos + new Vector2(0, diag / 2f);
 
             GL.Vertex3(p1.x + p1o.x, p1.y + p1o.y, 0);
             GL.Vertex3(p1.x + edge / 2f * spacing + p1o.x, p1.y + p1o.y, 0);
@@ -120,9 +119,9 @@ public class WeaponIndicatorScript : MonoBehaviour {
         if (!RoundScript.Instance.RoundStopped && !ServerScript.Instance.isLoading && !ServerScript.Spectating)
         {
             // Circle around
-            var opacity = Mathf.Lerp(lastOpacity, CooldownStep < 1 ? 1 : 0.3f, 0.1f);
+            float opacity = Mathf.Lerp(lastOpacity, CooldownStep < 1 ? 1 : 0.3f, 0.1f);
             lastOpacity = opacity;
-            var color = Color.white;
+            Color color = Color.white;
             if (isReady) {
                 opacity = 1;
                 //color = Color.Lerp(Color.white, Color.red, Mathf.Sin(Time.realtimeSinceStartup * 60) / 2f + 0.5f);

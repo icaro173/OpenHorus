@@ -33,7 +33,7 @@ public class HealthScript : MonoBehaviour {
         Shield = maxShield;
         Health = maxHealth;
 
-        var graphics = gameObject.FindChild("Animated Mesh Fixed");
+        GameObject graphics = gameObject.FindChild("Animated Mesh Fixed");
         bigCell = graphics.FindChild("healthsphere_rear").GetComponentInChildren<Renderer>();
         smallCells = new[] { graphics.FindChild("healthsphere_left").GetComponentInChildren<Renderer>(), graphics.FindChild("healthsphere_right").GetComponentInChildren<Renderer>() };
     }
@@ -81,7 +81,7 @@ public class HealthScript : MonoBehaviour {
             if (shieldRenderer == null)
                 return true;
 
-            var p = Easing.EaseIn(Mathf.Clamp01(t / 0.75f), EasingType.Quadratic);
+            float p = Easing.EaseIn(Mathf.Clamp01(t / 0.75f), EasingType.Quadratic);
             p = on ? p : 1 - p;
 
             shieldRenderer.enabled = RandomHelper.Probability(Mathf.Clamp01(p));
@@ -98,7 +98,7 @@ public class HealthScript : MonoBehaviour {
     [RPC]
     void SetHealth(int health) {
         bigCell.enabled = health >= 2;
-        foreach (var r in smallCells)
+        foreach (Renderer r in smallCells)
             r.enabled = health >= 2;
     }
 
@@ -147,7 +147,7 @@ public class HealthScript : MonoBehaviour {
     void ScheduleRespawn(Vector3 position) {
         Hide();
         Instantiate(deathPrefab, transform.position, transform.rotation);
-        var thisLock = new object();
+        object thisLock = new object();
         respawnLock = thisLock;
         TaskManager.Instance.WaitFor(timeUntilRespawn).Then(() => {
             //Debug.Log("Spectating? " + ServerScript.Spectating);
@@ -167,9 +167,10 @@ public class HealthScript : MonoBehaviour {
 
         Health = 0;
         dead = true;
-        foreach (var r in GetComponentsInChildren<Renderer>()) r.enabled = false;
-        foreach (var r in GetComponentsInChildren<Collider>()) r.enabled = false;
-        foreach (var r in GetComponentsInChildren<PlayerShootingScript>()) {
+        foreach (Renderer r in GetComponentsInChildren<Renderer>()) r.enabled = false;
+        foreach (Collider r in GetComponentsInChildren<Collider>()) r.enabled = false;
+        foreach (PlayerShootingScript r in GetComponentsInChildren<PlayerShootingScript>())
+        {
             r.CheckTargets();
             r.targets.Clear();
             r.enabled = false;
@@ -181,9 +182,9 @@ public class HealthScript : MonoBehaviour {
 
         //Debug.Log("UnHid");
 
-        foreach (var r in GetComponentsInChildren<Renderer>()) if (r.name != "Canon" && r.name != "flag_flag" && r.name != "Cube" && r.name != "flag_pole") r.enabled = true; // Reenable non glitched renderers
-        foreach (var r in GetComponentsInChildren<Collider>()) r.enabled = true;
-        foreach (var r in GetComponentsInChildren<PlayerShootingScript>()) r.enabled = true;
+        foreach (Renderer r in GetComponentsInChildren<Renderer>()) if (r.name != "Canon" && r.name != "flag_flag" && r.name != "Cube" && r.name != "flag_pole") r.enabled = true; // Reenable non glitched renderers
+        foreach (Collider r in GetComponentsInChildren<Collider>()) r.enabled = true;
+        foreach (PlayerShootingScript r in GetComponentsInChildren<PlayerShootingScript>()) r.enabled = true;
 
         GetComponent<PlayerScript>().ResetVelocities();
         GetComponent<PlayerShootingScript>().InstantReload();
