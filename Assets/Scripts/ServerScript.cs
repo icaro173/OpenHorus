@@ -15,37 +15,36 @@ using UnityEngine;
 public class ServerScript : MonoBehaviour {
     public static ServerScript Instance { get; private set; }
 
-    //Publioc
+    //Public
     public const int port = 31415;
-    public string[] allowedLevels = { "pi_rah", "pi_jst", "pi_mar", "pi_ven", "pi_gho", "pi_set" };
     public const string buildVersion = "13062014";
-    public bool lanMode = false;
     public const string MasterServerUri = "http://ohs.padrepio.in/";
+
+    public string[] allowedLevels = { "pi_rah", "pi_jst", "pi_mar", "pi_ven", "pi_gho", "pi_set" };
+    public bool lanMode = false;
     public NetworkPeerType peerType;
     public GUISkin guiSkin;
-    public static bool isLoading = false;
-
     public List<LeaderboardEntry> SavedLeaderboardEntries = new List<LeaderboardEntry>();
 
+    public static bool isLoading = false;
     public static bool Spectating;
-
     public static HostingState hostState = HostingState.WaitingForInput;
 
     //Private
     private const int MaxPlayers = 6;
     private const int RefreshTime = 15;
 
-    private static JsonSerializerSettings jsonSettings = new Newtonsoft.Json.JsonSerializerSettings {
-        TypeNameHandling = TypeNameHandling.Auto,
-        Formatting = Formatting.None,
-        PreserveReferencesHandling = PreserveReferencesHandling.None
-    };
-
     private IFuture<string> wanIp;
     private IFuture<ServerList> serverList;
     private string serverToken;
     private ServerInfo currentServer;
     private string chosenUsername = "Anon";
+
+    private static JsonSerializerSettings jsonSettings = new Newtonsoft.Json.JsonSerializerSettings {
+        TypeNameHandling = TypeNameHandling.Auto,
+        Formatting = Formatting.None,
+        PreserveReferencesHandling = PreserveReferencesHandling.None
+    };
 
     private enum MappingStatus { InProgress, Success, Failure }
     class MappingResult {
