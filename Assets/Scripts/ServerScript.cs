@@ -26,9 +26,9 @@ public class ServerScript : MonoBehaviour {
     public GUISkin guiSkin;
     public List<LeaderboardEntry> SavedLeaderboardEntries = new List<LeaderboardEntry>();
 
-    public static bool isLoading = false;
+    public bool isLoading = false;
     public static bool Spectating;
-    public static HostingState hostState = HostingState.WaitingForInput;
+    public static HostingState hostState { get; set; }
 
     //Private
     private const int MaxPlayers = 6;
@@ -46,7 +46,12 @@ public class ServerScript : MonoBehaviour {
         PreserveReferencesHandling = PreserveReferencesHandling.None
     };
 
-    private enum MappingStatus { InProgress, Success, Failure }
+    private enum MappingStatus {
+        InProgress,
+        Success,
+        Failure
+    }
+
     class MappingResult {
         public INatDevice Device;
         public MappingStatus Status = MappingStatus.InProgress;
@@ -120,8 +125,14 @@ public class ServerScript : MonoBehaviour {
         RoundScript.Instance.CurrentLevel = RandomHelper.InEnumerable(allowedLevels);
         ChangeLevelIfNeeded(RoundScript.Instance.CurrentLevel);
 
+        hostState = HostingState.WaitingForInput;
+
         // Get list of servers
         QueryServerList();
+    }
+
+    void createStateChangeCallbacks() {
+
     }
 
     void Update() {
@@ -129,7 +140,6 @@ public class ServerScript : MonoBehaviour {
         switch (hostState) {
             case HostingState.ReadyToListServers:
                 QueryServerList();
-                hostState = HostingState.WaitingForServers;
                 break;
 
             case HostingState.WaitingForServers:
@@ -307,6 +317,9 @@ public class ServerScript : MonoBehaviour {
         if (serverList != null && serverList.HasValue) {
             blackList = serverList.Value.Servers.Where(x => x.ConnectionFailed).Select(x => x.GUID).ToArray();
         }
+
+        //Update state to waiting for server list
+        hostState = HostingState.WaitingForServers;
 
         // Grab new server list
         serverList = ThreadPool.Instance.Evaluate(() => {

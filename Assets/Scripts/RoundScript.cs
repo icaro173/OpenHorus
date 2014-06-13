@@ -113,7 +113,7 @@ public class RoundScript : MonoBehaviour {
     }
 
     IEnumerator WaitAndResume() {
-        while (ServerScript.isLoading)
+        while (ServerScript.Instance.isLoading)
             yield return new WaitForSeconds(1 / 30f);
 
         foreach (var player in FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>())
