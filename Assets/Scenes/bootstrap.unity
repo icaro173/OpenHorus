@@ -179,8 +179,6 @@ MonoBehaviour:
   - pi_rah
   - pi_ven
   - pi_mar
-  - pi_gho
-  - pi_set
   PeerType: 0
   LocalMode: 0
   Skin: {fileID: 11400000, guid: ca3d138dd65c2564f9ccc4895664196a, type: 2}
