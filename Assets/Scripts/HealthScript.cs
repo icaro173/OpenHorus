@@ -107,9 +107,6 @@ public class HealthScript : MonoBehaviour {
     {
         if (!dead)  //!networkView.isMine &&
         {
-            //Debug.Log("Got " + damage + " damage");
-            //Debug.Log("Before hit : Shield = " + Shield + ", Health = " + Health);
-
             if (invulnerable)
                 return;
 
@@ -132,8 +129,6 @@ public class HealthScript : MonoBehaviour {
                 Camera.main.GetComponent<WeaponIndicatorScript>().CooldownStep = 0;
             }
 
-            //Debug.Log("Shield = " + Shield + ", Health = " + Health);
-
             networkView.RPC("SetHealth", RPCMode.All, Health);
 
             if ((Shield != 0) != (oldShield != 0)) {
@@ -150,7 +145,6 @@ public class HealthScript : MonoBehaviour {
         object thisLock = new object();
         respawnLock = thisLock;
         TaskManager.Instance.WaitFor(timeUntilRespawn).Then(() => {
-            //Debug.Log("Spectating? " + ServerScript.Spectating);
             if (this != null && respawnLock == thisLock && !ServerScript.Spectating && !RoundScript.Instance.RoundStopped)
                 Respawn(position);
         });
@@ -180,8 +174,6 @@ public class HealthScript : MonoBehaviour {
         if (!(ServerScript.hostState == ServerScript.HostingState.Hosting || ServerScript.hostState == ServerScript.HostingState.Connected))
             return;
 
-        //Debug.Log("UnHid");
-
         foreach (Renderer r in GetComponentsInChildren<Renderer>()) if (r.name != "Canon" && r.name != "flag_flag" && r.name != "Cube" && r.name != "flag_pole") r.enabled = true; // Reenable non glitched renderers
         foreach (Collider r in GetComponentsInChildren<Collider>()) r.enabled = true;
         foreach (PlayerShootingScript r in GetComponentsInChildren<PlayerShootingScript>()) r.enabled = true;
@@ -197,8 +189,6 @@ public class HealthScript : MonoBehaviour {
 
     [RPC]
     public void ToggleSpectate(bool isSpectating) {
-        //Debug.Log("Toggled spectate to " + isSpectating);
-
         if (isSpectating) Hide();
         else UnHide();
 
@@ -208,8 +198,6 @@ public class HealthScript : MonoBehaviour {
     public void Respawn(Vector3 position) {
         if (!(ServerScript.hostState == ServerScript.HostingState.Hosting || ServerScript.hostState == ServerScript.HostingState.Connected))
             return;
-
-        //Debug.Log("Respawned");
 
         networkView.RPC("ToggleSpectate", RPCMode.All, false);
 

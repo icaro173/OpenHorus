@@ -154,7 +154,6 @@ public class PlayerScript : MonoBehaviour {
         recoilVelocity += impulse;
         if (impulse.y > 0)
             sinceNotGrounded = 0.25f;
-        //Debug.Log("added recoil : " + impulse);
     }
 
     public void ResetVelocities() {
@@ -211,9 +210,7 @@ public class PlayerScript : MonoBehaviour {
             smoothLookRotation = Quaternion.Euler(lookRotationEuler);
         } else {
             if (iPosition.IsRunning) {
-                //Debug.Log("Before correct : " + transform.position);
                 transform.position += iPosition.Update();
-                //Debug.Log("After correct : " + transform.position);
             }
 
             smoothYaw = Mathf.LerpAngle(smoothYaw, lookRotationEuler.y, 0.4f);

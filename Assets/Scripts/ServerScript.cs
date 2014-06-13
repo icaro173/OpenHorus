@@ -162,7 +162,8 @@ public class ServerScript : MonoBehaviour {
                     .FirstOrDefault(x => x.CurrentPlayers < x.MaxPlayers && x.Version == buildVersion);
 
                 if (currentServer == null) {
-                    Debug.Log("Tried to find server, failed. Returning to interactive state.");
+                    
+                    Log("Tried to find server, failed. Returning to interactive state.");
                     serverList = null;
                     hostState = HostingState.WaitingForInput;
                 } else {

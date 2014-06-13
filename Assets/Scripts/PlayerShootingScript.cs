@@ -132,7 +132,6 @@ public class PlayerShootingScript : MonoBehaviour {
             float allowedDistance = 130 * Screen.height / 1500f;
 
             foreach (WeaponIndicatorScript.PlayerData v in targets) v.Found = false;
-            //Debug.Log(targets.Values.Count + " targets to find");
 
             // Test for players in crosshair
             foreach (PlayerScript p in FindObjectsOfType(typeof(PlayerScript))) {
