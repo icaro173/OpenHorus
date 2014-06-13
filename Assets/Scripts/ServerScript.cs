@@ -448,7 +448,6 @@ public class ServerScript : MonoBehaviour {
 
     void SyncAndSpawn(string newLevel) {
         ChangeLevelIfNeeded(newLevel);
-
         SpawnScript.Instance.Spawn();
     }
 
