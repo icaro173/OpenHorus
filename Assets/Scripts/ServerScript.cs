@@ -174,6 +174,7 @@ public class ServerScript : MonoBehaviour {
                     .FirstOrDefault(x => x.CurrentPlayers < x.MaxPlayers && x.Version == buildVersion);
 
                 if (currentServer == null) {
+
                     Debug.Log("Tried to find server, failed. Returning to interactive state.");
                     serverList = null;
                     hostState = HostingState.WaitingForInput;
@@ -297,24 +298,24 @@ public class ServerScript : MonoBehaviour {
             case NetworkPeerType.Connecting:
                 GUI.enabled = hostState == HostingState.WaitingForInput;
                 GUILayout.BeginHorizontal();
-                    chosenUsername = RemoveSpecialCharacters(GUILayout.TextField(chosenUsername));
-                    PlayerPrefs.SetString("username", chosenUsername.Trim());
-                    SendMessage("SetChosenUsername", chosenUsername.Trim());
+                chosenUsername = RemoveSpecialCharacters(GUILayout.TextField(chosenUsername));
+                PlayerPrefs.SetString("username", chosenUsername.Trim());
+                SendMessage("SetChosenUsername", chosenUsername.Trim());
 
-                    GUI.enabled = hostState == HostingState.WaitingForInput && chosenUsername.Trim().Length != 0;
-                    GUILayout.Box("", new GUIStyle(guiSkin.box) { fixedWidth = 1 });
-                    if (GUILayout.Button("HOST") && hostState == HostingState.WaitingForInput) {
-                        PlayerPrefs.Save();
-                        GlobalSoundsScript.PlayButtonPress();
-                        hostState = HostingState.ReadyToDiscoverNat;
-                    }
-                    GUILayout.Box("", new GUIStyle(guiSkin.box) { fixedWidth = 1 });
-                    if (GUILayout.Button("JOIN") && hostState == HostingState.WaitingForInput) {
-                        PlayerPrefs.Save();
-                        GlobalSoundsScript.PlayButtonPress();
-                        hostState = HostingState.ReadyToListServers;
-                    }
-                    GUI.enabled = true;
+                GUI.enabled = hostState == HostingState.WaitingForInput && chosenUsername.Trim().Length != 0;
+                GUILayout.Box("", new GUIStyle(guiSkin.box) { fixedWidth = 1 });
+                if (GUILayout.Button("HOST") && hostState == HostingState.WaitingForInput) {
+                    PlayerPrefs.Save();
+                    GlobalSoundsScript.PlayButtonPress();
+                    hostState = HostingState.ReadyToDiscoverNat;
+                }
+                GUILayout.Box("", new GUIStyle(guiSkin.box) { fixedWidth = 1 });
+                if (GUILayout.Button("JOIN") && hostState == HostingState.WaitingForInput) {
+                    PlayerPrefs.Save();
+                    GlobalSoundsScript.PlayButtonPress();
+                    hostState = HostingState.ReadyToListServers;
+                }
+                GUI.enabled = true;
                 GUILayout.EndHorizontal();
 
                 GUI.enabled = true;
@@ -344,10 +345,8 @@ public class ServerScript : MonoBehaviour {
                     ServerList servers = JsonConvert.DeserializeObject<ServerList>(response, jsonSettings);
 
                     // Blacklist things that failed before
-                    if (blackList != null && blackList.Length > 0)
-                    {
-                        foreach (ServerInfo s in servers.Servers)
-                        {
+                    if (blackList != null && blackList.Length > 0) {
+                        foreach (ServerInfo s in servers.Servers) {
                             s.ConnectionFailed = blackList.Contains(s.GUID);
                         }
                     }
@@ -456,7 +455,7 @@ public class ServerScript : MonoBehaviour {
         RoundScript.Instance.CurrentLevel = newLevel;
         if (currentServer != null) {
             currentServer.Map = RoundScript.Instance.CurrentLevel;
-        } 
+        }
         isLoading = false;
     }
 

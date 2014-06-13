@@ -54,7 +54,6 @@ public class ChatScript : MonoBehaviour {
 
         bool enteredChat = !showChat && (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.T);
         if (enteredChat) {
-            //Debug.Log("Should enter chat");
             showChat = true;
         }
 

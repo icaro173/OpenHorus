@@ -156,7 +156,6 @@ public class BulletScript : MonoBehaviour {
 
             // homing
             if (target != null && homing > 0) {
-                //Debug.Log("Is homing @ " + homing);
                 Vector3 lookVec = (target.position - transform.position).normalized;
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(lookVec),
                                                       Mathf.Clamp01(homing * Time.deltaTime * 9));
