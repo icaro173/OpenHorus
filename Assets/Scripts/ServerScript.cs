@@ -324,30 +324,32 @@ public class ServerScript : MonoBehaviour {
         Debug.Log("Updating servers");
 
         // Grab new server list
-        ThreadPool.Instance.Fire(() => {
-            using (WebClient client = new WebClient()) {
-                // HTTP GET
-                // TODO: Handle if the server is down
-                string response = client.DownloadString(MasterServerUri);
+        if (ThreadPool.Instance != null) {
+            ThreadPool.Instance.Fire(() => {
+                using (WebClient client = new WebClient()) {
+                    // HTTP GET
+                    // TODO: Handle if the server is down
+                    string response = client.DownloadString(MasterServerUri);
 
-                try {
-                    ServerList servers = JsonConvert.DeserializeObject<ServerList>(response, jsonSettings);
+                    try {
+                        ServerList servers = JsonConvert.DeserializeObject<ServerList>(response, jsonSettings);
 
-                    // Blacklist things that failed before
-                    if (blackList != null && blackList.Length > 0) {
-                        foreach (ServerInfo s in servers.Servers) {
-                            s.ConnectionFailed = blackList.Contains(s.GUID);
+                        // Blacklist things that failed before
+                        if (blackList != null && blackList.Length > 0) {
+                            foreach (ServerInfo s in servers.Servers) {
+                                s.ConnectionFailed = blackList.Contains(s.GUID);
+                            }
                         }
-                    }
 
-                    serverList = servers;
-                    hostState = HostingState.WaitingForInput;
-                } catch (Exception ex) {
-                    Debug.Log(ex.ToString());
-                    throw ex;
+                        serverList = servers;
+                        hostState = HostingState.WaitingForInput;
+                    } catch (Exception ex) {
+                        Debug.Log(ex.ToString());
+                        throw ex;
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     // Add our own hoster server to the list on the master server
