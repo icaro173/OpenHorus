@@ -162,7 +162,7 @@ public class HealthScript : MonoBehaviour {
     }
 
     public void Hide() {
-        if (!(ServerScript.hostState == ServerScript.HostingState.Hosting || ServerScript.hostState == ServerScript.HostingState.Connected))
+        if (!(ServerScript.state == ServerScript.HostingState.Hosting || ServerScript.state == ServerScript.HostingState.Connected))
             return;
 
         Health = 0;
@@ -177,7 +177,7 @@ public class HealthScript : MonoBehaviour {
         }
     }
     public void UnHide() {
-        if (!(ServerScript.hostState == ServerScript.HostingState.Hosting || ServerScript.hostState == ServerScript.HostingState.Connected))
+        if (!(ServerScript.state == ServerScript.HostingState.Hosting || ServerScript.state == ServerScript.HostingState.Connected))
             return;
 
         //Debug.Log("UnHid");
@@ -206,7 +206,7 @@ public class HealthScript : MonoBehaviour {
     }
 
     public void Respawn(Vector3 position) {
-        if (!(ServerScript.hostState == ServerScript.HostingState.Hosting || ServerScript.hostState == ServerScript.HostingState.Connected))
+        if (!(ServerScript.state == ServerScript.HostingState.Hosting || ServerScript.state == ServerScript.HostingState.Connected))
             return;
 
         //Debug.Log("Respawned");

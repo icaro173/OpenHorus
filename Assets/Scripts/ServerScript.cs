@@ -28,7 +28,14 @@ public class ServerScript : MonoBehaviour {
 
     public bool isLoading = false;
     public static bool Spectating;
-    public static HostingState hostState { get; set; }
+    public static HostingState state {
+        get { return hostState; }
+        set {
+            HostingState oldstate = hostState;
+            hostState = value;
+            Instance.hostStateChanged(oldstate, hostState);
+        }
+    }
 
     //Private
     private const int MaxPlayers = 6;
@@ -39,6 +46,7 @@ public class ServerScript : MonoBehaviour {
     private string serverToken;
     private ServerInfo currentServer;
     private string chosenUsername = "Anon";
+    private static HostingState hostState;
 
     private static JsonSerializerSettings jsonSettings = new Newtonsoft.Json.JsonSerializerSettings {
         TypeNameHandling = TypeNameHandling.Auto,
@@ -129,6 +137,10 @@ public class ServerScript : MonoBehaviour {
 
         // Get list of servers
         QueryServerList();
+    }
+
+    void hostStateChanged(HostingState oldstate, HostingState currentstate) {
+
     }
 
     void createStateChangeCallbacks() {
