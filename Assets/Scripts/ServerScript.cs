@@ -17,33 +17,31 @@ using UnityEngine;
 public class ServerScript : MonoBehaviour {
     public static ServerScript Instance { get; private set; }
 
-    public const int Port = 31415;
-    const int MaxPlayers = 6;
-    const string MasterServerUri = "http://api.xxiivv.com/?key=wfh";
+    //Publioc
+    public const int port = 31415;
+    public string[] allowedLevels = { "pi_rah", "pi_jst", "pi_mar", "pi_ven", "pi_gho", "pi_set" };
+    public NetworkPeerType peerType;
+    public bool localMode;
+    public GUISkin guiSkin;
+    public int buildVersion;
 
-    public string[] AllowedLevels = { "pi_rah", "pi_jst", "pi_mar", "pi_ven", "pi_gho", "pi_set" };
+    public List<LeaderboardEntry> SavedLeaderboardEntries = new List<LeaderboardEntry>();
 
-    public NetworkPeerType PeerType;
+    public static bool Spectating;
 
-    public bool LocalMode;
+    //Private
+    private const int MaxPlayers = 6;
+    private const string MasterServerUri = "http://api.xxiivv.com/?key=wfh";
+    private static JsonWriter jsonWriter = new JsonWriter(new DataWriterSettings(new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.CamelCase)));
+    private static JsonReader jsonReader = new JsonReader(new DataReaderSettings(new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.CamelCase)));
 
-    public GUISkin Skin;
-    public int BuildVersion;
+    private IFuture<string> wanIp;
+    private IFuture<ReadResponse> readResponse;
+    private IFuture<int> thisServerId;
+    private  ServerInfo currentServer;
+    private string chosenUsername = "Anon";
 
-    static JsonWriter jsonWriter;
-    static JsonReader jsonReader;
-
-    public Texture Multiply;
-
-    IFuture<string> wanIp;
-    IFuture<ReadResponse> readResponse;
-    IFuture<int> thisServerId;
-    ServerInfo currentServer;
-    bool connecting;
-    string chosenUsername = "Anon";
-    public string chosenIP = "127.0.0.1";
-
-    enum MappingStatus { InProgress, Success, Failure }
+    private enum MappingStatus { InProgress, Success, Failure }
     class MappingResult {
         public INatDevice Device;
         public MappingStatus Status = MappingStatus.InProgress;
@@ -51,25 +49,17 @@ public class ServerScript : MonoBehaviour {
     }
     List<MappingResult> mappingResults = new List<MappingResult>();
 
-    bool natDiscoveryStarted;
-    float sinceRefreshedPlayers;
-    int lastPlayerCount;
-    float sinceStartedDiscovery;
-    string lastLevelName;
-
-    public bool ResumingSavedGame = false;
-    public List<LeaderboardEntry> SavedLeaderboardEntries = new List<LeaderboardEntry>();
-
-    public static bool Spectating;
-
-    GUIStyle TextStyle;
-    GUIStyle WelcomeStyle;
+    private bool natDiscoveryStarted;
+    private float sinceRefreshedPlayers;
+    private int lastPlayerCount;
+    private float sinceStartedDiscovery;
+    private string lastLevelName;
 
     class ReadResponse {
-        public string Message;
-        public int Connections;
-        public int Activegames;
-        public ServerInfo[] Servers;
+        public string Message = null;
+        public int Connections = 0;
+        public int Activegames = 0;
+        public ServerInfo[] Servers = null;
     }
 
     class ServerInfo {
@@ -108,26 +98,25 @@ public class ServerScript : MonoBehaviour {
     }
 
     void Start() {
+        // Make sure the owning gameObject is preserved between level loads
         DontDestroyOnLoad(gameObject);
 
+        // Set the username, or use default
         chosenUsername = PlayerPrefs.GetString("username", "Anon");
 
-        jsonWriter = new JsonWriter(new DataWriterSettings(new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.CamelCase)));
-        jsonReader = new JsonReader(new DataReaderSettings(new ConventionResolverStrategy(ConventionResolverStrategy.WordCasing.CamelCase)));
-
+        // Set target frame rate for the game
         Application.targetFrameRate = 60;
-        TextStyle = new GUIStyle { normal = { textColor = new Color(1.0f, 138 / 255f, 0) }, padding = { left = 30, top = 12 } };
-        WelcomeStyle = new GUIStyle { normal = { textColor = new Color(1, 1, 1, 1f) } };
 
-        RoundScript.Instance.CurrentLevel = RandomHelper.InEnumerable(AllowedLevels);
+        // Select a random level as background and map for hosting
+        RoundScript.Instance.CurrentLevel = RandomHelper.InEnumerable(allowedLevels);
         ChangeLevelIfNeeded(RoundScript.Instance.CurrentLevel);
 
+        // Get list of servers
         QueryServerList();
     }
 
     void Update() {
         // Automatic host/connect logic follows
-
         switch (hostState) {
             case HostingState.ReadyToListServers:
                 QueryServerList();
@@ -147,13 +136,12 @@ public class ServerScript : MonoBehaviour {
                     return;
                 }
 
-                currentServer = readResponse.Value.Servers.OrderBy(x => x.Players).ThenBy(x => Guid.NewGuid()).FirstOrDefault(x => !x.ConnectionFailed && x.Players < MaxPlayers && x.Version == BuildVersion); //&& x.BuildVer == BuildVersion
+                currentServer = readResponse.Value.Servers.OrderBy(x => x.Players).ThenBy(x => Guid.NewGuid()).FirstOrDefault(x => !x.ConnectionFailed && x.Players < MaxPlayers && x.Version == buildVersion); //&& x.BuildVer == BuildVersion
                 if (currentServer == null) {
                     Debug.Log("Tried to find server, failed. Returning to interactive state.");
                     readResponse = null;
                     hostState = HostingState.WaitingForInput;
                 } else {
-                    chosenIP = currentServer.Ip;
                     hostState = HostingState.ReadyToConnect;
                 }
                 break;
@@ -163,7 +151,7 @@ public class ServerScript : MonoBehaviour {
                     Debug.Log("NAT discovery started");
                     StartNatDiscovery();
                 }
-                hostState = LocalMode ? HostingState.ReadyToHost : HostingState.WaitingForNat;
+                hostState = localMode ? HostingState.ReadyToHost : HostingState.WaitingForNat;
                 break;
 
             case HostingState.WaitingForNat:
@@ -212,15 +200,17 @@ public class ServerScript : MonoBehaviour {
 
             case HostingState.Hosting:
                 if (!Network.isServer) {
-                    Debug.Log("Hosting but is not the server...?");
+                    Debug.LogError("Hosting but is not the server...?");
                     break;
                 }
 
                 sinceRefreshedPlayers += Time.deltaTime;
+
                 if (thisServerId.HasValue &&
                         (lastPlayerCount != Network.connections.Length ||
                          lastLevelName != RoundScript.Instance.CurrentLevel ||
-                         sinceRefreshedPlayers > 25)) {
+                         sinceRefreshedPlayers > 25)
+                ) {
                     Debug.Log("Refreshing...");
                     RefreshListedServer();
                     sinceRefreshedPlayers = 0;
@@ -230,9 +220,9 @@ public class ServerScript : MonoBehaviour {
                 break;
 
             case HostingState.ReadyToConnect:
-                if (Connect())
+                if (Connect()) {
                     hostState = HostingState.Connected;
-                else {
+                } else {
                     currentServer.ConnectionFailed = true;
                     Debug.Log("Couldn't connect, will try choosing another server");
                     hostState = HostingState.ReadyToChooseServer;
@@ -242,12 +232,11 @@ public class ServerScript : MonoBehaviour {
     }
 
     void OnGUI() {
-        PeerType = Network.peerType;
-        if (connecting) PeerType = NetworkPeerType.Connecting;
+        peerType = Network.peerType;
 
-        GUI.skin = Skin;
+        GUI.skin = guiSkin;
 
-        if (PeerType == NetworkPeerType.Connecting || PeerType == NetworkPeerType.Disconnected) {
+        if (peerType == NetworkPeerType.Connecting || peerType == NetworkPeerType.Disconnected) {
             // Welcome message is now a chat prompt
             if (readResponse != null && readResponse.HasValue) {
                 var message = "Server activity : " + readResponse.Value.Connections + " players in " + readResponse.Value.Activegames + " games.";
@@ -270,31 +259,30 @@ public class ServerScript : MonoBehaviour {
     }
 
     void Login(int windowId) {
-        switch (PeerType) {
+        switch (peerType) {
             case NetworkPeerType.Disconnected:
             case NetworkPeerType.Connecting:
                 GUI.enabled = hostState == HostingState.WaitingForInput;
-                GUILayout.BeginHorizontal(); {
+                GUILayout.BeginHorizontal();
                     chosenUsername = RemoveSpecialCharacters(GUILayout.TextField(chosenUsername));
                     PlayerPrefs.SetString("username", chosenUsername.Trim());
                     SendMessage("SetChosenUsername", chosenUsername.Trim());
 
                     GUI.enabled = true;
                     GUI.enabled = hostState == HostingState.WaitingForInput && chosenUsername.Trim().Length != 0;
-                    GUILayout.Box("", new GUIStyle(Skin.box) { fixedWidth = 1 });
+                    GUILayout.Box("", new GUIStyle(guiSkin.box) { fixedWidth = 1 });
                     if (GUILayout.Button("HOST") && hostState == HostingState.WaitingForInput) {
                         PlayerPrefs.Save();
                         GlobalSoundsScript.PlayButtonPress();
                         hostState = HostingState.ReadyToDiscoverNat;
                     }
-                    GUILayout.Box("", new GUIStyle(Skin.box) { fixedWidth = 1 });
+                    GUILayout.Box("", new GUIStyle(guiSkin.box) { fixedWidth = 1 });
                     if (GUILayout.Button("JOIN") && hostState == HostingState.WaitingForInput) {
                         PlayerPrefs.Save();
                         GlobalSoundsScript.PlayButtonPress();
                         hostState = HostingState.ReadyToListServers;
                     }
                     GUI.enabled = true;
-                }
                 GUILayout.EndHorizontal();
 
                 GUI.enabled = true;
@@ -303,11 +291,12 @@ public class ServerScript : MonoBehaviour {
     }
 
     void QueryServerList() {
-        var blackList = new int[0];
+        int[] blackList = null;
         if (readResponse != null && readResponse.HasValue) {
             blackList = readResponse.Value.Servers.Where(x => x.ConnectionFailed).Select(x => x.Id).ToArray();
-            if (blackList.Length > 0)
+            if (blackList.Length > 0) {
                 Debug.Log("blacklisted servers : " + blackList.Skip(1).Aggregate(blackList[0].ToString(), (s, i) => s + ", " + i.ToString()));
+            }
         }
 
         readResponse = ThreadPool.Instance.Evaluate(() => {
@@ -332,8 +321,9 @@ public class ServerScript : MonoBehaviour {
     }
 
     void AddServerToList() {
+        // 
         thisServerId = ThreadPool.Instance.Evaluate(() => {
-            if (LocalMode) return 0;
+            if (localMode) return 0;
 
             using (var client = new WebClient()) {
                 var result = jsonWriter.Write(currentServer.Packed);
@@ -353,7 +343,7 @@ public class ServerScript : MonoBehaviour {
     void RefreshListedServer() {
         currentServer.Players = 1 + Network.connections.Length;
         ThreadPool.Instance.Fire(() => {
-            if (LocalMode) return;
+            if (localMode) return;
             using (var client = new WebClient()) {
                 var result = jsonWriter.Write(currentServer.Packed);
 
@@ -370,7 +360,7 @@ public class ServerScript : MonoBehaviour {
     }
 
     void DeleteServer() {
-        if (LocalMode) return;
+        if (localMode) return;
         using (var client = new WebClient()) {
             var uri = new Uri(MasterServerUri + "&cmd=delete&id=" + thisServerId.Value);
             var nvc = new NameValueCollection { { "", "" } };
@@ -380,17 +370,23 @@ public class ServerScript : MonoBehaviour {
     }
 
     bool CreateServer() {
-        var result = Network.InitializeServer(MaxPlayers, Port, true);
+        var result = Network.InitializeServer(MaxPlayers, port, true);
         if (result == NetworkConnectionError.NoError) {
-            currentServer = new ServerInfo { Ip = Network.player.guid, Map = RoundScript.Instance.CurrentLevel, Players = 1, Version = BuildVersion }; //wanIp.Value
+            currentServer = new ServerInfo {
+                Ip = Network.player.guid,
+                Map = RoundScript.Instance.CurrentLevel,
+                Players = 1,
+                Version = buildVersion
+            };
             return true;
         }
         return false;
     }
 
     public void ChangeLevel() {
-        ChangeLevelIfNeeded(RandomHelper.InEnumerable(AllowedLevels.Except(new[] { RoundScript.Instance.CurrentLevel })));
+        ChangeLevelIfNeeded(RandomHelper.InEnumerable(allowedLevels.Except(new[] { RoundScript.Instance.CurrentLevel })));
     }
+
     void SyncAndSpawn(string newLevel) {
         ChangeLevelIfNeeded(newLevel);
         SpawnScript.Instance.Spawn();
@@ -400,22 +396,23 @@ public class ServerScript : MonoBehaviour {
         Application.LoadLevel(newLevel);
         ChatScript.Instance.LogChat(Network.player, "Changed level to " + newLevel + ".", true, true);
         RoundScript.Instance.CurrentLevel = newLevel;
-        if (currentServer != null) currentServer.Map = RoundScript.Instance.CurrentLevel;
+        if (currentServer != null) {
+            currentServer.Map = RoundScript.Instance.CurrentLevel;
+        }
     }
 
     bool Connect() {
-        Debug.Log("Connecting to " + chosenIP); //chosenIP
-        var result = Network.Connect(chosenIP);
+        Debug.Log("Connecting to " + currentServer.Ip);
+        var result = Network.Connect(currentServer.Ip);
         if (result != NetworkConnectionError.NoError) {
             return false;
         }
-        connecting = true;
+        peerType = NetworkPeerType.Connecting;
         return true;
     }
 
     void OnConnectedToServer() {
-        connecting = false;
-        PeerType = NetworkPeerType.Client;
+        peerType = NetworkPeerType.Client;
     }
 
     void OnPlayerConnected(NetworkPlayer player) {
@@ -425,110 +422,107 @@ public class ServerScript : MonoBehaviour {
     void StartNatDiscovery() {
         natDiscoveryStarted = true;
 
-        if (LocalMode) return;
+        if (localMode) return;
 
+        // Add discovery callbacks
         NatUtility.DeviceFound += (s, ea) => {
             Debug.Log("Mapping port for device : " + ea.Device.ToString());
-
             mappingResults.AddRange(MapPort(ea.Device));
-
         };
-        NatUtility.DeviceLost += (s, ea) => { mappingResults.RemoveAll(x => x.Device == ea.Device); };
+        NatUtility.DeviceLost += (s, ea) => {
+            mappingResults.RemoveAll(x => x.Device == ea.Device);
+        };
+
+        // Start discovery
         NatUtility.StartDiscovery();
     }
 
+    AsyncCallback getMappingCallback(INatDevice device, Mapping mapping, MappingResult result, Protocol protocol) {
+        return state => {
+            if (state.IsCompleted) {
+                Debug.Log("Mapping complete for : " + mapping.ToString());
+                try {
+                    Mapping m = device.GetSpecificMapping(protocol, port);
+
+                    // Mapping failed, throw
+                    if (m == null) {
+                        throw new InvalidOperationException("Mapping not found");
+                    } else if (m.PrivatePort != port || m.PublicPort != port) {
+                        throw new InvalidOperationException("Mapping invalid");
+                    }
+
+                    result.Status = MappingStatus.Success;
+                } catch (Exception ex) {
+                    Debug.Log("Failed to validate mapping :\n" + ex.ToString());
+                    result.Status = MappingStatus.Failure;
+                }
+            }
+        };
+    }
+
     IEnumerable<MappingResult> MapPort(INatDevice device) {
+        // Create mappings for both udp and tcp
+        Mapping udpMapping = new Mapping(Protocol.Udp, port, port) { Description = "Horus (UDP)" };
+        MappingResult udpResult = new MappingResult { Device = device, Mapping = udpMapping };
+        Mapping tcpMapping = new Mapping(Protocol.Tcp, port, port) { Description = "Horus (TCP)" };
+        MappingResult tcpResult = new MappingResult { Device = device, Mapping = tcpMapping };
 
-        var udpMapping = new Mapping(Protocol.Udp, Port, Port) { Description = "Horus (UDP)" };
-        var udpResult = new MappingResult { Device = device, Mapping = udpMapping };
+        // create delegates from factory for the mapping results
+        AsyncCallback mapUdp = getMappingCallback(device, udpMapping, udpResult, Protocol.Udp);
+        AsyncCallback mapTcp = getMappingCallback(device, tcpMapping, tcpResult, Protocol.Tcp);
 
-        device.BeginCreatePortMap(udpMapping, state => {
-            if (state.IsCompleted) {
-                Debug.Log("Mapping complete for : " + udpMapping.ToString());
-                try {
-                    var m = device.GetSpecificMapping(Protocol.Udp, Port);
-                    if (m == null)
-                        throw new InvalidOperationException("Mapping not found");
-                    if (m.PrivatePort != Port || m.PublicPort != Port)
-                        throw new InvalidOperationException("Mapping invalid");
+        // try mapping
+        device.BeginCreatePortMap(udpMapping, mapUdp, null);
+        device.BeginCreatePortMap(tcpMapping, mapTcp, null);
 
-                    udpResult.Status = MappingStatus.Success;
-                } catch (Exception ex) {
-                    Debug.Log("Failed to validate mapping :\n" + ex.ToString());
-                    udpResult.Status = MappingStatus.Failure;
-                }
-            }
-        }, null);
-
+        // wait for results
         yield return udpResult;
-
-        var tcpMapping = new Mapping(Protocol.Tcp, Port, Port) { Description = "Horus (TCP)" };
-        var tcpResult = new MappingResult { Device = device, Mapping = tcpMapping };
-
-        device.BeginCreatePortMap(tcpMapping, state => {
-            if (state.IsCompleted) {
-                Debug.Log("Mapping complete for : " + tcpMapping.ToString());
-                try {
-                    var m = device.GetSpecificMapping(Protocol.Tcp, Port);
-                    if (m == null)
-                        throw new InvalidOperationException("Mapping not found");
-                    if (m.PrivatePort != Port || m.PublicPort != Port)
-                        throw new InvalidOperationException("Mapping invalid");
-
-                    tcpResult.Status = MappingStatus.Success;
-                } catch (Exception ex) {
-                    Debug.Log("Failed to validate mapping :\n" + ex.ToString());
-                    tcpResult.Status = MappingStatus.Failure;
-                }
-            }
-        }, null);
-
         yield return tcpResult;
     }
 
     void OnServerInitialized() {
-        Debug.Log("==> GUID is " + Network.player.guid + ". Use this on clients to connect with NAT punchthrough.");
-        Debug.Log("==> Local IP/port is " + Network.player.ipAddress + "/" + Network.player.port + ". Use this on clients to connect directly.");
+        Debug.Log("GUID is " + Network.player.guid + ". Use this on clients to connect with NAT punchthrough.");
+        Debug.Log("Local IP/port is " + Network.player.ipAddress + "/" + Network.player.port + ". Use this on clients to connect directly.");
     }
 
     void OnApplicationQuit() {
-        foreach (var mr in mappingResults) {
-            if (mr.Device != null && mr.Mapping != null)
+        // Delete all mappings
+        foreach (MappingResult result in mappingResults) {
+            if (result.Device != null && result.Mapping != null) {
                 try {
-                    mr.Device.DeletePortMap(mr.Mapping);
-                    Debug.Log("Deleted port mapping : " + mr.Mapping);
+                    result.Device.DeletePortMap(result.Mapping);
+                    Debug.Log("Deleted port mapping : " + result.Mapping);
                 } catch (Exception) {
-                    if (mr.Status == MappingStatus.Failure)
-                        Debug.Log("Tried to delete invalid port mapping and failed -- that's probably fine");
-                    else
-                        Debug.Log("Failed to delete port mapping : " + mr.Mapping);
+                    if (result.Status == MappingStatus.Failure) {
+                        Debug.Log("Tried to delete invalid port mapping and failed");
+                    } else {
+                        Debug.Log("Failed to delete port mapping : " + result.Mapping);
+                    }
                 }
+            }
         }
+
+        // Release mapping results from memory
         mappingResults.Clear();
 
-        if (natDiscoveryStarted)
+        //Disable discovery if enabled
+        if (natDiscoveryStarted) {
             NatUtility.StopDiscovery();
+            natDiscoveryStarted = false;
+        }
 
+        // Disconnect
         Network.Disconnect();
-
-        natDiscoveryStarted = false;
     }
 
     void OnFailedToConnect(NetworkConnectionError error) {
+        // TODO: Inform player that it failed and why
         currentServer.ConnectionFailed = true;
         Debug.Log("Couldn't connect, will try choosing another server");
         hostState = HostingState.ReadyToListServers;
-
-        connecting = false;
     }
 
     void OnDisconnectedFromServer(NetworkDisconnection info) {
         hostState = HostingState.WaitingForInput;
-    }
-
-    IEnumerator DelayedJoin() {
-        yield return new WaitForSeconds(1.0f);
-
-        hostState = HostingState.ReadyToConnect;
     }
 }

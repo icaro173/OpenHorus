@@ -143,7 +143,7 @@ public class PlayerShootingScript : MonoBehaviour {
             //Debug.Log(targets.Values.Count + " targets to find");
 
             // Test for players in crosshair
-            foreach (var p in FindSceneObjectsOfType(typeof(PlayerScript))) {
+            foreach (var p in FindObjectsOfType(typeof(PlayerScript))) {
                 var ps = p as PlayerScript;
                 if (p == gameObject.GetComponent<PlayerScript>()) // Is targeting self?
                     continue;
@@ -255,7 +255,7 @@ public class PlayerShootingScript : MonoBehaviour {
 
         PlayerScript targetScript;
         try {
-            targetScript = FindSceneObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>().Where(
+            targetScript = FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>().Where(
                 x => x.owner == target).OrderBy(x => Vector3.Distance(x.transform.position, lastKnownPosition)).FirstOrDefault();
         } catch (Exception) { targetScript = null; }
 

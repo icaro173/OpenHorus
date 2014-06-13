@@ -4,16 +4,15 @@ using System.Linq;
 using UnityEngine;
 
 class LeaderboardViewerScript : MonoBehaviour {
-    public GUISkin Skin;
-    GUIStyle RowStyle, MyRowStyle, SingleRowWindowStyle, MultiRowWindowStyle;
+    public GUISkin Skin = null;
+    GUIStyle RowStyle, MyRowStyle, MultiRowWindowStyle;
 
-    public GameObject LeaderboardPrefab;
+    public GameObject LeaderboardPrefab = null;
     NetworkLeaderboard Leaderboard;
 
     bool visible;
 
     void Awake() {
-        SingleRowWindowStyle = new GUIStyle(Skin.window) { };
         MultiRowWindowStyle = new GUIStyle(Skin.window) { padding = { bottom = 0 } };
         RowStyle = new GUIStyle(Skin.box) { };
         MyRowStyle = new GUIStyle(Skin.box) { };

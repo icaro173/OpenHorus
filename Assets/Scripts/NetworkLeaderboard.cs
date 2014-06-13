@@ -24,15 +24,11 @@ class NetworkLeaderboard : MonoBehaviour {
 
         DontDestroyOnLoad(gameObject);
 
-        if (!ServerScript.Instance.ResumingSavedGame) {
-            if (Network.isServer)
-                Entries.Add(new LeaderboardEntry {
-                    Ping = Network.GetLastPing(Network.player),
-                    NetworkPlayer = Network.player
-                });
-        } else {
-            Entries = ServerScript.Instance.SavedLeaderboardEntries;
-            ServerScript.Instance.ResumingSavedGame = false;
+        if (Network.isServer) {
+            Entries.Add(new LeaderboardEntry {
+                Ping = Network.GetLastPing(Network.player),
+                NetworkPlayer = Network.player
+            });
         }
     }
 
