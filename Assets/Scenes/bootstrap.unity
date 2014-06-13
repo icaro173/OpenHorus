@@ -175,13 +175,12 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   allowedLevels:
   - pi_rah
-  - pi_jst
   - pi_mar
   - pi_ven
   - pi_gho
   - pi_set
   peerType: 0
-  localMode: 0
+  localMode: 1
   guiSkin: {fileID: 11400000, guid: ca3d138dd65c2564f9ccc4895664196a, type: 2}
   buildVersion: 13062014
 --- !u!114 &502558920
