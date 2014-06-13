@@ -211,8 +211,8 @@ public class ServerScript : MonoBehaviour {
             lastLevelName = RoundScript.Instance.CurrentLevel;
             sinceRefreshedPlayers = 0;
         } else {
-            Debug.Log("Failed to create error");
-            hostState = HostingState.ChoosingServer;
+            Debug.LogWarning("Failed to create error");
+            hostState = HostingState.Startup;
         }
     }
 
@@ -220,32 +220,21 @@ public class ServerScript : MonoBehaviour {
         // Automatic host/connect logic follows
         switch (hostState) {          
             case HostingState.WaitingForNat:
-                sinceStartedDiscovery += Time.deltaTime;
-                if (sinceStartedDiscovery > 0.5f) {
-                    NatUtility.StopDiscovery();
-                    mappingResults.Clear();
-                    sinceStartedDiscovery = 0;
-
-                    if (mappingResults.Any(x => x.Status == MappingStatus.Success))
-                        Debug.Log("Some mapping attempts failed, but will proceed with hosting anyway");
-                    else
-                        Debug.Log("Can't map UPnP ports, but will proceed with hosting anyway");
-                    hostState = HostingState.ReadyToHost;
-                }
-
+                // No mapping results or anything still in progress? Stop
                 if (mappingResults.Count == 0 || mappingResults.Any(x => x.Status == MappingStatus.InProgress))
                     break;
 
-                sinceStartedDiscovery = 0;
-
+                // We mapped everything succesfully!
                 if (mappingResults.All(x => x.Status == MappingStatus.Success)) {
-                    Debug.Log("Ready to host!");
                     hostState = HostingState.ReadyToHost;
+
+                // We failed mapping all or some
                 } else {
-                    if (mappingResults.Any(x => x.Status == MappingStatus.Success))
+                    if (mappingResults.Any(x => x.Status == MappingStatus.Success)) {
                         Debug.Log("Some mapping attempts failed, but will proceed with hosting anyway");
-                    else
-                        Debug.Log("Can't map UPnP ports, but will proceed with hosting anyway");
+                    } else {
+                        Debug.LogWarning("Can't map UPnP ports, but will proceed with hosting anyway");
+                    }
                     hostState = HostingState.ReadyToHost;
                 }
                 break;
@@ -253,6 +242,7 @@ public class ServerScript : MonoBehaviour {
             case HostingState.Hosting:
                 if (!Network.isServer) {
                     Debug.LogError("Hosting but is not the server...?");
+                    hostState = HostingState.ReadyToHost;
                     break;
                 }
 
@@ -262,7 +252,6 @@ public class ServerScript : MonoBehaviour {
                     lastLevelName != RoundScript.Instance.CurrentLevel ||
                     sinceRefreshedPlayers <= 0
                 ) {
-                    Debug.Log("Refreshing...");
                     UpdateServer();
                     sinceRefreshedPlayers = RefreshTime;
                     lastPlayerCount = Network.connections.Length;
@@ -275,11 +264,11 @@ public class ServerScript : MonoBehaviour {
     void OnGUI() {
         peerType = Network.peerType;
 
-        GUI.skin = guiSkin;
+        if (peerType == NetworkPeerType.Disconnected && hostState == HostingState.WaitingForInput) {
+            GUI.skin = guiSkin;
 
-        if (peerType == NetworkPeerType.Connecting || peerType == NetworkPeerType.Disconnected) {
             // Welcome message is now a chat prompt
-            if (serverList != null && serverList != null) {
+            if (serverList != null) {
                 string message = "Server activity : " + serverList.Connections + " players in " + serverList.Activegames + " games.";
                 GUI.Box(new Rect((Screen.width / 2) - 122, Screen.height - 145, 248, 35), message.ToUpperInvariant());
             }
@@ -290,38 +279,32 @@ public class ServerScript : MonoBehaviour {
     }
 
     public static string RemoveSpecialCharacters(string str) {
-        StringBuilder sb = new StringBuilder();
-        foreach (char c in str)
-            if (c != '\n' && c != '\r' && sb.Length < 24)
-                sb.Append(c);
-        return sb.ToString();
+        str = str.Replace("\n", string.Empty)
+                 .Replace("\r", string.Empty);
+        return str.Substring(0, Mathf.Min(24, str.Length));
     }
 
     void Login(int windowId) {
-        switch (peerType) {
-            case NetworkPeerType.Disconnected:
-            case NetworkPeerType.Connecting:
+        if (peerType == NetworkPeerType.Disconnected) {
                 GUILayout.BeginHorizontal();
                 chosenUsername = RemoveSpecialCharacters(GUILayout.TextField(chosenUsername));
                 PlayerPrefs.SetString("username", chosenUsername.Trim());
                 SendMessage("SetChosenUsername", chosenUsername.Trim());
 
-                //GUI.enabled = hostState == HostingState.Startup && chosenUsername.Trim().Length != 0;
                 GUILayout.Box("", new GUIStyle(guiSkin.box) { fixedWidth = 1 });
-                if (GUILayout.Button("HOST") && hostState == HostingState.WaitingForInput) {
+                if (GUILayout.Button("HOST")) {
                     PlayerPrefs.Save();
                     GlobalSoundsScript.PlayButtonPress();
                     hostState = HostingState.DiscoveringNAT;
                 }
                 GUILayout.Box("", new GUIStyle(guiSkin.box) { fixedWidth = 1 });
-                if (GUILayout.Button("JOIN") && hostState == HostingState.WaitingForInput) {
+                if (GUILayout.Button("JOIN")) {
                     PlayerPrefs.Save();
                     GlobalSoundsScript.PlayButtonPress();
                     hostState = HostingState.ChoosingServer;
                 }
                 GUILayout.EndHorizontal();
-                GUI.enabled = hostState == HostingState.WaitingForInput;
-                break;
+                GUI.enabled = (hostState == HostingState.WaitingForInput);
         }
     }
 
@@ -337,6 +320,8 @@ public class ServerScript : MonoBehaviour {
         if (hostState == HostingState.Startup) {
             hostState = HostingState.WaitingForInitialServers;
         }
+
+        Debug.Log("Updating servers");
 
         // Grab new server list
         ThreadPool.Instance.Fire(() => {
@@ -489,7 +474,6 @@ public class ServerScript : MonoBehaviour {
 
         // Add discovery callbacks
         NatUtility.DeviceFound += (s, ea) => {
-            Debug.Log("Mapping port for device : " + ea.Device.ToString());
             mappingResults.AddRange(MapPort(ea.Device));
         };
         NatUtility.DeviceLost += (s, ea) => {
@@ -503,7 +487,6 @@ public class ServerScript : MonoBehaviour {
     AsyncCallback getMappingCallback(INatDevice device, Mapping mapping, MappingResult result, Protocol protocol) {
         return state => {
             if (state.IsCompleted) {
-                Debug.Log("Mapping complete for : " + mapping.ToString());
                 try {
                     Mapping m = device.GetSpecificMapping(protocol, port);
 
@@ -554,7 +537,6 @@ public class ServerScript : MonoBehaviour {
             if (result.Device != null && result.Mapping != null) {
                 try {
                     result.Device.DeletePortMap(result.Mapping);
-                    Debug.Log("Deleted port mapping : " + result.Mapping);
                 } catch (Exception) {
                     if (result.Status == MappingStatus.Failure) {
                         Debug.Log("Tried to delete invalid port mapping and failed");
@@ -581,11 +563,15 @@ public class ServerScript : MonoBehaviour {
     void OnFailedToConnect(NetworkConnectionError error) {
         // TODO: Inform player that it failed and why
         currentServer.ConnectionFailed = true;
-        Debug.Log("Couldn't connect, will try choosing another server");
+        Debug.LogWarning("Couldn't connect, will try choosing another server");
         hostState = HostingState.Startup;
     }
 
     void OnDisconnectedFromServer(NetworkDisconnection info) {
+        if (currentServer != null) {
+            DeleteServer();
+        }
+
         hostState = HostingState.Startup;
     }
 }
