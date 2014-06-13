@@ -29,6 +29,8 @@ public class ServerScript : MonoBehaviour {
 
     public static bool Spectating;
 
+    public static HostingState hostState = HostingState.WaitingForInput;
+
     //Private
     private const int MaxPlayers = 6;
     private const int RefreshTime = 15;
@@ -100,7 +102,6 @@ public class ServerScript : MonoBehaviour {
         Hosting,
         Connected
     }
-    public static HostingState hostState = HostingState.WaitingForInput;
 
     void Awake() {
         Instance = this;
@@ -252,7 +253,7 @@ public class ServerScript : MonoBehaviour {
         if (peerType == NetworkPeerType.Connecting || peerType == NetworkPeerType.Disconnected) {
             // Welcome message is now a chat prompt
             if (serverList != null && serverList.HasValue) {
-                var message = "Server activity : " + serverList.Value.Connections + " players in " + serverList.Value.Activegames + " games.";
+                string message = "Server activity : " + serverList.Value.Connections + " players in " + serverList.Value.Activegames + " games.";
                 GUI.Box(new Rect((Screen.width / 2) - 122, Screen.height - 145, 248, 35), message.ToUpperInvariant());
             }
 
@@ -262,7 +263,7 @@ public class ServerScript : MonoBehaviour {
     }
 
     public static string RemoveSpecialCharacters(string str) {
-        var sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         foreach (char c in str)
             if (c != '\n' && c != '\r' && sb.Length < 24)
                 sb.Append(c);
@@ -400,7 +401,7 @@ public class ServerScript : MonoBehaviour {
     }
 
     bool CreateServer() {
-        var result = Network.InitializeServer(MaxPlayers, port, true);
+        NetworkConnectionError result = Network.InitializeServer(MaxPlayers, port, true);
         if (result == NetworkConnectionError.NoError) {
             currentServer = new ServerInfo {
                 GUID = Network.player.guid,
@@ -436,7 +437,7 @@ public class ServerScript : MonoBehaviour {
 
     bool Connect() {
         Debug.Log("Connecting to " + currentServer.GUID);
-        var result = Network.Connect(currentServer.GUID);
+        NetworkConnectionError result = Network.Connect(currentServer.GUID);
         if (result != NetworkConnectionError.NoError) {
             return false;
         }
