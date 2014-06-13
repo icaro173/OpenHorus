@@ -38,9 +38,7 @@ public class PlayerShootingScript : MonoBehaviour {
     float cooldownLeft = 0.0f;
     int bulletsLeft;
 
-    //float cannonChargeCountdown = CannonChargeTime;
     WeaponIndicatorScript weaponIndicator;
-    // public because HealthScript accesses it :x
     public List<WeaponIndicatorScript.PlayerData> targets;
 
     CameraScript playerCamera;
@@ -54,17 +52,11 @@ public class PlayerShootingScript : MonoBehaviour {
         playerScript = GetComponent<PlayerScript>();
     }
 
-    /*void Update()
-    {
-        gun.LookAt(playerCamera.GetTargetPosition());
-
-        if (playerScript.Paused)
-            bulletsLeft = BurstCount;
-    }*/
-
     WeaponIndicatorScript.PlayerData GetFirstTarget() {
-        var aimedAt = targets.Where(x => x.SinceInCrosshair >= AimingTime);
-        return aimedAt.OrderBy(x => Guid.NewGuid()).First();
+        return targets
+               .Where(x => x.SinceInCrosshair >= AimingTime)
+               .OrderBy(x => Guid.NewGuid())
+               .First();
     }
 
     void Update() {
@@ -86,13 +78,13 @@ public class PlayerShootingScript : MonoBehaviour {
                     // find homing target(s)
                     var aimedAt = targets.Where(x => x.SinceInCrosshair >= AimingTime);
 
-                    var bulletsShot = bulletsLeft;
-                    var first = true;
+                    int bulletsShot = bulletsLeft;
+                    bool first = true;
                     while (bulletsLeft > 0) {
                         if (!aimedAt.Any())
                             DoHomingShot(ShotgunSpread, null, 0, first);
                         else {
-                            var pd = aimedAt.OrderBy(x => Guid.NewGuid()).First();
+                            WeaponIndicatorScript.PlayerData pd = aimedAt.OrderBy(x => Guid.NewGuid()).First();
                             DoHomingShot(ShotgunSpread, pd.Script, Mathf.Clamp01(pd.SinceInCrosshair / AimingTime) * ShotgunHomingSpeed, first);
                         }
 
@@ -101,7 +93,7 @@ public class PlayerShootingScript : MonoBehaviour {
                     }
                     cooldownLeft += ReloadTime;
 
-                    var recoilImpulse = -gun.forward * ((float)bulletsShot / BurstCount);
+                    Vector3 recoilImpulse = -gun.forward * ((float)bulletsShot / BurstCount);
                     recoilImpulse *= playerScript.controller.isGrounded ? 25 : 87.5f;
                     recoilImpulse.y *= playerScript.controller.isGrounded ? 0.1f : 0.375f;
                     playerScript.AddRecoil(recoilImpulse);
@@ -136,21 +128,21 @@ public class PlayerShootingScript : MonoBehaviour {
                     reloadSound.Play();
             }
 
-            var screenCenter = new Vector2(Screen.width / 2f, Screen.height / 2f);
-            var allowedDistance = 130 * Screen.height / 1500f;
+            Vector2 screenCenter = new Vector2(Screen.width / 2f, Screen.height / 2f);
+            float allowedDistance = 130 * Screen.height / 1500f;
 
-            foreach (var v in targets) v.Found = false;
+            foreach (WeaponIndicatorScript.PlayerData v in targets) v.Found = false;
             //Debug.Log(targets.Values.Count + " targets to find");
 
             // Test for players in crosshair
-            foreach (var p in FindObjectsOfType(typeof(PlayerScript))) {
-                var ps = p as PlayerScript;
+            foreach (PlayerScript p in FindObjectsOfType(typeof(PlayerScript))) {
+                PlayerScript ps = p;
                 if (p == gameObject.GetComponent<PlayerScript>()) // Is targeting self?
                     continue;
 
-                var health = ps.gameObject.GetComponent<HealthScript>();
-                var position = ps.transform.position;
-                var screenPos = Camera.main.WorldToScreenPoint(position);
+                HealthScript health = ps.gameObject.GetComponent<HealthScript>();
+                Vector3 position = ps.transform.position;
+                Vector3 screenPos = Camera.main.WorldToScreenPoint(position);
 
                 if (health.Health > 0 && screenPos.z > 0 && (screenPos.XY() - screenCenter).magnitude < allowedDistance) {
                     WeaponIndicatorScript.PlayerData data;
@@ -227,7 +219,7 @@ public class PlayerShootingScript : MonoBehaviour {
             Quaternion.Euler(Random.value * spread, 0, 0) *
             Quaternion.Euler(0, 0, -roll);
 
-        var lastKnownPosition = Vector3.zero;
+        Vector3 lastKnownPosition = Vector3.zero;
         NetworkPlayer targetOwner = Network.player;
         if (target != null) {
             targetOwner = target.owner ?? Network.player;

@@ -92,7 +92,7 @@ public class BulletScript : MonoBehaviour {
             if (c.gameObject.name != "PlayerHit")
                 continue;
 
-            var t = c.transform;
+            Transform t = c.transform;
             NetworkView view = t.networkView;
             while (view == null) {
                 t = t.parent;
@@ -100,13 +100,13 @@ public class BulletScript : MonoBehaviour {
             }
 
             t = t.FindChild("mecha_gun");
-            var endpoint = t.position + t.forward;
+            Vector3 endpoint = t.position + t.forward;
 
-            var direction = endpoint - point;
-            var dist = Mathf.Max(direction.magnitude, 0.5f);
+            Vector3 direction = endpoint - point;
+            float dist = Mathf.Max(direction.magnitude, 0.5f);
             direction.Normalize();
 
-            var impulse = direction * (45 / dist);
+            Vector3 impulse = direction * (45 / dist);
             if (impulse.y > 0)
                 impulse.y *= 2.25f;
             else
@@ -157,13 +157,13 @@ public class BulletScript : MonoBehaviour {
             // homing
             if (target != null && homing > 0) {
                 //Debug.Log("Is homing @ " + homing);
-                var lookVec = (target.position - transform.position).normalized;
+                Vector3 lookVec = (target.position - transform.position).normalized;
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(lookVec),
                                                       Mathf.Clamp01(homing * Time.deltaTime * 9));
             }
         }
 
-        var o = randomBrightness * lifetime / 2f * 0.75f;
+        float o = randomBrightness * lifetime / 2f * 0.75f;
         GetComponent<TrailRenderer>().material.SetColor("_TintColor", new Color(o, o, o, TrailAlpha));
 
         // max lifetime

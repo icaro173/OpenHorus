@@ -1,10 +1,8 @@
 ﻿using System;
 using UnityEngine;
 
-static class ColorHelper
-{
-    public static void ColorToHSV(Color color, out float hue, out float saturation, out float value)
-    {
+static class ColorHelper {
+    public static void ColorToHSV(Color color, out float hue, out float saturation, out float value) {
         float max = Math.Max(color.r, Math.Max(color.g, color.b));
         float min = Math.Min(color.r, Math.Min(color.g, color.b));
 
@@ -13,8 +11,7 @@ static class ColorHelper
         value = max;
     }
 
-    public static float GetHue(this Color color)
-    {
+    public static float GetHue(this Color color) {
         if ((color.r == color.g) && (color.g == color.b)) return 0f;
         float num = color.r;
         float num2 = color.g;
@@ -35,15 +32,14 @@ static class ColorHelper
         return num7;
     }
 
-    public static Color ColorFromHSV(float hue, float saturation, float value)
-    {
+    public static Color ColorFromHSV(float hue, float saturation, float value) {
         int hi = (int)(hue / 60) % 6;
         float f = hue / 60 - (int)(hue / 60);
 
-        var v = value;
-        var p = value * (1 - saturation);
-        var q = value * (1 - f * saturation);
-        var t = value * (1 - (1 - f) * saturation);
+        float v = value;
+        float p = value * (1 - saturation);
+        float q = value * (1 - f * saturation);
+        float t = value * (1 - (1 - f) * saturation);
 
         if (hi == 0) return new Color(v, t, p);
         if (hi == 1) return new Color(q, v, p);

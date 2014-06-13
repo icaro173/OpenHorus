@@ -14,13 +14,13 @@ public class AutoDestructScript : MonoBehaviour {
         timeToLive -= Time.deltaTime;
 
         if (timeToLive < fadeOutTime) {
-            var opacity = timeToLive / fadeOutTime;
-            foreach (var r in GetComponentsInChildren<Renderer>()) {
+            float opacity = timeToLive / fadeOutTime;
+            foreach (Renderer r in GetComponentsInChildren<Renderer>()) {
                 if (r.material.HasProperty("_TintColor")) {
-                    var color = r.material.GetColor("_TintColor");
+                    Color color = r.material.GetColor("_TintColor");
                     r.material.SetColor("_TintColor", new Color(color.r, color.g, color.b, opacity));
                 } else {
-                    var color = r.material.color;
+                    Color color = r.material.color;
                     r.material.color = new Color(color.r, color.g, color.b, opacity);
                 }
             }

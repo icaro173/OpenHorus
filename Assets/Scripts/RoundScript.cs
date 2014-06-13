@@ -97,7 +97,7 @@ public class RoundScript : MonoBehaviour {
 
     [RPC]
     public void StopRound() {
-        foreach (var player in FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>())
+        foreach (PlayerScript player in FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>())
             player.Paused = true;
         RoundStopped = true;
     }
@@ -105,7 +105,7 @@ public class RoundScript : MonoBehaviour {
     [RPC]
     public void RestartRound() {
         if (!ServerScript.Spectating)
-            foreach (var player in FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>())
+            foreach (PlayerScript player in FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>())
                 if (player.networkView.isMine)
                     player.networkView.RPC("ImmediateRespawn", RPCMode.All);
 
@@ -116,10 +116,10 @@ public class RoundScript : MonoBehaviour {
         while (ServerScript.isLoading)
             yield return new WaitForSeconds(1 / 30f);
 
-        foreach (var player in FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>())
+        foreach (PlayerScript player in FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>())
             player.Paused = false;
 
-        foreach (var entry in NetworkLeaderboard.Instance.Entries) {
+        foreach (LeaderboardEntry entry in NetworkLeaderboard.Instance.Entries) {
             entry.Deaths = 0;
             entry.Kills = 0;
             entry.ConsecutiveKills = 0;

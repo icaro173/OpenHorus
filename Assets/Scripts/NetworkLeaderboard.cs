@@ -39,19 +39,19 @@ class NetworkLeaderboard : MonoBehaviour {
         }
 
         if (Network.isServer) {
-            foreach (var entry in Entries)
+            foreach (LeaderboardEntry entry in Entries)
                 entry.Ping = Network.GetLastPing(entry.NetworkPlayer);
         }
 
         // update colors
-        var isFirst = true;
-        var isSecond = false;
-        foreach (var entry in Entries.OrderByDescending(x => x.Kills)) {
+        bool isFirst = true;
+        bool isSecond = false;
+        foreach (LeaderboardEntry entry in Entries.OrderByDescending(x => x.Kills)) {
             if (!PlayerRegistry.Has(Network.player) ||
                 !PlayerRegistry.Has(entry.NetworkPlayer))
                 continue;
 
-            var player = PlayerRegistry.For(entry.NetworkPlayer);
+            PlayerRegistry.PlayerInfo player = PlayerRegistry.For(entry.NetworkPlayer);
             if (isSecond)
                 player.Color = new Color(114 / 255f, 222 / 255f, 194 / 255f); // cyan
             else if (isFirst)
@@ -84,7 +84,7 @@ class NetworkLeaderboard : MonoBehaviour {
         }
 
         // Sync entries
-        foreach (var entry in Entries) {
+        foreach (LeaderboardEntry entry in Entries) {
             stream.Serialize(ref entry.NetworkPlayer);
             stream.Serialize(ref entry.Kills);
             stream.Serialize(ref entry.Deaths);
@@ -97,7 +97,7 @@ class NetworkLeaderboard : MonoBehaviour {
     public void RegisterKill(NetworkPlayer shooter, NetworkPlayer victim) {
         if (!Network.isServer) return;
 
-        var scheduledMessage = 0;
+        int scheduledMessage = 0;
 
         LeaderboardEntry entry;
         if (shooter != victim) {
@@ -116,7 +116,7 @@ class NetworkLeaderboard : MonoBehaviour {
         }
 
         entry = Entries.FirstOrDefault(x => x.NetworkPlayer == victim);
-        var endedSpree = false;
+        bool endedSpree = false;
         if (entry != null) {
             entry.Deaths++;
             if (entry.ConsecutiveKills >= 3)

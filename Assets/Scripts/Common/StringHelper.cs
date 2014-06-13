@@ -3,18 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-class StringHelper
-{
-    public static string DeepToString<T>(IEnumerable<T> collection)
-    {
+class StringHelper {
+    public static string DeepToString<T>(IEnumerable<T> collection) {
         return DeepToString(collection, false);
     }
-    public static string DeepToString<T>(IEnumerable<T> collection, bool omitBrackets)
-    {
-        var builder = new StringBuilder(omitBrackets ? string.Empty : "{");
+    public static string DeepToString<T>(IEnumerable<T> collection, bool omitBrackets) {
+        StringBuilder builder = new StringBuilder(omitBrackets ? string.Empty : "{");
 
-        foreach (T obj in collection)
-        {
+        foreach (T obj in collection) {
             builder.Append(obj == null ? string.Empty : obj.ToString());
             builder.Append(", ");
         }

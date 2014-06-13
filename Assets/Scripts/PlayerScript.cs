@@ -79,7 +79,7 @@ public class PlayerScript : MonoBehaviour {
         characterAnimation["strafeLeft"].speed = 1.5f;
         characterAnimation["strafeRight"].speed = 1.5f;
 
-        foreach (var r in GetComponentsInChildren<Renderer>()) {
+        foreach (Renderer r in GetComponentsInChildren<Renderer>()) {
             if (!r.material.HasProperty("_Color")) continue;
             if (r.gameObject.name == "TextBubble") continue;
             if (r.gameObject.name == "flag_flag001") continue;
@@ -222,13 +222,13 @@ public class PlayerScript : MonoBehaviour {
 
         // set up text bubble visibility
         if (!textBubbleVisible) {
-            var o = textBubble.renderer.material.color.a;
+            float o = textBubble.renderer.material.color.a;
             textBubble.renderer.material.color = new Color(1, 1, 1, Mathf.Clamp(o - Time.deltaTime * 10, 0, 0.875f));
             if (o <= 0)
                 textBubble.renderer.enabled = false;
         } else {
             textBubble.renderer.enabled = true;
-            var o = textBubble.renderer.material.color.a;
+            float o = textBubble.renderer.material.color.a;
             textBubble.renderer.material.color = new Color(1, 1, 1, Mathf.Clamp(o + Time.deltaTime * 10, 0, 0.875f));
         }
         textBubble.transform.LookAt(Camera.main.transform);
@@ -250,16 +250,6 @@ public class PlayerScript : MonoBehaviour {
             color.a = 0;
         }
         dashEffectRenderer.material.SetColor("_TintColor", color);
-
-        /*if (owner.HasValue && PlayerRegistry.Has(owner.Value))
-        {
-            var info = PlayerRegistry.For(owner.Value);
-
-            transform.Find("Animated Mesh Fixed").Find("flag_pole001").Find("flag_flag001").renderer.material.color = info.Color;
-
-            if (!networkView.isMine)
-                GetComponentInChildren<TextMesh>().text = info.Username;
-        }*/
     }
 
     void FixedUpdate() {
@@ -274,7 +264,6 @@ public class PlayerScript : MonoBehaviour {
         bool justJumped = false;
         if (networkView.isMine && Time.time - lastJumpInputTime <= JumpInputQueueTime) {
             if ((controller.isGrounded || sinceNotGrounded < 0.25f) && recoilVelocity.y <= 0) {
-                //Debug.Log("Accepted jump");
                 lastJumpInputTime = -1;
                 justJumped = true;
                 activelyJumping = true;
@@ -300,7 +289,7 @@ public class PlayerScript : MonoBehaviour {
                     dashSound.Play();
                 }
 
-                var dashDirection = inputVelocity.normalized;
+                Vector3 dashDirection = inputVelocity.normalized;
                 if (dashDirection == Vector3.zero)
                     dashDirection = Vector3.up * 0.4f;
 
@@ -333,12 +322,10 @@ public class PlayerScript : MonoBehaviour {
             if (MathHelper.AlmostEquals(smoothedInputVelocity, Vector3.zero, 0.1f) && currentAnim != "idle")
                 characterAnimation.CrossFade(currentAnim = "idle", IdleTransitionFadeLength);
             else {
-                var xDir = Vector3.Dot(smoothedInputVelocity, transform.right);
-                var zDir = Vector3.Dot(smoothedInputVelocity, transform.forward);
+                float xDir = Vector3.Dot(smoothedInputVelocity, transform.right);
+                float zDir = Vector3.Dot(smoothedInputVelocity, transform.forward);
 
                 const float epsilon = 15f;
-
-                //Debug.Log("xDir : " + xDir + " | zDir : " + zDir);
 
                 if (zDir > epsilon) {
                     if (currentAnim != "run")
@@ -356,7 +343,7 @@ public class PlayerScript : MonoBehaviour {
             }
         }
 
-        var smoothFallingVelocity = fallingVelocity * 0.4f + lastFallingVelocity * 0.65f;
+        Vector3 smoothFallingVelocity = fallingVelocity * 0.4f + lastFallingVelocity * 0.65f;
         lastFallingVelocity = smoothFallingVelocity;
 
         // damp recoil
@@ -390,7 +377,7 @@ public class PlayerScript : MonoBehaviour {
     }
 
     void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info) {
-        var pOwner = owner.HasValue ? owner.Value : default(NetworkPlayer);
+        NetworkPlayer pOwner = owner.HasValue ? owner.Value : default(NetworkPlayer);
         stream.Serialize(ref pOwner);
         if (stream.isReading) owner = pOwner;
 
@@ -407,7 +394,6 @@ public class PlayerScript : MonoBehaviour {
         stream.Serialize(ref lookRotationEuler);
 
         if (stream.isReading) {
-            //Debug.Log("pPosition = " + pPosition + " / transform.position = " + transform.position);
             if (lastNetworkFramePosition == pPosition)
                 transform.position = pPosition;
 
@@ -448,7 +434,6 @@ abstract class Interpolator<T> {
 class VectorInterpolator : Interpolator<Vector3> {
     public override bool Start(Vector3 delta) {
         IsRunning = !MathHelper.AlmostEquals(delta, Vector3.zero, 0.01f);
-        //if (IsRunning) Debug.Log("vector interpolator started, delta == " + delta);
         SinceStarted = 0;
         Delta = delta;
         return IsRunning;
@@ -456,7 +441,6 @@ class VectorInterpolator : Interpolator<Vector3> {
     public override Vector3 Update() {
         UpdateInternal();
         if (!IsRunning) return Vector3.zero;
-        //Debug.Log("Correcting for " + Delta + " with " + (Delta * Time.deltaTime / InterpolationTime));
         return Delta * Time.deltaTime / InterpolationTime;
     }
 }
@@ -464,9 +448,6 @@ class QuaternionInterpolator : Interpolator<Quaternion> {
     public override bool Start(Quaternion delta) {
         IsRunning = !Mathf.Approximately(
             Quaternion.Angle(delta, Quaternion.identity), 0);
-        //if (IsRunning)
-        //    Debug.Log("quaternion interpolator started, angle == " +
-        //    Quaternion.Angle(delta, Quaternion.identity));
         SinceStarted = 0;
         Delta = delta;
         return IsRunning;

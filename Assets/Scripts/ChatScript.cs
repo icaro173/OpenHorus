@@ -43,7 +43,7 @@ public class ChatScript : MonoBehaviour {
     void Update() {
         forceVisible = Input.GetKey(KeyCode.Tab) || RoundScript.Instance.RoundStopped;
 
-        foreach (var log in ChatLog)
+        foreach (ChatMessage log in ChatLog)
             log.Life += Time.deltaTime;
     }
 
@@ -52,13 +52,13 @@ public class ChatScript : MonoBehaviour {
 
         GUI.skin = Skin;
 
-        var enteredChat = !showChat && (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.T);
+        bool enteredChat = !showChat && (Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.T);
         if (enteredChat) {
             //Debug.Log("Should enter chat");
             showChat = true;
         }
 
-        var height = 36 + ChatLog.Count(x => !x.Hidden || forceVisible) * 36;
+        int height = 36 + ChatLog.Count(x => !x.Hidden || forceVisible) * 36;
         GUILayout.Window(1, new Rect(35, Screen.height - height, 247, height), Chat, string.Empty);
 
         if (enteredChat) {
@@ -70,7 +70,7 @@ public class ChatScript : MonoBehaviour {
 
     void Chat(int windowId) {
         try {
-            foreach (var log in ChatLog) {
+            foreach (ChatMessage log in ChatLog) {
                 if (!PlayerRegistry.Has(log.Player))
                     continue;
 
@@ -111,7 +111,7 @@ public class ChatScript : MonoBehaviour {
                 if (Event.current.keyCode == KeyCode.Return && (Event.current.type == EventType.KeyDown || Event.current.type == EventType.Layout)) {
                     lastMessage = lastMessage.Trim();
                     if (lastMessage.StartsWith("/")) {
-                        var messageParts = lastMessage.Split(' ');
+                        string[] messageParts = lastMessage.Split(' ');
 
                         // console commands
                         switch (messageParts[0]) {
@@ -150,9 +150,9 @@ public class ChatScript : MonoBehaviour {
                             case "/spectate":
                                 if (!ServerScript.Spectating) {
                                     bool isDead = false;
-                                    foreach (var p in FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>())
+                                    foreach (PlayerScript p in FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>())
                                         if (p.networkView != null && p.networkView.isMine) {
-                                            var h = p.GetComponent<HealthScript>();
+                                            HealthScript h = p.GetComponent<HealthScript>();
                                             if (h.Health == 0) {
                                                 LogChat(Network.player, "Wait until you respawned to spectate", true, true);
                                                 isDead = true;
@@ -174,7 +174,7 @@ public class ChatScript : MonoBehaviour {
 
                             case "/join":
                                 if (ServerScript.Spectating) {
-                                    foreach (var p in FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>())
+                                    foreach (PlayerScript p in FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>())
                                         if (p.networkView != null && p.networkView.isMine)
                                             p.GetComponent<HealthScript>().Respawn(RespawnZone.GetRespawnPoint());
 
