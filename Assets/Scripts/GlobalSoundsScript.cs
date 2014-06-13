@@ -34,11 +34,7 @@ public class GlobalSoundsScript : MonoBehaviour {
     }
 
     void OnLevelWasLoaded(int levelIndex) {
-        var indexInArray = levelIndex - 1;
-
-        if (indexInArray < songs.Length) {
-            audio.clip = songs[indexInArray];
-            audio.Play();
-        }
+        audio.clip = songs[(levelIndex - 1) % songs.Length];
+        audio.Play();
     }
 }
