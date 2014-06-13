@@ -3,7 +3,7 @@
 --- !u!29 &1
 SceneSettings:
   m_ObjectHideFlags: 0
-  m_PVSData:
+  m_PVSData: 
   m_PVSObjectsArray: []
   m_PVSPortalsArray: []
   m_OcclusionBakeSettings:
@@ -114,8 +114,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a8433ff6a1df0124f84694dbb12c8210, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &210913193
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -126,8 +126,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3a1c81fec6ec31d4fa1c635003351894, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &502558917
 GameObject:
   m_ObjectHideFlags: 0
@@ -171,15 +171,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4ca73633617af3843b5c4b80f9d3dd87, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   allowedLevels:
   - pi_rah
   - pi_mar
   - pi_ven
   - pi_gho
   - pi_set
-  localMode: 0
+  lanMode: 0
   peerType: 0
   guiSkin: {fileID: 11400000, guid: ca3d138dd65c2564f9ccc4895664196a, type: 2}
 --- !u!114 &502558920
@@ -192,8 +192,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 008e301b5801481479ca10b930911386, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   PlayerTemplate: {fileID: 100000, guid: 11a4e5f239d167a44bfaf435661ccd48, type: 2}
   PlayerRegistryPrefab: {fileID: 100000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
 --- !u!148 &502558921
@@ -251,7 +251,7 @@ Renderer:
   m_LightmapTilingOffset: {x: 1, y: 1, z: 0, w: 0}
   m_Materials:
   - {fileID: 2100000, guid: 7acfed8e1ae424d329ae3efedb5ed64a, type: 2}
-  m_SubsetIndices:
+  m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
   m_LightProbeAnchor: {fileID: 0}
@@ -293,9 +293,7 @@ GameObject:
   - 92: {fileID: 656731832}
   - 124: {fileID: 656731833}
   - 81: {fileID: 656731831}
-  - 114: {fileID: 656731835}
   - 114: {fileID: 656731834}
-  - 114: {fileID: 656731836}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -378,31 +376,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7a9a9515839867342a6eeb2883192f8a, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
---- !u!114 &656731835
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 11400002, guid: c96dbb7712a004beb84ace25193b3eae,
-    type: 2}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 656731828}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bef3d242a13c447ac90c2d2dc213b1ea, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
---- !u!114 &656731836
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 656731828}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 57378565f2adf4d3fbe949ebe1453f09, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1036526807
 GameObject:
   m_ObjectHideFlags: 0
@@ -440,8 +415,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2d634b6c68fdf1141aea370dc60cf03d, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   skin: {fileID: 11400000, guid: ca3d138dd65c2564f9ccc4895664196a, type: 2}
   baseSensitivity: 3
 --- !u!1 &1050480389
@@ -481,8 +456,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 975ef170386c6444c8423491dc401bed, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   Skin: {fileID: 11400000, guid: ca3d138dd65c2564f9ccc4895664196a, type: 2}
   LeaderboardPrefab: {fileID: 100000, guid: 362a005554fac104bba3727bacc55eaa, type: 2}
 --- !u!1 &1198184569
@@ -525,8 +500,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 28cf5f66524ca6149acfed6d02941eac, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   rotateSpeed: .200000003
   sign: 1
 --- !u!1 &1271378265
@@ -666,8 +641,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5285882bee6370948860ff1ec08b6f34, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   explosionPrefab: {fileID: 100000, guid: b4d7217f2a5f71f4fa566f5dce6c36b3, type: 2}
   explosionHitPrefab: {fileID: 100000, guid: 55246ff3c507476458227ef1615a081f, type: 2}
   areaExplosionPrefab: {fileID: 100000, guid: 1aa3b4ef5d08ba648bdc957a48c7b97a, type: 2}
@@ -723,8 +698,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7abaee3f0789e4bf7a899e986163edc8, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1834919049
 GameObject:
   m_ObjectHideFlags: 0
@@ -776,8 +751,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8e6cc0494fa0f495a8c04f5b907a76be, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   Skin: {fileID: 11400000, guid: ca3d138dd65c2564f9ccc4895664196a, type: 2}
   showChat: 0
 --- !u!1 &2049539267
@@ -819,8 +794,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 51c6e7fc93ef3f3489c5dd2e4ff57774, type: 3}
-  m_Name:
-  m_EditorClassIdentifier:
+  m_Name: 
+  m_EditorClassIdentifier: 
   buttonPressSound: {fileID: 1271378267}
   songs:
   - {fileID: 8300000, guid: 07f28d2eb73974f818f7786a07d023e4, type: 3}
@@ -838,7 +813,7 @@ AudioSource:
   serializedVersion: 3
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: .300000012
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -929,7 +904,7 @@ Renderer:
   m_LightmapTilingOffset: {x: 1, y: 1, z: 0, w: 0}
   m_Materials:
   - {fileID: 2100000, guid: 100bd6e33cf0f481e97333afda9d3001, type: 2}
-  m_SubsetIndices:
+  m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
   m_LightProbeAnchor: {fileID: 0}

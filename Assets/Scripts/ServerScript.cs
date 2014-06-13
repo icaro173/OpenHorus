@@ -18,9 +18,9 @@ public class ServerScript : MonoBehaviour {
     //Publioc
     public const int port = 31415;
     public string[] allowedLevels = { "pi_rah", "pi_jst", "pi_mar", "pi_ven", "pi_gho", "pi_set" };
-    public const int buildVersion = 13062014;
-    public bool localMode = false;
-    public const string MasterServerUri = "http://api.xxiivv.com/?key=wfh";
+    public const string buildVersion = "13062014";
+    public bool lanMode = false;
+    public const string MasterServerUri = "http://ohs.padrepio.in/";
     public NetworkPeerType peerType;
     public GUISkin guiSkin;
 
@@ -30,6 +30,7 @@ public class ServerScript : MonoBehaviour {
 
     //Private
     private const int MaxPlayers = 6;
+    private const int RefreshTime = 15;
 
     private static JsonSerializerSettings jsonSettings = new Newtonsoft.Json.JsonSerializerSettings {
         TypeNameHandling = TypeNameHandling.Auto,
@@ -38,8 +39,8 @@ public class ServerScript : MonoBehaviour {
     };
 
     private IFuture<string> wanIp;
-    private IFuture<ReadResponse> readResponse;
-    private IFuture<int> thisServerId;
+    private IFuture<ServerList> serverList;
+    private IFuture<string> serverToken;
     private  ServerInfo currentServer;
     private string chosenUsername = "Anon";
 
@@ -57,20 +58,28 @@ public class ServerScript : MonoBehaviour {
     private float sinceStartedDiscovery;
     private string lastLevelName;
 
-    class ReadResponse {
+    class ServerList {
         public string Message = null;
         public int Connections = 0;
         public int Activegames = 0;
         public ServerInfo[] Servers = null;
     }
 
+    class ServerItem {
+        public int Status;
+        public string Token;
+        public ServerInfo Info;
+    }
+
     class ServerInfo {
-        public string Ip;
-        public int Players;
-        public string Map;
-        public int Id;
+        public string GUID = "";
+        public string Map = "";
+        public string Version = "";
+        public int CurrentPlayers = 0;
+        public int MaxPlayers = 0;
+
+        [JsonIgnore]
         public bool ConnectionFailed;
-        public int Version;
 
         public override string ToString() {
             return JsonConvert.SerializeObject(this, jsonSettings);
@@ -86,6 +95,7 @@ public class ServerScript : MonoBehaviour {
         ReadyToConnect,
         WaitingForNat,
         ReadyToHost,
+        AttemptingToHost,
         Hosting,
         Connected
     }
@@ -122,22 +132,25 @@ public class ServerScript : MonoBehaviour {
                 break;
 
             case HostingState.WaitingForServers:
-                if (!readResponse.HasValue && !readResponse.InError)
+                if (!serverList.HasValue && !serverList.InError)
                     break;
 
                 hostState = HostingState.ReadyToChooseServer;
                 break;
 
             case HostingState.ReadyToChooseServer:
-                if (readResponse == null) {
+                if (serverList == null) {
                     hostState = HostingState.ReadyToListServers;
                     return;
                 }
 
-                currentServer = readResponse.Value.Servers.OrderBy(x => x.Players).ThenBy(x => Guid.NewGuid()).FirstOrDefault(x => !x.ConnectionFailed && x.Players < MaxPlayers && x.Version == buildVersion); //&& x.BuildVer == BuildVersion
+                currentServer = serverList.Value.Servers
+                    .OrderBy(x => x.CurrentPlayers)
+                    .ThenBy(x => Guid.NewGuid())
+                    .FirstOrDefault(x => x.CurrentPlayers < x.MaxPlayers && x.Version == buildVersion);
                 if (currentServer == null) {
                     Debug.Log("Tried to find server, failed. Returning to interactive state.");
-                    readResponse = null;
+                    serverList = null;
                     hostState = HostingState.WaitingForInput;
                 } else {
                     hostState = HostingState.ReadyToConnect;
@@ -149,7 +162,7 @@ public class ServerScript : MonoBehaviour {
                     Debug.Log("NAT discovery started");
                     StartNatDiscovery();
                 }
-                hostState = localMode ? HostingState.ReadyToHost : HostingState.WaitingForNat;
+                hostState = lanMode ? HostingState.ReadyToHost : HostingState.WaitingForNat;
                 break;
 
             case HostingState.WaitingForNat:
@@ -185,13 +198,13 @@ public class ServerScript : MonoBehaviour {
 
             case HostingState.ReadyToHost:
                 if (CreateServer()) {
-                    hostState = HostingState.Hosting;
+                    hostState = HostingState.AttemptingToHost;
                     AddServerToList();
                     lastPlayerCount = 0;
                     lastLevelName = RoundScript.Instance.CurrentLevel;
                     sinceRefreshedPlayers = 0;
                 } else {
-                    Debug.Log("Couldn't create server, will try joining instead");
+                    Debug.Log("Failed to create error");
                     hostState = HostingState.ReadyToChooseServer;
                 }
                 break;
@@ -202,16 +215,16 @@ public class ServerScript : MonoBehaviour {
                     break;
                 }
 
-                sinceRefreshedPlayers += Time.deltaTime;
+                sinceRefreshedPlayers -= Time.deltaTime;
 
-                if (thisServerId.HasValue &&
+                if (serverToken.HasValue &&
                         (lastPlayerCount != Network.connections.Length ||
                          lastLevelName != RoundScript.Instance.CurrentLevel ||
-                         sinceRefreshedPlayers > 25)
+                         sinceRefreshedPlayers <= 0)
                 ) {
                     Debug.Log("Refreshing...");
-                    RefreshListedServer();
-                    sinceRefreshedPlayers = 0;
+                    UpdateServer();
+                    sinceRefreshedPlayers = RefreshTime;
                     lastPlayerCount = Network.connections.Length;
                     lastLevelName = RoundScript.Instance.CurrentLevel;
                 }
@@ -236,11 +249,9 @@ public class ServerScript : MonoBehaviour {
 
         if (peerType == NetworkPeerType.Connecting || peerType == NetworkPeerType.Disconnected) {
             // Welcome message is now a chat prompt
-            if (readResponse != null && readResponse.HasValue) {
-                var message = "Server activity : " + readResponse.Value.Connections + " players in " + readResponse.Value.Activegames + " games.";
-                message = message.ToUpperInvariant();
-
-                GUI.Box(new Rect((Screen.width / 2) - 122, Screen.height - 145, 248, 35), message);
+            if (serverList != null && serverList.HasValue) {
+                var message = "Server activity : " + serverList.Value.Connections + " players in " + serverList.Value.Activegames + " games.";
+                GUI.Box(new Rect((Screen.width / 2) - 122, Screen.height - 145, 248, 35), message.ToUpperInvariant());
             }
 
             Screen.showCursor = true;
@@ -288,28 +299,31 @@ public class ServerScript : MonoBehaviour {
         }
     }
 
+    // Get list of servers from the master server
     void QueryServerList() {
-        int[] blackList = null;
-        if (readResponse != null && readResponse.HasValue) {
-            blackList = readResponse.Value.Servers.Where(x => x.ConnectionFailed).Select(x => x.Id).ToArray();
-            if (blackList.Length > 0) {
-                Debug.Log("blacklisted servers : " + blackList.Skip(1).Aggregate(blackList[0].ToString(), (s, i) => s + ", " + i.ToString()));
-            }
+        // Create server blacklist (remove servers we failed to connect to)
+        string[] blackList = null;
+        if (serverList != null && serverList.HasValue) {
+            blackList = serverList.Value.Servers.Where(x => x.ConnectionFailed).Select(x => x.GUID).ToArray();
         }
 
-        readResponse = ThreadPool.Instance.Evaluate(() => {
-            using (var client = new WebClient()) {
-                var response = client.DownloadString(MasterServerUri + "&cmd=read");
+        // Grab new server list
+        serverList = ThreadPool.Instance.Evaluate(() => {
+            using (WebClient client = new WebClient()) {
+                // HTTP GET
+                // TODO: Handle if the server is down
+                string response = client.DownloadString(MasterServerUri);
 
                 try {
-                    ReadResponse data = JsonConvert.DeserializeObject<ReadResponse>(response, jsonSettings);
-                    Debug.Log("MOTD : " + data.Message);
-                    Debug.Log(data.Servers.Length + " servers : ");
-                    foreach (ServerInfo s in data.Servers) {
-                        s.ConnectionFailed = blackList.Contains(s.Id);
-                        Debug.Log(s + (s.ConnectionFailed ? " (blacklisted)" : ""));
+                    ServerList servers = JsonConvert.DeserializeObject<ServerList>(response, jsonSettings);
+
+                    // Blacklist things that failed before
+                    foreach (ServerInfo s in servers.Servers) {
+                        s.ConnectionFailed = blackList.Contains(s.GUID);
                     }
-                    return data;
+
+                    // Return server list
+                    return servers;
                 } catch (Exception ex) {
                     Debug.Log(ex.ToString());
                     throw ex;
@@ -318,72 +332,81 @@ public class ServerScript : MonoBehaviour {
         });
     }
 
+    // Add our own hoster server to the list on the master server
     void AddServerToList() {
         // TODO: Replace with new master server code
-        thisServerId = ThreadPool.Instance.Evaluate(() => {
-            if (localMode) {
-                return 0;
-            }
+        serverToken = ThreadPool.Instance.Evaluate(() => {
+            // Do nothing on LAN-only mode
+            if (lanMode) { return ""; }
 
-            using (var client = new WebClient()) {
-                string result = JsonConvert.SerializeObject(currentServer);
-                Debug.Log("server json : " + result);
+            using (WebClient client = new WebClient()) {
+                // Serialize server info to JSON
+                string currentServerJSON = JsonConvert.SerializeObject(currentServer);
 
                 // then add new server
-                var nvc = new NameValueCollection { { "value", result } };
-                var uri = MasterServerUri + "&cmd=add";
-                var response = Encoding.ASCII.GetString(client.UploadValues(uri, nvc));
-                Debug.Log("Added server, got id = " + response);
-                currentServer.Id = int.Parse(response);
-                return int.Parse(response);
+                // TODO: Handle if the server is down
+                string token = client.UploadString(MasterServerUri + "/add", currentServerJSON);
+
+                // We are now hosting
+                hostState = HostingState.Hosting;
+
+                return token;
             }
         });
     }
 
-    void RefreshListedServer() {
-        // TODO: Replace with new master server code
-        currentServer.Players = Network.connections.Length +1;
-        ThreadPool.Instance.Fire(() => {
-            if (localMode) {
-                return;
-            }
+    // Update our server status on the master server
+    void UpdateServer() {
+        // Do nothing on LAN-only mode
+        if (lanMode) { return; }
+
+        //ThreadPool.Instance.Fire(() => {
             using (WebClient client = new WebClient()) {
-                string result = JsonConvert.SerializeObject(currentServer);
+                // Setup data to send
+                ServerItem serverItem = new ServerItem();
+                serverItem.Status = 0; // Running
+                serverItem.Token = serverToken.Value;
+                serverItem.Info = currentServer;
 
-                Debug.Log("server json : " + result);
+                // Create player count
+                currentServer.CurrentPlayers = Network.connections.Length;
 
-                // update!
-                NameValueCollection nvc = new NameValueCollection { { "value", result } };
-                string uri = MasterServerUri + "&cmd=update";
-                string response = Encoding.ASCII.GetString(client.UploadValues(uri, nvc));
-                Debug.Log(uri);
-                Debug.Log("Refreshed server with connection count to " + currentServer.Players + " and map " + currentServer.Map + ", server said : " + response);
+                // Create JSON string
+                string serverItemJSON = JsonConvert.SerializeObject(serverItem);
+
+                // Update
+                try {
+                    client.UploadString(MasterServerUri + "/update", serverItemJSON);
+                } catch (System.Net.WebException ex) {
+                    // TODO: Exit gracefully when server is down or expired
+                    Debug.LogError(ex.Message);
+                }
             }
-        });
+        //});
     }
 
+    // Delete our server from the list
     void DeleteServer() {
-        // TODO: Replace with new master server code
-        if (localMode) {
-            return;
-        }
+        Debug.Log("DeleteServer");
+        // Do nothing on LAN-only mode
+        if (lanMode) { return; }
+
         using (WebClient client = new WebClient()) {
-            Uri uri = new Uri(MasterServerUri + "&cmd=delete&id=" + thisServerId.Value);
-            NameValueCollection nvc = new NameValueCollection { { "", "" } };
-            string response = Encoding.ASCII.GetString(client.UploadValues(uri, nvc));
-            Debug.Log("Deleted server " + thisServerId.Value + ", server said : " + response);
+            // TODO: Handle if the server is down
+            client.UploadString(MasterServerUri + "/delete", serverToken.Value);
+            Debug.Log("DeleteServer DONE");
         }
     }
 
     bool CreateServer() {
-        // TODO: Replace with new master server code
         var result = Network.InitializeServer(MaxPlayers, port, true);
         if (result == NetworkConnectionError.NoError) {
             currentServer = new ServerInfo {
-                Ip = Network.player.guid,
+                GUID = Network.player.guid,
                 Map = RoundScript.Instance.CurrentLevel,
-                Players = 1,
-                Version = buildVersion
+                Version = buildVersion,
+                MaxPlayers = MaxPlayers,
+                CurrentPlayers = 0
             };
             return true;
         }
@@ -409,8 +432,8 @@ public class ServerScript : MonoBehaviour {
     }
 
     bool Connect() {
-        Debug.Log("Connecting to " + currentServer.Ip);
-        var result = Network.Connect(currentServer.Ip);
+        Debug.Log("Connecting to " + currentServer.GUID);
+        var result = Network.Connect(currentServer.GUID);
         if (result != NetworkConnectionError.NoError) {
             return false;
         }
@@ -429,7 +452,8 @@ public class ServerScript : MonoBehaviour {
     void StartNatDiscovery() {
         natDiscoveryStarted = true;
 
-        if (localMode) return;
+        // Do nothing on LAN-only mode
+        if (lanMode) { return; }
 
         // Add discovery callbacks
         NatUtility.DeviceFound += (s, ea) => {
