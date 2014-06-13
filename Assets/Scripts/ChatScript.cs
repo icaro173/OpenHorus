@@ -7,7 +7,6 @@ public class ChatScript : MonoBehaviour {
     public readonly List<ChatMessage> ChatLog = new List<ChatMessage>();
 
     public GUISkin Skin;
-    GUIStyle ChatStyle, MyChatStyle;
 
     string lastMessage = "";
     public bool showChat;
@@ -23,11 +22,6 @@ public class ChatScript : MonoBehaviour {
     void OnDestroy() {
         if (Instance == this)
             Instance = null;
-    }
-
-    void Start() {
-        ChatStyle = new GUIStyle { normal = { textColor = Color.white }, padding = { top = 9, left = 5, right = 10 }, fixedWidth = 209, fixedHeight = 32 };
-        MyChatStyle = new GUIStyle(ChatStyle) { normal = { background = Skin.window.normal.background } };
     }
 
     void OnServerInitialized() {
@@ -87,7 +81,6 @@ public class ChatScript : MonoBehaviour {
                     continue;
 
                 GUIStyle rowStyle = new GUIStyle(Skin.box) { fixedWidth = 200 };
-                //if (log.Player == Network.player && !log.IsSystem) rowStyle = MyChatStyle;
 
                 GUILayout.BeginHorizontal();
 
@@ -96,30 +89,7 @@ public class ChatScript : MonoBehaviour {
 
                 String message = (log.IsSourceless ? "" : (PlayerRegistry.For(log.Player).Username.ToUpper() + ": ")) + log.Message;
 
-                /*if( log.IsSystem )
-                {
-                    if( !log.IsSourceless )
-                    {
-                        var playerName = PlayerRegistry.For(log.Player).Username.ToUpper();
-                        //rowStyle.fixedWidth = rowStyle.CalcSize(new GUIContent(playerName)).x;
-                        GUILayout.Box( playerName, rowStyle );
-                    }
-                    else
-                    {
-                        rowStyle.fixedWidth = rowStyle.CalcSize(new GUIContent(" ")).x;
-                        rowStyle.padding.left = 0;
-                        GUILayout.Label(" ", rowStyle);
-                    }
-					
-                    GUILayout.Box( " " + log.Message, rowStyle );
-                }
-                else
-                {
-                    GUILayout.Box( PlayerRegistry.For(log.Player).Username.ToUpper() + ":", rowStyle );
-                    GUILayout.Box( log.Message, rowStyle, GUILayout.MaxWidth(225)); 
-                }*/
                 GUILayout.Box(message);
-
                 GUILayout.EndHorizontal();
             }
 
@@ -166,10 +136,10 @@ public class ChatScript : MonoBehaviour {
                                 else if (Application.loadedLevelName == messageParts[1])
                                     LogChat(Network.player, "You're already in " + messageParts[1] + ", dummy.",
                                             true, true);
-                                else if (!ServerScript.Instance.AllowedLevels.Contains(messageParts[1]))
+                                else if (!ServerScript.Instance.allowedLevels.Contains(messageParts[1]))
                                     LogChat(Network.player,
                                             "Level " + messageParts[1] + " does not exist. " +
-                                            StringHelper.DeepToString(ServerScript.Instance.AllowedLevels), true, true);
+                                            StringHelper.DeepToString(ServerScript.Instance.allowedLevels), true, true);
                                 else {
                                     RoundScript.Instance.networkView.RPC("ChangeLevelTo", RPCMode.All,
                                                                             messageParts[1]);
@@ -227,7 +197,7 @@ public class ChatScript : MonoBehaviour {
                                     Network.Disconnect();
                                     ServerScript.Spectating = false;
                                     TaskManager.Instance.WaitFor(0.75f).Then(
-                                        () => Network.Connect(messageParts[1], ServerScript.Port));
+                                        () => Network.Connect(messageParts[1], ServerScript.port));
                                 });
                                 break;
 
@@ -268,7 +238,6 @@ public class ChatScript : MonoBehaviour {
 
     [RPC]
     public void LogChat(NetworkPlayer player, string message, bool systemMessage, bool isSourceless) {
-        //ChatLog.Insert(0, new Pair<string, string>(username, message));
         ChatLog.Add(new ChatMessage { Player = player, Message = message, IsSystem = systemMessage, IsSourceless = isSourceless });
         if (ChatLog.Count > 60)
             ChatLog.RemoveAt(0);
