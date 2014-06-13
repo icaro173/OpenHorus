@@ -568,7 +568,7 @@ public class ServerScript : MonoBehaviour {
     }
 
     void OnDisconnectedFromServer(NetworkDisconnection info) {
-        if (currentServer != null) {
+        if (Network.isServer && currentServer != null) {
             DeleteServer();
         }
 
