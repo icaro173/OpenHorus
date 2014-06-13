@@ -28,12 +28,13 @@ public class ServerScript : MonoBehaviour {
 
     public bool isLoading = false;
     public static bool Spectating;
-    public static HostingState state {
-        get { return hostState; }
+    public static HostingState hostState {
+        get { return _hostState; }
         set {
-            HostingState oldstate = hostState;
-            hostState = value;
-            Instance.hostStateChanged(oldstate, hostState);
+            HostingState oldstate = _hostState;
+            _hostState = value;
+            Debug.Log("HostState: " + _hostState);
+            hostStateChanged(oldstate, _hostState);
         }
     }
 
@@ -42,11 +43,13 @@ public class ServerScript : MonoBehaviour {
     private const int RefreshTime = 15;
 
     private IFuture<string> wanIp;
-    private IFuture<ServerList> serverList;
+    private ServerList serverList = null;
     private string serverToken;
     private ServerInfo currentServer;
     private string chosenUsername = "Anon";
-    private static HostingState hostState;
+    private static HostingState _hostState = HostingState.Startup;
+    private delegate void stateChangedCB(HostingState oldstate, HostingState currentstate);
+    private static Dictionary<HostingState, stateChangedCB> hostStateCallbacks = null;
 
     private static JsonSerializerSettings jsonSettings = new Newtonsoft.Json.JsonSerializerSettings {
         TypeNameHandling = TypeNameHandling.Auto,
@@ -102,12 +105,12 @@ public class ServerScript : MonoBehaviour {
     }
 
     public enum HostingState {
+        Startup,
+        WaitingForInitialServers,
         WaitingForInput,
-        ReadyToListServers,
-        WaitingForServers,
-        ReadyToChooseServer,
-        ReadyToDiscoverNat,
-        ReadyToConnect,
+        ChoosingServer,
+        DiscoveringNAT,
+        Connecting,
         WaitingForNat,
         ReadyToHost,
         AttemptingToHost,
@@ -129,68 +132,93 @@ public class ServerScript : MonoBehaviour {
         // Set target frame rate for the game
         Application.targetFrameRate = 60;
 
+        // Setup state changes
+        createStateChangeCallbacks();
+
         // Select a random level as background and map for hosting
         RoundScript.Instance.CurrentLevel = RandomHelper.InEnumerable(allowedLevels);
         ChangeLevelIfNeeded(RoundScript.Instance.CurrentLevel);
 
-        hostState = HostingState.WaitingForInput;
-
-        // Get list of servers
-        QueryServerList();
+        // Startup the state chain
+        hostState = HostingState.Startup;
     }
 
-    void hostStateChanged(HostingState oldstate, HostingState currentstate) {
-
+    static void hostStateChanged(HostingState oldstate, HostingState currentstate) {
+        if (hostStateCallbacks != null && hostStateCallbacks.ContainsKey(currentstate)) {
+            hostStateCallbacks[currentstate](oldstate, currentstate);
+        }
     }
 
     void createStateChangeCallbacks() {
+        hostStateCallbacks = new Dictionary<HostingState, stateChangedCB>();
 
+        hostStateCallbacks.Add(HostingState.Startup, (old, current) => QueryServerList());
+        hostStateCallbacks.Add(HostingState.ChoosingServer, onChoosingServer);
+        hostStateCallbacks.Add(HostingState.Connecting, onConnecting);
+        hostStateCallbacks.Add(HostingState.DiscoveringNAT, onDiscoveringNAT);
+        hostStateCallbacks.Add(HostingState.ReadyToHost, onReadyToHost);
+    }
+
+    // This state is when the payer has pressed Join, auto select a server
+    void onChoosingServer(HostingState oldstate, HostingState currentstate) {
+        // We got not servers from the master, refresh again in 1 second
+        if (serverList == null || serverList.Servers == null || serverList.Servers.Length == 0) {
+            hostState = HostingState.Startup;
+            return;
+        }
+
+        // Filter out useless servers
+        currentServer = serverList.Servers
+            .OrderBy(x => x.CurrentPlayers)
+            .ThenBy(x => Guid.NewGuid())
+            .FirstOrDefault(x => x.CurrentPlayers < x.MaxPlayers && x.Version == buildVersion);
+
+        if (currentServer == null) {
+            // TODO: Somehow put this on screen
+            Debug.Log("Tried to find server, failed. Returning to interactive state.");
+            serverList = null;
+            // Failed to find a server, restart the search
+            hostState = HostingState.Startup;
+        } else {
+            // Server found, connect
+            hostState = HostingState.Connecting;
+        }
+    }
+
+    void onConnecting(HostingState oldstate, HostingState currentstate) {
+        if (Connect()) {
+            hostState = HostingState.Connected;
+        } else {
+            currentServer.ConnectionFailed = true;
+            // TODO: Get this on the screen
+            Debug.Log("Couldn't connect, will try choosing another server");
+            hostState = HostingState.Startup;
+        }
+    }
+
+    void onDiscoveringNAT(HostingState oldstate, HostingState currentstate) {
+        if (!natDiscoveryStarted) {
+            StartNatDiscovery();
+        }
+        hostState = lanMode ? HostingState.ReadyToHost : HostingState.WaitingForNat;
+    }
+
+    void onReadyToHost(HostingState oldstate, HostingState currentstate) {
+        if (CreateServer()) {
+            hostState = HostingState.AttemptingToHost;
+            AddServerToList();
+            lastPlayerCount = 0;
+            lastLevelName = RoundScript.Instance.CurrentLevel;
+            sinceRefreshedPlayers = 0;
+        } else {
+            Debug.Log("Failed to create error");
+            hostState = HostingState.ChoosingServer;
+        }
     }
 
     void Update() {
         // Automatic host/connect logic follows
-        switch (hostState) {
-            case HostingState.ReadyToListServers:
-                QueryServerList();
-                break;
-
-            case HostingState.WaitingForServers:
-                if (!serverList.HasValue && !serverList.InError)
-                    break;
-
-                hostState = HostingState.ReadyToChooseServer;
-                break;
-
-            case HostingState.ReadyToChooseServer:
-                // We have no server list, go fetch
-                if (serverList == null || !serverList.HasValue || serverList.Value.Servers == null) {
-                    hostState = HostingState.ReadyToListServers;
-                    return;
-                }
-
-                currentServer = serverList.Value.Servers
-                    .OrderBy(x => x.CurrentPlayers)
-                    .ThenBy(x => Guid.NewGuid())
-                    .FirstOrDefault(x => x.CurrentPlayers < x.MaxPlayers && x.Version == buildVersion);
-
-                if (currentServer == null) {
-
-                    Debug.Log("Tried to find server, failed. Returning to interactive state.");
-                    serverList = null;
-                    hostState = HostingState.WaitingForInput;
-                } else {
-                    hostState = HostingState.ReadyToConnect;
-                }
-                break;
-
-            case HostingState.ReadyToDiscoverNat:
-                if (!natDiscoveryStarted) {
-                    Debug.Log("NAT discovery started");
-                    StartNatDiscovery();
-                }
-                hostState = lanMode ? HostingState.ReadyToHost : HostingState.WaitingForNat;
-                break;
-
+        switch (hostState) {          
             case HostingState.WaitingForNat:
                 sinceStartedDiscovery += Time.deltaTime;
                 if (sinceStartedDiscovery > 0.5f) {
@@ -222,19 +250,6 @@ public class ServerScript : MonoBehaviour {
                 }
                 break;
 
-            case HostingState.ReadyToHost:
-                if (CreateServer()) {
-                    hostState = HostingState.AttemptingToHost;
-                    AddServerToList();
-                    lastPlayerCount = 0;
-                    lastLevelName = RoundScript.Instance.CurrentLevel;
-                    sinceRefreshedPlayers = 0;
-                } else {
-                    Debug.Log("Failed to create error");
-                    hostState = HostingState.ReadyToChooseServer;
-                }
-                break;
-
             case HostingState.Hosting:
                 if (!Network.isServer) {
                     Debug.LogError("Hosting but is not the server...?");
@@ -254,16 +269,6 @@ public class ServerScript : MonoBehaviour {
                     lastLevelName = RoundScript.Instance.CurrentLevel;
                 }
                 break;
-
-            case HostingState.ReadyToConnect:
-                if (Connect()) {
-                    hostState = HostingState.Connected;
-                } else {
-                    currentServer.ConnectionFailed = true;
-                    Debug.Log("Couldn't connect, will try choosing another server");
-                    hostState = HostingState.ReadyToChooseServer;
-                }
-                break;
         }
     }
 
@@ -274,8 +279,8 @@ public class ServerScript : MonoBehaviour {
 
         if (peerType == NetworkPeerType.Connecting || peerType == NetworkPeerType.Disconnected) {
             // Welcome message is now a chat prompt
-            if (serverList != null && serverList.HasValue) {
-                string message = "Server activity : " + serverList.Value.Connections + " players in " + serverList.Value.Activegames + " games.";
+            if (serverList != null && serverList != null) {
+                string message = "Server activity : " + serverList.Connections + " players in " + serverList.Activegames + " games.";
                 GUI.Box(new Rect((Screen.width / 2) - 122, Screen.height - 145, 248, 35), message.ToUpperInvariant());
             }
 
@@ -296,29 +301,26 @@ public class ServerScript : MonoBehaviour {
         switch (peerType) {
             case NetworkPeerType.Disconnected:
             case NetworkPeerType.Connecting:
-                GUI.enabled = hostState == HostingState.WaitingForInput;
                 GUILayout.BeginHorizontal();
                 chosenUsername = RemoveSpecialCharacters(GUILayout.TextField(chosenUsername));
                 PlayerPrefs.SetString("username", chosenUsername.Trim());
                 SendMessage("SetChosenUsername", chosenUsername.Trim());
 
-                GUI.enabled = hostState == HostingState.WaitingForInput && chosenUsername.Trim().Length != 0;
+                //GUI.enabled = hostState == HostingState.Startup && chosenUsername.Trim().Length != 0;
                 GUILayout.Box("", new GUIStyle(guiSkin.box) { fixedWidth = 1 });
                 if (GUILayout.Button("HOST") && hostState == HostingState.WaitingForInput) {
                     PlayerPrefs.Save();
                     GlobalSoundsScript.PlayButtonPress();
-                    hostState = HostingState.ReadyToDiscoverNat;
+                    hostState = HostingState.DiscoveringNAT;
                 }
                 GUILayout.Box("", new GUIStyle(guiSkin.box) { fixedWidth = 1 });
                 if (GUILayout.Button("JOIN") && hostState == HostingState.WaitingForInput) {
                     PlayerPrefs.Save();
                     GlobalSoundsScript.PlayButtonPress();
-                    hostState = HostingState.ReadyToListServers;
+                    hostState = HostingState.ChoosingServer;
                 }
-                GUI.enabled = true;
                 GUILayout.EndHorizontal();
-
-                GUI.enabled = true;
+                GUI.enabled = hostState == HostingState.WaitingForInput;
                 break;
         }
     }
@@ -327,15 +329,17 @@ public class ServerScript : MonoBehaviour {
     void QueryServerList() {
         // Create server blacklist (remove servers we failed to connect to)
         string[] blackList = null;
-        if (serverList != null && serverList.HasValue) {
-            blackList = serverList.Value.Servers.Where(x => x.ConnectionFailed).Select(x => x.GUID).ToArray();
+        if (serverList != null && serverList != null) {
+            blackList = serverList.Servers.Where(x => x.ConnectionFailed).Select(x => x.GUID).ToArray();
         }
 
-        //Update state to waiting for server list
-        hostState = HostingState.WaitingForServers;
+        // If this is the first time to grab the servers, make it switch state
+        if (hostState == HostingState.Startup) {
+            hostState = HostingState.WaitingForInitialServers;
+        }
 
         // Grab new server list
-        serverList = ThreadPool.Instance.Evaluate(() => {
+        ThreadPool.Instance.Fire(() => {
             using (WebClient client = new WebClient()) {
                 // HTTP GET
                 // TODO: Handle if the server is down
@@ -351,8 +355,8 @@ public class ServerScript : MonoBehaviour {
                         }
                     }
 
-                    // Return server list
-                    return servers;
+                    serverList = servers;
+                    hostState = HostingState.WaitingForInput;
                 } catch (Exception ex) {
                     Debug.Log(ex.ToString());
                     throw ex;
@@ -579,10 +583,10 @@ public class ServerScript : MonoBehaviour {
         // TODO: Inform player that it failed and why
         currentServer.ConnectionFailed = true;
         Debug.Log("Couldn't connect, will try choosing another server");
-        hostState = HostingState.ReadyToListServers;
+        hostState = HostingState.Startup;
     }
 
     void OnDisconnectedFromServer(NetworkDisconnection info) {
-        hostState = HostingState.WaitingForInput;
+        hostState = HostingState.Startup;
     }
 }

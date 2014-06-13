@@ -156,7 +156,7 @@ public class HealthScript : MonoBehaviour {
     }
 
     public void Hide() {
-        if (!(ServerScript.state == ServerScript.HostingState.Hosting || ServerScript.state == ServerScript.HostingState.Connected))
+        if (!(ServerScript.hostState == ServerScript.HostingState.Hosting || ServerScript.hostState == ServerScript.HostingState.Connected))
             return;
 
         Health = 0;
@@ -171,7 +171,7 @@ public class HealthScript : MonoBehaviour {
         }
     }
     public void UnHide() {
-        if (!(ServerScript.state == ServerScript.HostingState.Hosting || ServerScript.state == ServerScript.HostingState.Connected))
+        if (!(ServerScript.hostState == ServerScript.HostingState.Hosting || ServerScript.hostState == ServerScript.HostingState.Connected))
             return;
 
         foreach (Renderer r in GetComponentsInChildren<Renderer>()) if (r.name != "Canon" && r.name != "flag_flag" && r.name != "Cube" && r.name != "flag_pole") r.enabled = true; // Reenable non glitched renderers
@@ -196,7 +196,7 @@ public class HealthScript : MonoBehaviour {
     }
 
     public void Respawn(Vector3 position) {
-        if (!(ServerScript.state == ServerScript.HostingState.Hosting || ServerScript.state == ServerScript.HostingState.Connected))
+        if (!(ServerScript.hostState == ServerScript.HostingState.Hosting || ServerScript.hostState == ServerScript.HostingState.Connected))
             return;
 
         networkView.RPC("ToggleSpectate", RPCMode.All, false);
