@@ -109,10 +109,13 @@ public class RoundScript : MonoBehaviour {
                 if (player.networkView.isMine)
                     player.networkView.RPC("ImmediateRespawn", RPCMode.All);
 
-        WaitAndResume();
+        StartCoroutine(WaitAndResume());
     }
 
-    void WaitAndResume() {
+    IEnumerator WaitAndResume() {
+        while (ServerScript.isLoading)
+            yield return new WaitForSeconds(1 / 30f);
+
         foreach (var player in FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>())
             player.Paused = false;
 

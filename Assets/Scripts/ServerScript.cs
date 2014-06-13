@@ -23,6 +23,7 @@ public class ServerScript : MonoBehaviour {
     public const string MasterServerUri = "http://ohs.padrepio.in/";
     public NetworkPeerType peerType;
     public GUISkin guiSkin;
+    public static bool isLoading = false;
 
     public List<LeaderboardEntry> SavedLeaderboardEntries = new List<LeaderboardEntry>();
 
@@ -41,7 +42,7 @@ public class ServerScript : MonoBehaviour {
     private IFuture<string> wanIp;
     private IFuture<ServerList> serverList;
     private string serverToken;
-    private  ServerInfo currentServer;
+    private ServerInfo currentServer;
     private string chosenUsername = "Anon";
 
     private enum MappingStatus { InProgress, Success, Failure }
@@ -140,7 +141,7 @@ public class ServerScript : MonoBehaviour {
 
             case HostingState.ReadyToChooseServer:
                 // We have no server list, go fetch
-                if (serverList == null || serverList.Value.Servers == null) {
+                if (serverList == null || !serverList.HasValue || serverList.Value.Servers == null) {
                     hostState = HostingState.ReadyToListServers;
                     return;
                 }
@@ -318,8 +319,12 @@ public class ServerScript : MonoBehaviour {
                     ServerList servers = JsonConvert.DeserializeObject<ServerList>(response, jsonSettings);
 
                     // Blacklist things that failed before
-                    foreach (ServerInfo s in servers.Servers) {
-                        s.ConnectionFailed = blackList.Contains(s.GUID);
+                    if (blackList != null && blackList.Length > 0)
+                    {
+                        foreach (ServerInfo s in servers.Servers)
+                        {
+                            s.ConnectionFailed = blackList.Contains(s.GUID);
+                        }
                     }
 
                     // Return server list
@@ -419,9 +424,11 @@ public class ServerScript : MonoBehaviour {
     }
 
     public void ChangeLevelIfNeeded(string newLevel) {
+        isLoading = true;
         Application.LoadLevel(newLevel);
         ChatScript.Instance.LogChat(Network.player, "Changed level to " + newLevel + ".", true, true);
         RoundScript.Instance.CurrentLevel = newLevel;
+        isLoading = false;
         if (currentServer != null) {
             currentServer.Map = RoundScript.Instance.CurrentLevel;
         }
@@ -439,6 +446,7 @@ public class ServerScript : MonoBehaviour {
 
     void OnConnectedToServer() {
         peerType = NetworkPeerType.Client;
+        isLoading = true;
     }
 
     void OnPlayerConnected(NetworkPlayer player) {
