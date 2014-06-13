@@ -11058,7 +11058,6 @@ Transform:
   m_Children:
   - {fileID: 1922881833}
   - {fileID: 800385090}
-  - {fileID: 2038781490}
   - {fileID: 2006150052}
   m_Father: {fileID: 1333200397}
   m_RootOrder: 0
@@ -52655,7 +52654,7 @@ Transform:
   m_LocalScale: {x: .307352275, y: .307352275, z: .307352275}
   m_Children: []
   m_Father: {fileID: 407067236}
-  m_RootOrder: 3
+  m_RootOrder: 2
 --- !u!1 &2006963551
 GameObject:
   m_ObjectHideFlags: 0
@@ -53370,64 +53369,6 @@ MeshCollider:
   m_SmoothSphereCollisions: 0
   m_Convex: 0
   m_Mesh: {fileID: 4300000, guid: 22b0b92ee83a5478898fdf9437625e4b, type: 3}
---- !u!1 &2038781489
-GameObject:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 100002, guid: d51fcc9817d8ccd4dbf7be561cc9e3de, type: 2}
-  m_PrefabInternal: {fileID: 0}
-  serializedVersion: 4
-  m_Component:
-  - 4: {fileID: 2038781490}
-  - 33: {fileID: 2038781492}
-  - 23: {fileID: 2038781491}
-  m_Layer: 0
-  m_Name: HologramGlowFocus
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
-  m_IsActive: 1
---- !u!4 &2038781490
-Transform:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 400002, guid: d51fcc9817d8ccd4dbf7be561cc9e3de, type: 2}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2038781489}
-  m_LocalRotation: {x: -1.68587391e-07, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: .307352275, y: .307352275, z: .307352275}
-  m_Children: []
-  m_Father: {fileID: 407067236}
-  m_RootOrder: 2
---- !u!23 &2038781491
-Renderer:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 2300000, guid: d51fcc9817d8ccd4dbf7be561cc9e3de,
-    type: 2}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2038781489}
-  m_Enabled: 1
-  m_CastShadows: 0
-  m_ReceiveShadows: 0
-  m_LightmapIndex: 0
-  m_LightmapTilingOffset: {x: .068359375, y: .068359375, z: .613014221, w: .853248596}
-  m_Materials:
-  - {fileID: 2100000, guid: 6faf0261432fa44f5a5b95429abfa452, type: 2}
-  m_SubsetIndices: 
-  m_StaticBatchRoot: {fileID: 0}
-  m_UseLightProbes: 0
-  m_LightProbeAnchor: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_SortingLayerID: 0
-  m_SortingOrder: 0
---- !u!33 &2038781492
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 3300000, guid: d51fcc9817d8ccd4dbf7be561cc9e3de,
-    type: 2}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2038781489}
-  m_Mesh: {fileID: 4300000, guid: b0a92ad1a7c1e4298bff96c9436c3260, type: 3}
 --- !u!1001 &2042531294
 Prefab:
   m_ObjectHideFlags: 0
