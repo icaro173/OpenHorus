@@ -9,3 +9,6 @@ obj
 Builds
 .DS_Store
 UpgradeLog.htm
+/OpenHorus-csharp.sln
+/OpenHorus-csharp.v12.suo
+/OpenHorus.sln

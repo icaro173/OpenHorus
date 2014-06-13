@@ -179,10 +179,9 @@ MonoBehaviour:
   - pi_ven
   - pi_gho
   - pi_set
+  localMode: 0
   peerType: 0
-  localMode: 1
   guiSkin: {fileID: 11400000, guid: ca3d138dd65c2564f9ccc4895664196a, type: 2}
-  buildVersion: 13062014
 --- !u!114 &502558920
 MonoBehaviour:
   m_ObjectHideFlags: 0
