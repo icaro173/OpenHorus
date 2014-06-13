@@ -40,7 +40,7 @@ public class ServerScript : MonoBehaviour {
 
     private IFuture<string> wanIp;
     private IFuture<ServerList> serverList;
-    private IFuture<string> serverToken;
+    private string serverToken;
     private  ServerInfo currentServer;
     private string chosenUsername = "Anon";
 
@@ -139,7 +139,8 @@ public class ServerScript : MonoBehaviour {
                 break;
 
             case HostingState.ReadyToChooseServer:
-                if (serverList == null) {
+                // We have no server list, go fetch
+                if (serverList == null || serverList.Value.Servers == null) {
                     hostState = HostingState.ReadyToListServers;
                     return;
                 }
@@ -148,6 +149,7 @@ public class ServerScript : MonoBehaviour {
                     .OrderBy(x => x.CurrentPlayers)
                     .ThenBy(x => Guid.NewGuid())
                     .FirstOrDefault(x => x.CurrentPlayers < x.MaxPlayers && x.Version == buildVersion);
+
                 if (currentServer == null) {
                     Debug.Log("Tried to find server, failed. Returning to interactive state.");
                     serverList = null;
@@ -217,10 +219,9 @@ public class ServerScript : MonoBehaviour {
 
                 sinceRefreshedPlayers -= Time.deltaTime;
 
-                if (serverToken.HasValue &&
-                        (lastPlayerCount != Network.connections.Length ||
-                         lastLevelName != RoundScript.Instance.CurrentLevel ||
-                         sinceRefreshedPlayers <= 0)
+                if (lastPlayerCount != Network.connections.Length ||
+                    lastLevelName != RoundScript.Instance.CurrentLevel ||
+                    sinceRefreshedPlayers <= 0
                 ) {
                     Debug.Log("Refreshing...");
                     UpdateServer();
@@ -277,7 +278,6 @@ public class ServerScript : MonoBehaviour {
                     PlayerPrefs.SetString("username", chosenUsername.Trim());
                     SendMessage("SetChosenUsername", chosenUsername.Trim());
 
-                    GUI.enabled = true;
                     GUI.enabled = hostState == HostingState.WaitingForInput && chosenUsername.Trim().Length != 0;
                     GUILayout.Box("", new GUIStyle(guiSkin.box) { fixedWidth = 1 });
                     if (GUILayout.Button("HOST") && hostState == HostingState.WaitingForInput) {
@@ -334,25 +334,20 @@ public class ServerScript : MonoBehaviour {
 
     // Add our own hoster server to the list on the master server
     void AddServerToList() {
-        // TODO: Replace with new master server code
-        serverToken = ThreadPool.Instance.Evaluate(() => {
-            // Do nothing on LAN-only mode
-            if (lanMode) { return ""; }
+        // Do nothing on LAN-only mode
+        if (lanMode) { serverToken = ""; }
 
-            using (WebClient client = new WebClient()) {
-                // Serialize server info to JSON
-                string currentServerJSON = JsonConvert.SerializeObject(currentServer);
+        using (WebClient client = new WebClient()) {
+            // Serialize server info to JSON
+            string currentServerJSON = JsonConvert.SerializeObject(currentServer);
 
-                // then add new server
-                // TODO: Handle if the server is down
-                string token = client.UploadString(MasterServerUri + "/add", currentServerJSON);
+            // then add new server
+            // TODO: Handle if the server is down
+            serverToken = client.UploadString(MasterServerUri + "/add", currentServerJSON);
 
-                // We are now hosting
-                hostState = HostingState.Hosting;
-
-                return token;
-            }
-        });
+            // We are now hosting
+            hostState = HostingState.Hosting;
+        }
     }
 
     // Update our server status on the master server
@@ -360,21 +355,22 @@ public class ServerScript : MonoBehaviour {
         // Do nothing on LAN-only mode
         if (lanMode) { return; }
 
-        //ThreadPool.Instance.Fire(() => {
+        // Setup data to send
+        ServerItem serverItem = new ServerItem();
+        serverItem.Status = 0; // Running
+        serverItem.Token = serverToken;
+        serverItem.Info = currentServer;
+
+        // Set player count
+        currentServer.CurrentPlayers = Network.connections.Length;
+
+        // Create JSON string
+        string serverItemJSON = JsonConvert.SerializeObject(serverItem);
+
+        // TODO: Maby replace with UploadStringAsync?
+        // Has to be Async, as a slow server response would block the game thread
+        ThreadPool.Instance.Fire(() => {
             using (WebClient client = new WebClient()) {
-                // Setup data to send
-                ServerItem serverItem = new ServerItem();
-                serverItem.Status = 0; // Running
-                serverItem.Token = serverToken.Value;
-                serverItem.Info = currentServer;
-
-                // Create player count
-                currentServer.CurrentPlayers = Network.connections.Length;
-
-                // Create JSON string
-                string serverItemJSON = JsonConvert.SerializeObject(serverItem);
-
-                // Update
                 try {
                     client.UploadString(MasterServerUri + "/update", serverItemJSON);
                 } catch (System.Net.WebException ex) {
@@ -382,7 +378,7 @@ public class ServerScript : MonoBehaviour {
                     Debug.LogError(ex.Message);
                 }
             }
-        //});
+        });
     }
 
     // Delete our server from the list
@@ -393,7 +389,7 @@ public class ServerScript : MonoBehaviour {
 
         using (WebClient client = new WebClient()) {
             // TODO: Handle if the server is down
-            client.UploadString(MasterServerUri + "/delete", serverToken.Value);
+            client.UploadString(MasterServerUri + "/delete", serverToken);
             Debug.Log("DeleteServer DONE");
         }
     }
