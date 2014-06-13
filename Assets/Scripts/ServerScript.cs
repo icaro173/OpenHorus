@@ -126,7 +126,7 @@ public class ServerScript : MonoBehaviour {
         WelcomeStyle = new GUIStyle { normal = { textColor = new Color(1, 1, 1, 1f) } };
 
         RoundScript.Instance.CurrentLevel = RandomHelper.InEnumerable(AllowedLevels);
-        ChangeLevelIfNeeded(RoundScript.Instance.CurrentLevel, true);
+        ChangeLevelIfNeeded(RoundScript.Instance.CurrentLevel);
 
         QueryServerList();
     }
@@ -401,29 +401,16 @@ public class ServerScript : MonoBehaviour {
     }
 
     public void ChangeLevel() {
-        ChangeLevelIfNeeded(RandomHelper.InEnumerable(AllowedLevels.Except(new[] { RoundScript.Instance.CurrentLevel })), false);
+        ChangeLevelIfNeeded(RandomHelper.InEnumerable(AllowedLevels.Except(new[] { RoundScript.Instance.CurrentLevel })));
     }
     void SyncAndSpawn(string newLevel) {
-        ChangeLevelIfNeeded(newLevel, false);
+        ChangeLevelIfNeeded(newLevel);
         SpawnScript.Instance.WaitAndSpawn();
     }
-    public void ChangeLevelIfNeeded(string newLevel) {
-        ChangeLevelIfNeeded(newLevel, false);
-    }
-    public void ChangeLevelIfNeeded(string newLevel, bool force) {
-        if (force) {
-            Application.LoadLevel(newLevel);
-            ChatScript.Instance.LogChat(Network.player, "Changed level to " + newLevel + ".", true, true);
-        } else if (newLevel != RoundScript.Instance.CurrentLevel) {
-            IsAsyncLoading = true;
-            var asyncOperation = Application.LoadLevelAsync(newLevel);
-            TaskManager.Instance.WaitUntil(x => asyncOperation.isDone).Then(() => {
-                IsAsyncLoading = false;
-                ChatScript.Instance.LogChat(Network.player, "Changed level to " + newLevel + ".", true, true);
-            });
-        } else
-            IsAsyncLoading = false;
 
+    public void ChangeLevelIfNeeded(string newLevel) {
+        Application.LoadLevel(newLevel);
+        ChatScript.Instance.LogChat(Network.player, "Changed level to " + newLevel + ".", true, true);
         RoundScript.Instance.CurrentLevel = newLevel;
         if (currentServer != null) currentServer.Map = RoundScript.Instance.CurrentLevel;
     }
