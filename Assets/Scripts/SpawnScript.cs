@@ -25,16 +25,7 @@ public class SpawnScript : MonoBehaviour {
         ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player, "connected", true, false);
     }
 
-    public void WaitAndSpawn() {
-        StartCoroutine(Co_WaitAndSpawn());
-    }
-    IEnumerator Co_WaitAndSpawn() {
-        while (ServerScript.IsAsyncLoading)
-            yield return new WaitForSeconds(1 / 30f);
-        Spawn();
-    }
-
-    void Spawn() {
+    public void Spawn() {
         if (ServerScript.Spectating) return;
 
         Network.Instantiate(PlayerTemplate, RespawnZone.GetRespawnPoint(), Quaternion.identity, 0);

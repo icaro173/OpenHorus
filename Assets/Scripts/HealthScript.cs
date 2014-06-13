@@ -158,17 +158,6 @@ public class HealthScript : MonoBehaviour {
 
     [RPC]
     void ImmediateRespawn() {
-        StartCoroutine(WaitAndRespawn());
-    }
-
-    IEnumerator WaitAndRespawn() {
-        Hide();
-
-        while (ServerScript.IsAsyncLoading)
-            yield return new WaitForSeconds(1 / 30f);
-
-        //Debug.Log("WaitAndRespawned");
-
         Respawn(RespawnZone.GetRespawnPoint());
     }
 

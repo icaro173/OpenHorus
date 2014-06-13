@@ -65,12 +65,6 @@ public class ServerScript : MonoBehaviour {
     GUIStyle TextStyle;
     GUIStyle WelcomeStyle;
 
-    static bool isAsyncLoading;
-    public static bool IsAsyncLoading {
-        get { return isAsyncLoading || Application.isLoadingLevel; }
-        private set { isAsyncLoading = value; }
-    }
-
     class ReadResponse {
         public string Message;
         public int Connections;
@@ -389,12 +383,6 @@ public class ServerScript : MonoBehaviour {
         var result = Network.InitializeServer(MaxPlayers, Port, true);
         if (result == NetworkConnectionError.NoError) {
             currentServer = new ServerInfo { Ip = Network.player.guid, Map = RoundScript.Instance.CurrentLevel, Players = 1, Version = BuildVersion }; //wanIp.Value
-
-            TaskManager.Instance.WaitUntil(_ => !IsAsyncLoading).Then(() => {
-                if (readResponse != null && readResponse.HasValue)
-                    ChatScript.Instance.LogChat(Network.player, readResponse.Value.Message, true, true);
-            });
-
             return true;
         }
         return false;
@@ -405,7 +393,7 @@ public class ServerScript : MonoBehaviour {
     }
     void SyncAndSpawn(string newLevel) {
         ChangeLevelIfNeeded(newLevel);
-        SpawnScript.Instance.WaitAndSpawn();
+        SpawnScript.Instance.Spawn();
     }
 
     public void ChangeLevelIfNeeded(string newLevel) {
@@ -428,12 +416,6 @@ public class ServerScript : MonoBehaviour {
     void OnConnectedToServer() {
         connecting = false;
         PeerType = NetworkPeerType.Client;
-        IsAsyncLoading = true; // Delays spawn until the loading is done server-side
-
-        TaskManager.Instance.WaitUntil(_ => !IsAsyncLoading).Then(() => {
-            if (readResponse.HasValue)
-                ChatScript.Instance.LogChat(Network.player, readResponse.Value.Message, true, true);
-        });
     }
 
     void OnPlayerConnected(NetworkPlayer player) {
