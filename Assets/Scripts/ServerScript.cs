@@ -436,16 +436,18 @@ public class ServerScript : MonoBehaviour {
 
     void SyncAndSpawn(string newLevel) {
         ChangeLevelIfNeeded(newLevel);
-        SpawnScript.Instance.Spawn();
+        SpawnScript.Instance.WaitAndSpawn();
     }
 
     public void ChangeLevelIfNeeded(string newLevel) {
         isLoading = true;
-        Application.LoadLevel(newLevel);
-        ChatScript.Instance.LogChat(Network.player, "Changed level to " + newLevel + ".", true, true);
-        RoundScript.Instance.CurrentLevel = newLevel;
-        if (currentServer != null) {
-            currentServer.Map = RoundScript.Instance.CurrentLevel;
+        if (Application.loadedLevelName != newLevel) {
+            Application.LoadLevel(newLevel);
+            ChatScript.Instance.LogChat(Network.player, "Changed level to " + newLevel + ".", true, true);
+            RoundScript.Instance.CurrentLevel = newLevel;
+            if (currentServer != null) {
+                currentServer.Map = RoundScript.Instance.CurrentLevel;
+            }
         }
         isLoading = false;
     }
