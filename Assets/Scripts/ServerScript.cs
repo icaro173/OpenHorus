@@ -72,7 +72,6 @@ public class ServerScript : MonoBehaviour {
     private bool natDiscoveryStarted;
     private float sinceRefreshedPlayers;
     private int lastPlayerCount;
-    private float sinceStartedDiscovery;
     private string lastLevelName;
 
     class ServerList {
