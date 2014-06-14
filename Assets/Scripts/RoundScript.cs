@@ -8,7 +8,7 @@ public class RoundScript : MonoBehaviour {
     public string[] allowedLevels = { "pi_rah", "pi_jst", "pi_mar", "pi_ven", "pi_gho", "pi_set" };
 
     //Private
-    private const int roundDuration = 30;
+    private const int roundDuration = 60*3;
     private const int preRoundDuration = 5;
     private const int postRoundDuration = 20;
     private const int roundPerLevel = 2;
