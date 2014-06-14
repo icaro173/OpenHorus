@@ -221,7 +221,7 @@ public class PlayerShootingScript : MonoBehaviour {
         Vector3 lastKnownPosition = Vector3.zero;
         NetworkPlayer targetOwner = Network.player;
         if (target != null) {
-            targetOwner = target.owner ?? Network.player;
+            targetOwner = target.owner;
             lastKnownPosition = target.transform.position;
         }
 

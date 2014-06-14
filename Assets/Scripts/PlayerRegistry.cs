@@ -6,7 +6,6 @@ using UnityEngine;
 
 class PlayerRegistry : MonoBehaviour {
     readonly Dictionary<NetworkPlayer, PlayerInfo> registry = new Dictionary<NetworkPlayer, PlayerInfo>();
-    bool disposed;
 
     public static PlayerRegistry Instance;
 
@@ -25,7 +24,9 @@ class PlayerRegistry : MonoBehaviour {
     public static NetworkPlayer For(Transform player) {
         for (int i = 0; i < PlayerRegistry.Instance.registry.Count; i++) {
             PlayerRegistry.PlayerInfo otherPlayer = PlayerRegistry.Instance.registry.ElementAt(i).Value;
-            if (otherPlayer.Location == player) return PlayerRegistry.Instance.registry.ElementAt(i).Key;
+            if (otherPlayer.Location == player) {
+                return PlayerRegistry.Instance.registry.ElementAt(i).Key;
+            }
         }
 
         return PlayerRegistry.Instance.registry.ElementAt(0).Key; // SHOULD NEVER HAPPEN!!!
@@ -45,11 +46,6 @@ class PlayerRegistry : MonoBehaviour {
 
     [RPC]
     public void RegisterPlayer(NetworkPlayer player, string username, string guid) {
-        if (disposed) {
-            Debug.LogError("Should not access disposed object");
-            return;
-        }
-
         Color color = Color.white;
         if (registry.ContainsKey(player)) {
             Debug.Log("Tried to register player " + player + " but was already registered. Current username : " + registry[player].Username + " | wanted username : " + username);
@@ -70,34 +66,27 @@ class PlayerRegistry : MonoBehaviour {
         Debug.Log("Registered this player : " + player + " = " + username + " (" + ConnectedCount() + " now)");
     }
     [RPC]
-    public void RegisterPlayerFull(NetworkPlayer player, string username, string guid, float r, float g, float b, bool isSpectating) {
-        if (disposed) {
-            Debug.LogError("Should not access disposed object");
-            return;
-        }
-
+    public void RegisterPlayerFull(NetworkPlayer player, string username, string guid, Vector3 color, bool isSpectating) {
         if (registry.ContainsKey(player)) {
             Debug.Log("Tried to register player " + player + " but was already registered. Current username : " + registry[player].Username + " | wanted username : " + username + " (removing...)");
             registry.Remove(player);
         }
 
         PlayerScript playerData = null;
-        foreach (PlayerScript p in FindObjectsOfType(typeof(PlayerScript)) as PlayerScript[])
-            if (p.owner.Value == player) playerData = p;
+        foreach (PlayerScript p in FindObjectsOfType<PlayerScript>()) {
+            if (p.owner == player) {
+                playerData = p;
+            }
+        }
         playerData.enabled = true;
         Transform location = playerData.transform;
 
-        registry.Add(player, new PlayerInfo { Username = username, Color = new Color(r, g, b), Spectating = isSpectating, Location = location, GUID = guid });
+        registry.Add(player, new PlayerInfo { Username = username, Color = new Color(color.x, color.y, color.z), Spectating = isSpectating, Location = location, GUID = guid });
         Debug.Log("Registered other player : " + player + " = " + username + " (" + ConnectedCount() + " now)");
     }
 
     [RPC]
     public void UnregisterPlayer(NetworkPlayer player) {
-        if (disposed) {
-            Debug.LogError("Should not access disposed object");
-            return;
-        }
-
         if (!registry.ContainsKey(player)) {
             Debug.Log("Tried to unregister player " + player + " but was not found");
             return;
@@ -110,21 +99,25 @@ class PlayerRegistry : MonoBehaviour {
     public void OnPlayerConnected(NetworkPlayer player) {
         Debug.Log("Propagating player registry to player " + player);
 
-        foreach (NetworkPlayer otherPlayer in registry.Keys)
+        foreach (NetworkPlayer otherPlayer in registry.Keys) {
             if (otherPlayer != player) {
                 PlayerInfo info = registry[otherPlayer];
-                if (info.Disconnected)
-                    continue;
+                if (info.Disconnected) continue;
+
 
                 networkView.RPC("RegisterPlayerFull", player, otherPlayer, info.Username, info.GUID,
-                                info.Color.r, info.Color.g, info.Color.b,
+                                new Vector3(info.Color.r, info.Color.g, info.Color.b),
                                 info.Spectating);
 
-                if (info.Spectating)
-                    foreach (PlayerScript p in FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>())
-                        if (p.networkView.owner == otherPlayer)
+                if (info.Spectating) {
+                    foreach (PlayerScript p in FindObjectsOfType<PlayerScript>()) {
+                        if (p.networkView.owner == otherPlayer) {
                             p.GetComponent<HealthScript>().networkView.RPC("ToggleSpectate", player, true);
+                        }
+                    }
+                }
             }
+        }
     }
 
     public void OnPlayerDisconnected(NetworkPlayer player) {
@@ -132,7 +125,6 @@ class PlayerRegistry : MonoBehaviour {
     }
 
     public void Clear() {
-        disposed = true;
         Destroy(gameObject);
         Instance = null;
     }
