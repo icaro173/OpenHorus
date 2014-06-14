@@ -109,20 +109,6 @@ public class RoundScript : MonoBehaviour {
                 if (player.networkView.isMine)
                     player.networkView.RPC("ImmediateRespawn", RPCMode.All);
 
-        StartCoroutine(WaitAndResume());
-    }
-
-    [RPC]
-    public void ChangeLevelAndRestart(string toLevelName) {
-        ServerScript.Instance.isLoading = true;
-        ChangeLevelTo(toLevelName);
-        RestartRound();
-    }
-
-    IEnumerator WaitAndResume() {
-        while (ServerScript.Instance.isLoading)
-            yield return new WaitForSeconds(1 / 30f);
-
         foreach (PlayerScript player in FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>())
             player.Paused = false;
 
@@ -136,4 +122,11 @@ public class RoundScript : MonoBehaviour {
 
         RoundStopped = false;
     }
+
+    [RPC]
+    public void ChangeLevelAndRestart(string toLevelName) {
+        ChangeLevelTo(toLevelName);
+        RestartRound();
+    }
+
 }

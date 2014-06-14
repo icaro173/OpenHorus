@@ -76,7 +76,7 @@ public class PlayerShootingScript : MonoBehaviour {
                     gameObject.SendMessage("ShotFired");
 
                     // find homing target(s)
-                    var aimedAt = targets.Where(x => x.SinceInCrosshair >= AimingTime);
+                    IEnumerable<WeaponIndicatorScript.PlayerData> aimedAt = targets.Where(x => x.SinceInCrosshair >= AimingTime);
 
                     int bulletsShot = bulletsLeft;
                     bool first = true;

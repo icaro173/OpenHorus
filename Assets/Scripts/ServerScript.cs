@@ -26,7 +26,6 @@ public class ServerScript : MonoBehaviour {
     public GUISkin guiSkin;
     public List<LeaderboardEntry> SavedLeaderboardEntries = new List<LeaderboardEntry>();
 
-    public bool isLoading = false;
     public static bool Spectating;
     public static HostingState hostState {
         get { return _hostState; }
@@ -436,11 +435,10 @@ public class ServerScript : MonoBehaviour {
 
     void SyncAndSpawn(string newLevel) {
         ChangeLevelIfNeeded(newLevel);
-        SpawnScript.Instance.WaitAndSpawn();
+        SpawnScript.Instance.Spawn();
     }
 
     public void ChangeLevelIfNeeded(string newLevel) {
-        isLoading = true;
         if (Application.loadedLevelName != newLevel) {
             Application.LoadLevel(newLevel);
             ChatScript.Instance.LogChat(Network.player, "Changed level to " + newLevel + ".", true, true);
@@ -449,7 +447,6 @@ public class ServerScript : MonoBehaviour {
                 currentServer.Map = RoundScript.Instance.CurrentLevel;
             }
         }
-        isLoading = false;
     }
 
     bool Connect() {
@@ -464,7 +461,6 @@ public class ServerScript : MonoBehaviour {
 
     void OnConnectedToServer() {
         peerType = NetworkPeerType.Client;
-        isLoading = true;
     }
 
     void OnPlayerConnected(NetworkPlayer player) {

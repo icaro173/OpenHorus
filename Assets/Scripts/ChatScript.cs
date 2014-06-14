@@ -230,8 +230,8 @@ public class ChatScript : MonoBehaviour {
             }
 
             GUILayout.EndHorizontal();
-        } catch (ArgumentException) {
-            // Wtf...
+        } catch (ArgumentException e) {
+            Debug.Log(e.Message);
         }
     }
 
