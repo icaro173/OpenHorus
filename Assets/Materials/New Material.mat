@@ -24,11 +24,11 @@ Material:
       data:
         first:
           name: _DiffuseAmount
-        second: .5
+        second: .258928567
       data:
         first:
           name: _TexAmount
-        second: 1
+        second: 0
       data:
         first:
           name: _Contrast

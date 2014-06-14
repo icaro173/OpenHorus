@@ -63,7 +63,7 @@ Material:
       data:
         first:
           name: _DiffuseAmount
-        second: .177277431
+        second: 0
       data:
         first:
           name: _TexAmount

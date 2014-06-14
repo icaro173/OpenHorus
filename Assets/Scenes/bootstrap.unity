@@ -179,6 +179,7 @@ MonoBehaviour:
   - pi_ven
   - pi_gho
   - pi_set
+  - pi_jsf
   lanMode: 0
   peerType: 0
   guiSkin: {fileID: 11400000, guid: ca3d138dd65c2564f9ccc4895664196a, type: 2}
