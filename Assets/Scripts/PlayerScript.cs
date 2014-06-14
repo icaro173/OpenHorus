@@ -7,7 +7,7 @@ using System.Collections.Generic;
 public class PlayerScript : MonoBehaviour {
     const float JumpInputQueueTime = 0.2f;
 
-    // tunable
+    // Tunable
     public float speed = 10;
     public float mouseSensitivity = 1.5f;
     public float lookAngleLimit = 80;
@@ -16,82 +16,83 @@ public class PlayerScript : MonoBehaviour {
     public float timeBetweenDashes = 1;
     public float dashForwardVelocity = 70;
     public float dashUpwardVelocity = 30;
-    // air velocity damping: 0.05f -> speed drops to 5% in one second
-    public float airVelocityDamping = 0.05f;
-    public float recoilDamping = 0.0005f;
-    
+    public float airVelocityDamping = 0.05f;    // air velocity damping: 0.05f -> speed drops to 5% in one second
+    public float recoilDamping = 0.0005f;       // TODO: Fix! recoil works bad with lag
     public float IdleTransitionFadeLength = 1.0f;
 
+    public bool Paused;
+
+    //References
     public Transform cameraPivot;
     public Transform dashEffectPivot;
     public Renderer dashEffectRenderer;
     public CharacterController controller;
     public GameObject warningSphereFab;
-    GameObject textBubble;
-
-    Vector3 fallingVelocity;
-    Vector3 lastFallingVelocity;
-    Vector3 recoilVelocity;
-    bool invertMouse = true;
-    Vector3 inputVelocity;
-    Vector3 lastInputVelocity;
-    public Vector3 lookRotationEuler;
-    float lastJumpInputTime = -1;
-    float dashCooldown = 0;
-    Animation characterAnimation;
-    string currentAnim;
     public NetworkPlayer owner;
-    float sinceNotGrounded;
-    bool activelyJumping;
-    bool textBubbleVisible;
-    bool playJumpSound, playDashSound;
-    int jumpsSinceGrounded = 0;
 
+    //Audio
     public AudioSource warningSound;
     public AudioSource dashSound;
     public AudioSource landingSound;
     public AudioSource jumpSound;
-
-    public bool Paused { get; set; }
-
-    // for interpolation on remote computers only
-    //VectorInterpolator iPosition;
-    //Vector3 lastNetworkFramePosition;
-    Quaternion smoothLookRotation;
-    float smoothYaw;
-    List<NetworkPlayer> targetedBy { get; set; }
-    List<GameObject> warningSpheres { get; set; }
+    
+    //Private
+    private GameObject textBubble;
+    private Vector3 fallingVelocity;
+    private Vector3 lastFallingVelocity;
+    private Vector3 recoilVelocity;
+    private bool invertMouse = true;
+    private Vector3 inputVelocity;
+    private Vector3 lastInputVelocity;
+    private Vector3 lookRotationEuler;
+    private float lastJumpInputTime = -1;
+    private float dashCooldown = 0;
+    private Animation characterAnimation;
+    private string currentAnim;
+    private float sinceNotGrounded;
+    private bool activelyJumping;
+    private bool textBubbleVisible;
+    private bool playJumpSound = false;
+    private bool playDashSound = false;
+    private int jumpsSinceGrounded = 0;
+    private Quaternion smoothLookRotation;
+    private float smoothYaw;
+    private List<GameObject> warningSpheres;
 
     void Awake() {
-        targetedBy = new List<NetworkPlayer>();
-        warningSpheres = new List<GameObject>();
-
         DontDestroyOnLoad(gameObject);
 
+        warningSpheres = new List<GameObject>();
+
+        //Find player parts
         controller = GetComponent<CharacterController>();
         characterAnimation = transform.Find("Animated Mesh Fixed").animation;
-        characterAnimation.Play("idle");
+        characterAnimation.Play(currentAnim = "idle");
         textBubble = gameObject.FindChild("TextBubble");
         textBubble.renderer.material.color = new Color(1, 1, 1, 0);
 
+        // Set animation speeds
         characterAnimation["run"].speed = 1.25f;
         characterAnimation["backward"].speed = 1.75f;
         characterAnimation["strafeLeft"].speed = 1.5f;
         characterAnimation["strafeRight"].speed = 1.5f;
 
-        foreach (Renderer r in GetComponentsInChildren<Renderer>()) {
+        // Tag materials
+        /*foreach (Renderer r in GetComponentsInChildren<Renderer>()) {
             if (!r.material.HasProperty("_Color")) continue;
             if (r.gameObject.name == "TextBubble") continue;
             if (r.gameObject.name == "flag_flag001") continue;
             r.tag = "PlayerMaterial";
-        }
+        }*/
     }
 
     void OnNetworkInstantiate(NetworkMessageInfo info) {
         if (Network.isServer) {
-            foreach (NetworkView nv in GetComponents<NetworkView>())
-                foreach (NetworkPlayer np in Network.connections)
+            foreach (NetworkView nv in GetComponents<NetworkView>()) {
+                foreach (NetworkPlayer np in Network.connections) {
                     nv.SetScope(np, true);
+                }
+            }
         }
 
         if (!networkView.isMine) {
@@ -361,9 +362,9 @@ public class PlayerScript : MonoBehaviour {
             recoilVelocity.y *= Mathf.Pow(recoilDamping * 100, Time.deltaTime);
             recoilVelocity.z *= Mathf.Pow(recoilDamping * 10, Time.deltaTime);
         } else {
-            recoilVelocity.x *= Mathf.Pow(recoilDamping / 25, Time.deltaTime);
-            recoilVelocity.y *= Mathf.Pow(recoilDamping * 100, Time.deltaTime);
-            recoilVelocity.z *= Mathf.Pow(recoilDamping / 25, Time.deltaTime);
+            recoilVelocity.x *= Mathf.Pow(recoilDamping * 0.04f, Time.deltaTime);
+            recoilVelocity.y *= Mathf.Pow(recoilDamping * 100f, Time.deltaTime);
+            recoilVelocity.z *= Mathf.Pow(recoilDamping * 0.04f, Time.deltaTime);
         }
 
         // move!
@@ -390,9 +391,6 @@ public class PlayerScript : MonoBehaviour {
         stream.Serialize(ref pOwner);
         if (stream.isReading) owner = pOwner;
 
-        //Vector3 pPosition = stream.isWriting ? transform.position : Vector3.zero;
-
-        //stream.Serialize(ref pPosition);
         stream.Serialize(ref inputVelocity);
         stream.Serialize(ref fallingVelocity);
         stream.Serialize(ref activelyJumping);
@@ -400,19 +398,11 @@ public class PlayerScript : MonoBehaviour {
         stream.Serialize(ref textBubbleVisible);
         stream.Serialize(ref playDashSound);
         stream.Serialize(ref playJumpSound);
-        //stream.Serialize(ref lookRotationEuler);
 
         if (stream.isReading) {
-            //if (lastNetworkFramePosition == pPosition)
-            //    transform.position = pPosition;
-
-            //if (!iPosition.Start(pPosition - transform.position))
-            //    transform.position = pPosition;
-
+            // Play sounds
             if (playDashSound && GlobalSoundsScript.soundEnabled) dashSound.Play();
             if (playJumpSound && GlobalSoundsScript.soundEnabled) jumpSound.Play();
-
-            //lastNetworkFramePosition = pPosition;
         }
 
         playJumpSound = playDashSound = false;

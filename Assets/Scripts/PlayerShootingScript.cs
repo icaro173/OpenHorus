@@ -246,17 +246,23 @@ public class PlayerShootingScript : MonoBehaviour {
 
         PlayerScript targetScript;
         try {
-            targetScript = FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>().Where(
-                x => x.owner == target).OrderBy(x => Vector3.Distance(x.transform.position, lastKnownPosition)).FirstOrDefault();
-        } catch (Exception) { targetScript = null; }
+            targetScript = FindObjectsOfType<PlayerScript>()
+                .Where( x => x.owner == target)
+                .OrderBy(x => Vector3.Distance(x.transform.position, lastKnownPosition))
+                .FirstOrDefault();
+        } catch (Exception) { 
+            targetScript = null;
+        }
 
         bullet.target = targetScript == null ? null : targetScript.transform;
         bullet.homing = homing;
         bullet.speed *= ShotgunBulletSpeedMultiplier;
         bullet.recoil = 1;
 
-        if (doSound)
-            if (GlobalSoundsScript.soundEnabled)
+        if (doSound) {
+            if (GlobalSoundsScript.soundEnabled) {
                 pepperGunSound.Play();
+            }
+        }
     }
 }
