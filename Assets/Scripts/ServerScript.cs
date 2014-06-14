@@ -119,21 +119,22 @@ public class ServerScript : MonoBehaviour {
     }
 
     void Awake() {
+        // Set global instance
         Instance = this;
-    }
 
-    void Start() {
         // Make sure the owning gameObject is preserved between level loads
         DontDestroyOnLoad(gameObject);
-
-        // Set the username, or use default
-        chosenUsername = PlayerPrefs.GetString("username", "Anon");
 
         // Set target frame rate for the game
         Application.targetFrameRate = 60;
 
         // Setup state changes
         createStateChangeCallbacks();
+    }
+
+    void Start() {
+        // Set the username, or use default
+        chosenUsername = PlayerPrefs.GetString("username", "Anon");
 
         // Select a random level as background and map for hosting
         RoundScript.Instance.CurrentLevel = RandomHelper.InEnumerable(allowedLevels);
