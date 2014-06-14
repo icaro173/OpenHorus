@@ -112,6 +112,13 @@ public class RoundScript : MonoBehaviour {
         StartCoroutine(WaitAndResume());
     }
 
+    [RPC]
+    public void ChangeLevelAndRestart(string toLevelName) {
+        ServerScript.Instance.isLoading = true;
+        ChangeLevelTo(toLevelName);
+        RestartRound();
+    }
+
     IEnumerator WaitAndResume() {
         while (ServerScript.Instance.isLoading)
             yield return new WaitForSeconds(1 / 30f);
