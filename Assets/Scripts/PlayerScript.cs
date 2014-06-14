@@ -35,7 +35,7 @@ public class PlayerScript : MonoBehaviour {
     bool invertMouse = true;
     Vector3 inputVelocity;
     Vector3 lastInputVelocity;
-    Vector3 lookRotationEuler;
+    public Vector3 lookRotationEuler;
     float lastJumpInputTime = -1;
     float dashCooldown = 0;
     Animation characterAnimation;
@@ -220,6 +220,12 @@ public class PlayerScript : MonoBehaviour {
             Screen.showCursor = !Screen.lockCursor;
             smoothYaw = lookRotationEuler.y;
             smoothLookRotation = Quaternion.Euler(lookRotationEuler);
+
+            //Copy
+            Vector3 euler = transform.rotation.eulerAngles;
+            euler.y = smoothYaw;
+            transform.rotation = Quaternion.Euler(euler);
+            cameraPivot.rotation = smoothLookRotation;
         } else {
             if (iPosition.IsRunning) {
                 transform.position += iPosition.Update();
@@ -244,11 +250,13 @@ public class PlayerScript : MonoBehaviour {
         textBubble.transform.localRotation = textBubble.transform.localRotation * Quaternion.Euler(90, 0, 0);
 
         // sync up actual player and camera transforms
+        /*
         Vector3 euler = transform.rotation.eulerAngles;
         euler.y = smoothYaw;
         transform.rotation = Quaternion.Euler(euler);
         cameraPivot.rotation = smoothLookRotation;
-
+        */
+       
         // dash animation
         Color color = dashEffectRenderer.material.GetColor("_TintColor");
         Vector3 dashVelocity = new Vector3(fallingVelocity.x, activelyJumping ? 0 : Math.Max(fallingVelocity.y, 0), fallingVelocity.z);
