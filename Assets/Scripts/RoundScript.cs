@@ -8,8 +8,9 @@ public class RoundScript : MonoBehaviour {
     public string[] allowedLevels = { "pi_rah", "pi_jst", "pi_mar", "pi_ven", "pi_gho", "pi_set" };
 
     //Private
-    private const float roundDuration = 60 * 5;
-    private const float postRoundDuration = 20;
+    private const int roundDuration = 30;
+    private const int preRoundDuration = 5;
+    private const int postRoundDuration = 20;
     private const int roundPerLevel = 2;
 
     float roundTime;
@@ -40,7 +41,6 @@ public class RoundScript : MonoBehaviour {
 
     void handleTimeEvents(float time) {
         if (roundTimeEvents == null) {
-            Debug.LogWarning("No events");
             return;
         }
 
@@ -54,7 +54,6 @@ public class RoundScript : MonoBehaviour {
         }
 
         foreach (KeyValuePair<float, roundTimeCB> pair in triggeredEvents) {
-            Debug.Log("Time Event: " + time);
             // Even has triggered, remove from list
             roundTimeEvents.Remove(pair.Key);
             // Run event
@@ -69,7 +68,8 @@ public class RoundScript : MonoBehaviour {
         roundTimeEvents.Add(roundDuration - 30, (time) => announceTimeLeft(30));
         roundTimeEvents.Add(roundDuration - 10, (time) => announceTimeLeft(10));
         roundTimeEvents.Add(roundDuration, (time) => postRound());
-        roundTimeEvents.Add(roundDuration + postRoundDuration, (time) => endRound());
+        roundTimeEvents.Add(roundDuration + postRoundDuration, (time) => endRound(preRoundDuration));
+        roundTimeEvents.Add(roundDuration + postRoundDuration + preRoundDuration, (time) => changeRound());
     }
 
     void announceTimeLeft(int time) {
@@ -77,7 +77,6 @@ public class RoundScript : MonoBehaviour {
     }
 
     void postRound() {
-        Debug.Log("postRound: " + roundsRemaining);
         networkView.RPC("StopRound", RPCMode.All);
         roundsRemaining--;
 
@@ -89,8 +88,7 @@ public class RoundScript : MonoBehaviour {
         }
     }
 
-    void endRound() {
-        Debug.Log("endRound: " + roundsRemaining);
+    void endRound(int timeout) {
         if (roundsRemaining <= 0) {
             // Have the server change level
             changeRandomMap();
@@ -98,9 +96,12 @@ public class RoundScript : MonoBehaviour {
             networkView.RPC("ChangeLevelTo", RPCMode.Others, currentLevel);
         }
 
-        // Start new round
-        networkView.RPC("RestartRound", RPCMode.All);
         // Announce new round
+        ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player, "Starting game in " + timeout + " seconds!", true, true);
+    }
+
+    void changeRound() {
+        networkView.RPC("RestartRound", RPCMode.All);
         ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player, "Game start!", true, true);
     }
 

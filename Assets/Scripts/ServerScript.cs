@@ -31,7 +31,6 @@ public class ServerScript : MonoBehaviour {
         set {
             HostingState oldstate = _hostState;
             _hostState = value;
-            Debug.Log("HostState: " + _hostState);
             hostStateChanged(oldstate, _hostState);
         }
     }
