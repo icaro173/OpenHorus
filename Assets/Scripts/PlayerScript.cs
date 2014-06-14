@@ -401,10 +401,10 @@ public class PlayerScript : MonoBehaviour {
         //Vector3 pPosition = stream.isWriting ? transform.position : Vector3.zero;
 
         //stream.Serialize(ref pPosition);
-        stream.Serialize(ref inputVelocity);
-        stream.Serialize(ref fallingVelocity);
+        //stream.Serialize(ref inputVelocity);
+        //stream.Serialize(ref fallingVelocity);
         stream.Serialize(ref activelyJumping);
-        stream.Serialize(ref recoilVelocity);
+        //stream.Serialize(ref recoilVelocity);
         stream.Serialize(ref textBubbleVisible);
         stream.Serialize(ref playDashSound);
         stream.Serialize(ref playJumpSound);
