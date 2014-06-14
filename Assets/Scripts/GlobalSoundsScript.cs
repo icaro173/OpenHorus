@@ -8,6 +8,8 @@ public class GlobalSoundsScript : MonoBehaviour {
     static GlobalSoundsScript Instance;
     static bool playing = false; //work around the fact that TaskManager does a DontDestroyOnLoad
 
+    public int lastSongId = -1;
+
     void Start() {
         Instance = this;
     }
@@ -31,10 +33,21 @@ public class GlobalSoundsScript : MonoBehaviour {
 
         if (Input.GetKeyDown("n"))
             GlobalSoundsScript.soundEnabled = !GlobalSoundsScript.soundEnabled;
+
+        if (!audio.mute && !audio.isPlaying)
+            PlaySong();
     }
 
     void OnLevelWasLoaded(int levelIndex) {
-        audio.clip = songs[(levelIndex - 1) % songs.Length];
+        PlaySong();
+    }
+
+    void PlaySong() {
+        int songId;
+        do { songId = Random.Range(0, songs.Length); }
+        while (songId == lastSongId);
+        lastSongId = songId;
+        audio.clip = songs[songId];
         audio.Play();
     }
 }
