@@ -11,86 +11,97 @@ public class RoundScript : MonoBehaviour {
     private const float roundDuration = 60 * 5;
     private const float postRoundDuration = 20;
     private const int roundPerLevel = 2;
-    private int[] warnings = { 60, 30, 10, -1 };
 
     float roundTime;
     public bool roundStopped { get; private set; }
     public string currentLevel;
-    bool startWarning;
-    int endWarning, currentWarning = 0;
     int roundsRemaining;
 
     //Time events
     private delegate void roundTimeCB(float time);
-    private static Dictionary<int, roundTimeCB> roundTimeEvents = null;
+    private static Dictionary<float, roundTimeCB> roundTimeEvents = null;
 
     public static RoundScript Instance { get; private set; }
 
     void Awake() {
         Instance = this;
-        currentWarning = 0;
-        endWarning = warnings[currentWarning];
-        startWarning = false;
         roundsRemaining = roundPerLevel;
     }
 
     void Update() {
         if (Network.isServer) {
+            //Increment round time
             roundTime += Time.deltaTime;
 
-            if (!roundStopped) {
-                if (roundDuration - roundTime < endWarning) {
-                    ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player,
-                                                        endWarning.ToString()+" seconds remaining...", true, true);
-                    endWarning = warnings[++currentWarning];
-                }
-            } else {
-                if (!startWarning && postRoundDuration - roundTime < 5) {
-                    ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player,
-                                                        "Game starts in 5 seconds...", true, true);
-                    startWarning = true;
-                }
+            //Trigger round events
+            handleTimeEvents(roundTime);
+        }
+    }
+
+    void handleTimeEvents(float time) {
+        if (roundTimeEvents == null) {
+            Debug.LogWarning("No events");
+            return;
+        }
+
+        Dictionary<float, roundTimeCB> triggeredEvents = new Dictionary<float, roundTimeCB>();
+        foreach (KeyValuePair<float, roundTimeCB> pair in roundTimeEvents) {
+            // Time for the event is now or has passed
+            if (time >= pair.Key) {
+                // Since we cannot alter a list we are currently iterating on, copy it over
+                triggeredEvents.Add(pair.Key, pair.Value);
             }
+        }
 
-
-            if (roundTime >= (roundStopped ? postRoundDuration : roundDuration)) {
-                roundStopped = !roundStopped;
-                if (roundStopped) {
-                    networkView.RPC("StopRound", RPCMode.All);
-                    ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player,
-                                    "Round over!", true, true);
-                    roundsRemaining--;
-
-                    if (roundsRemaining == 0)
-                        ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player,
-                                                            "Level will change on the next round.", true, true);
-                } else {
-                    if (roundsRemaining == 0) {
-                        ChangeLevel();
-                        Debug.Log("Loaded level is now " + currentLevel);
-                        networkView.RPC("ChangeLevelTo", RPCMode.Others, currentLevel);
-                    }
-
-                    networkView.RPC("RestartRound", RPCMode.All);
-                    ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player,
-                                    "Game start!", true, true);
-                }
-                roundTime = 0;
-                startWarning = false;
-                currentWarning = 0;
-                endWarning = warnings[currentWarning];
-            }
+        foreach (KeyValuePair<float, roundTimeCB> pair in triggeredEvents) {
+            Debug.Log("Time Event: " + time);
+            // Even has triggered, remove from list
+            roundTimeEvents.Remove(pair.Key);
+            // Run event
+            pair.Value(time);
         }
     }
 
     void addTimeEvents_DeathMatch() {
-        roundTimeEvents = new Dictionary<int, roundTimeCB>();
+        roundTimeEvents = new Dictionary<float, roundTimeCB>();
 
-        roundTimeEvents.Add(60, (time) => AnnounceTimeLeft((int) time));
+        roundTimeEvents.Add(roundDuration - 60, (time) => announceTimeLeft(60));
+        roundTimeEvents.Add(roundDuration - 30, (time) => announceTimeLeft(30));
+        roundTimeEvents.Add(roundDuration - 10, (time) => announceTimeLeft(10));
+        roundTimeEvents.Add(roundDuration, (time) => postRound(10));
+        roundTimeEvents.Add(roundDuration + postRoundDuration, (time) => endRound(10));
     }
 
-    void AnnounceTimeLeft(int time) {
+    void announceTimeLeft(int time) {
         ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player, time.ToString() + " seconds remaining...", true, true);
+    }
+
+    void postRound(int time) {
+        Debug.Log("postRound: " + roundsRemaining);
+        networkView.RPC("StopRound", RPCMode.All);
+        roundsRemaining--;
+
+        ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player, "Round over!", true, true);
+
+        // Was this the last round on this map? announce change
+        if (roundsRemaining <= 0) {
+            ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player, "Level will change on the next round.", true, true);
+        }
+    }
+
+    void endRound(int time) {
+        Debug.Log("endRound: " + roundsRemaining);
+        if (roundsRemaining <= 0) {
+            // Have the server change level
+            changeRandomMap();
+            // Have the players change level
+            networkView.RPC("ChangeLevelTo", RPCMode.Others, currentLevel);
+        }
+
+        // Start new round
+        networkView.RPC("RestartRound", RPCMode.All);
+        // Announce new round
+        ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player, "Game start!", true, true);
     }
 
     [RPC]
@@ -106,20 +117,30 @@ public class RoundScript : MonoBehaviour {
 
     [RPC]
     public void StopRound() {
-        foreach (PlayerScript player in FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>())
+        foreach (PlayerScript player in FindObjectsOfType<PlayerScript>()) {
             player.Paused = true;
+        }
         roundStopped = true;
     }
 
     [RPC]
     public void RestartRound() {
-        if (!ServerScript.Spectating)
-            foreach (PlayerScript player in FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>())
-                if (player.networkView.isMine)
-                    player.networkView.RPC("ImmediateRespawn", RPCMode.All);
+        // Get all player scripts in the current game
+        PlayerScript[] players = FindObjectsOfType<PlayerScript>();
 
-        foreach (PlayerScript player in FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>())
+        if (!ServerScript.Spectating) {
+            // Respawn all players
+            foreach (PlayerScript player in players) {
+                if (player.networkView.isMine) {
+                    player.networkView.RPC("ImmediateRespawn", RPCMode.All);
+                }
+            }
+        }
+
+        // Unpause players
+        foreach (PlayerScript player in players) {
             player.Paused = false;
+        }
 
         foreach (LeaderboardEntry entry in NetworkLeaderboard.Instance.Entries) {
             entry.Deaths = 0;
@@ -127,18 +148,28 @@ public class RoundScript : MonoBehaviour {
             entry.ConsecutiveKills = 0;
         }
 
+        // Reset time events
+        if (Network.isServer) {
+            addTimeEvents_DeathMatch();
+        }
+
+        // Hide old chat
         ChatScript.Instance.ChatLog.ForEach(x => x.Hidden = true);
 
+        // Start round
+        roundTime = 0;
         roundStopped = false;
     }
 
+    // Force map change (used from chat)
     [RPC]
     public void ChangeLevelAndRestart(string toLevelName) {
         ChangeLevelTo(toLevelName);
         RestartRound();
     }
 
-    public void ChangeLevel() {
+    // Server picks new map and loads
+    public void changeRandomMap() {
         ChangeLevelIfNeeded(RandomHelper.InEnumerable(allowedLevels.Except(new[] { RoundScript.Instance.currentLevel })));
     }
 
@@ -147,6 +178,7 @@ public class RoundScript : MonoBehaviour {
         SpawnScript.Instance.Spawn();
     }
 
+    // Load new map
     public void ChangeLevelIfNeeded(string newLevel) {
         if (Application.loadedLevelName != newLevel) {
             Application.LoadLevel(newLevel);
@@ -154,6 +186,10 @@ public class RoundScript : MonoBehaviour {
             RoundScript.Instance.currentLevel = newLevel;
             ServerScript.Instance.SetMap(RoundScript.Instance.currentLevel);
         }
+    }
+
+    void OnServerInitialized() {
+        networkView.RPC("RestartRound", RPCMode.All);
     }
 
 
