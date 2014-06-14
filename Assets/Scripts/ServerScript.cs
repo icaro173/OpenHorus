@@ -140,8 +140,8 @@ public class ServerScript : MonoBehaviour {
         chosenUsername = PlayerPrefs.GetString("username", "Anon");
 
         // Select a random level as background and map for hosting
-        RoundScript.Instance.CurrentLevel = RandomHelper.InEnumerable(RoundScript.Instance.allowedLevels);
-        RoundScript.Instance.ChangeLevelIfNeeded(RoundScript.Instance.CurrentLevel);
+        RoundScript.Instance.currentLevel = RandomHelper.InEnumerable(RoundScript.Instance.allowedLevels);
+        RoundScript.Instance.ChangeLevelIfNeeded(RoundScript.Instance.currentLevel);
 
         // Startup the state chain
         hostState = HostingState.Startup;
@@ -212,7 +212,7 @@ public class ServerScript : MonoBehaviour {
             hostState = HostingState.AttemptingToHost;
             AddServerToList();
             lastPlayerCount = 0;
-            lastLevelName = RoundScript.Instance.CurrentLevel;
+            lastLevelName = RoundScript.Instance.currentLevel;
             sinceRefreshedPlayers = 0;
         } else {
             Debug.LogWarning("Failed to create error");
@@ -253,13 +253,13 @@ public class ServerScript : MonoBehaviour {
                 sinceRefreshedPlayers -= Time.deltaTime;
 
                 if (lastPlayerCount != Network.connections.Length ||
-                    lastLevelName != RoundScript.Instance.CurrentLevel ||
+                    lastLevelName != RoundScript.Instance.currentLevel ||
                     sinceRefreshedPlayers <= 0
                 ) {
                     UpdateServer();
                     sinceRefreshedPlayers = RefreshTime;
                     lastPlayerCount = Network.connections.Length;
-                    lastLevelName = RoundScript.Instance.CurrentLevel;
+                    lastLevelName = RoundScript.Instance.currentLevel;
                 }
                 break;
         }
@@ -423,7 +423,7 @@ public class ServerScript : MonoBehaviour {
         if (result == NetworkConnectionError.NoError) {
             currentServer = new ServerInfo {
                 GUID = Network.player.guid,
-                Map = RoundScript.Instance.CurrentLevel,
+                Map = RoundScript.Instance.currentLevel,
                 Version = buildVersion,
                 MaxPlayers = MaxPlayers,
                 CurrentPlayers = 0
@@ -448,7 +448,7 @@ public class ServerScript : MonoBehaviour {
     }
 
     void OnPlayerConnected(NetworkPlayer player) {
-        RoundScript.Instance.networkView.RPC("SyncLevel", player, RoundScript.Instance.CurrentLevel);
+        RoundScript.Instance.networkView.RPC("SyncLevel", player, RoundScript.Instance.currentLevel);
     }
 
     void StartNatDiscovery() {

@@ -145,7 +145,7 @@ public class HealthScript : MonoBehaviour {
         object thisLock = new object();
         respawnLock = thisLock;
         TaskManager.Instance.WaitFor(timeUntilRespawn).Then(() => {
-            if (this != null && respawnLock == thisLock && !ServerScript.Spectating && !RoundScript.Instance.RoundStopped)
+            if (this != null && respawnLock == thisLock && !ServerScript.Spectating && !RoundScript.Instance.roundStopped)
                 Respawn(position);
         });
     }

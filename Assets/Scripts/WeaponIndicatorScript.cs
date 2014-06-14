@@ -116,7 +116,7 @@ public class WeaponIndicatorScript : MonoBehaviour {
     IEnumerator OnPostRender() {
         yield return new WaitForEndOfFrame();
 
-        if (!RoundScript.Instance.RoundStopped && !ServerScript.Spectating)
+        if (!RoundScript.Instance.roundStopped && !ServerScript.Spectating)
         {
             // Circle around
             float opacity = Mathf.Lerp(lastOpacity, CooldownStep < 1 ? 1 : 0.3f, 0.1f);

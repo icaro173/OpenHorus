@@ -41,7 +41,7 @@ public class ChatScript : MonoBehaviour {
     }
 
     void Update() {
-        forceVisible = Input.GetKey(KeyCode.Tab) || RoundScript.Instance.RoundStopped;
+        forceVisible = Input.GetKey(KeyCode.Tab) || RoundScript.Instance.roundStopped;
 
         foreach (ChatMessage log in ChatLog)
             log.Life += Time.deltaTime;
