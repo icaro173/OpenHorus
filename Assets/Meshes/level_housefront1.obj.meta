@@ -5,11 +5,16 @@ ModelImporter:
   fileIDToRecycleName:
     100000: Cube
     100002: //RootNode
+    100004: default
     400000: Cube
     400002: //RootNode
+    400004: default
     2300000: Cube
+    2300002: default
     3300000: Cube
+    3300002: default
     4300000: Cube
+    4300002: default
     11100000: //RootNode
   materials:
     importMaterials: 1
@@ -45,7 +50,7 @@ ModelImporter:
   tangentSpace:
     normalSmoothAngle: 60
     splitTangentsAcrossUV: 1
-    normalImportMode: 0
+    normalImportMode: 1
     tangentImportMode: 1
   importAnimation: 1
   copyAvatar: 0

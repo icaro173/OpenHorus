@@ -5,11 +5,16 @@ ModelImporter:
   fileIDToRecycleName:
     100000: lingerie
     100002: //RootNode
+    100004: default
     400000: lingerie
     400002: //RootNode
+    400004: default
     2300000: lingerie
+    2300002: default
     3300000: lingerie
+    3300002: default
     4300000: lingerie
+    4300002: default
     11100000: //RootNode
   materials:
     importMaterials: 1
