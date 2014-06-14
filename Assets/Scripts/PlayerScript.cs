@@ -394,11 +394,7 @@ public class PlayerScript : MonoBehaviour {
 
         //stream.Serialize(ref pPosition);
         stream.Serialize(ref inputVelocity);
-<<<<<<< HEAD
-        //stream.Serialize(ref fallingVelocity);
-=======
         stream.Serialize(ref fallingVelocity);
->>>>>>> origin/master
         stream.Serialize(ref activelyJumping);
         stream.Serialize(ref recoilVelocity);
         stream.Serialize(ref textBubbleVisible);
