@@ -8,6 +8,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 400000}
+  - 148: {fileID: 14800002}
   - 148: {fileID: 14800000}
   - 114: {fileID: 11400000}
   - 143: {fileID: 14300000}
@@ -2578,6 +2579,7 @@ MonoBehaviour:
   dashUpwardVelocity: 10
   airVelocityDamping: .0500000007
   recoilDamping: .000500000024
+  username: 
   IdleTransitionFadeLength: .125
   cameraPivot: {fileID: 400046}
   dashEffectPivot: {fileID: 400060}
@@ -3013,6 +3015,18 @@ NetworkView:
   m_Enabled: 1
   m_StateSynchronization: 2
   m_Observed: {fileID: 11400000}
+  m_ViewID:
+    m_ID: 0
+    m_Type: 0
+--- !u!148 &14800002
+NetworkView:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_StateSynchronization: 1
+  m_Observed: {fileID: 400000}
   m_ViewID:
     m_ID: 0
     m_Type: 0

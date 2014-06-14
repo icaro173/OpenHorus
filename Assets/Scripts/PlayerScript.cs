@@ -40,7 +40,7 @@ public class PlayerScript : MonoBehaviour {
     float dashCooldown = 0;
     Animation characterAnimation;
     string currentAnim;
-    public NetworkPlayer? owner;
+    public NetworkPlayer owner;
     float sinceNotGrounded;
     bool activelyJumping;
     bool textBubbleVisible;
@@ -106,9 +106,9 @@ public class PlayerScript : MonoBehaviour {
     }
 
     IEnumerator WaitAndLabel() {
-        while (!PlayerRegistry.Has(owner.Value))
+        while (!PlayerRegistry.Has(owner))
             yield return new WaitForSeconds(1 / 30f);
-        UpdateLabel(PlayerRegistry.For(owner.Value).Username);
+        UpdateLabel(PlayerRegistry.For(owner).Username);
     }
 
     void OnGUI() {
@@ -386,13 +386,13 @@ public class PlayerScript : MonoBehaviour {
     }
 
     void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info) {
-        NetworkPlayer pOwner = owner.HasValue ? owner.Value : default(NetworkPlayer);
+        NetworkPlayer pOwner = owner;
         stream.Serialize(ref pOwner);
         if (stream.isReading) owner = pOwner;
 
-        Vector3 pPosition = stream.isWriting ? transform.position : Vector3.zero;
+        //Vector3 pPosition = stream.isWriting ? transform.position : Vector3.zero;
 
-        stream.Serialize(ref pPosition);
+        //stream.Serialize(ref pPosition);
         stream.Serialize(ref inputVelocity);
         stream.Serialize(ref fallingVelocity);
         stream.Serialize(ref activelyJumping);
@@ -403,16 +403,16 @@ public class PlayerScript : MonoBehaviour {
         stream.Serialize(ref lookRotationEuler);
 
         if (stream.isReading) {
-            if (lastNetworkFramePosition == pPosition)
-                transform.position = pPosition;
+            //if (lastNetworkFramePosition == pPosition)
+                //transform.position = pPosition;
 
-            if (!iPosition.Start(pPosition - transform.position))
-                transform.position = pPosition;
+            //if (!iPosition.Start(pPosition - transform.position))
+                //transform.position = pPosition;
 
             if (playDashSound && GlobalSoundsScript.soundEnabled) dashSound.Play();
             if (playJumpSound && GlobalSoundsScript.soundEnabled) jumpSound.Play();
 
-            lastNetworkFramePosition = pPosition;
+            //lastNetworkFramePosition = pPosition;
         }
 
         playJumpSound = playDashSound = false;
