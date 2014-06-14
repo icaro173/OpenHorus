@@ -17,7 +17,7 @@ public class ServerScript : MonoBehaviour {
 
     //Public
     public const int port = 31415;
-    public const string buildVersion = "13062014";
+    public const string buildVersion = "14062014";
     public const string MasterServerUri = "http://ohs.padrepio.in/";
 
     public string[] allowedLevels = { "pi_rah", "pi_jst", "pi_mar", "pi_ven", "pi_gho", "pi_set" };
