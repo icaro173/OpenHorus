@@ -57,8 +57,12 @@ class PlayerRegistry : MonoBehaviour {
         }
 
         PlayerScript playerData = null;
-        foreach (PlayerScript p in FindObjectsOfType(typeof(PlayerScript)) as PlayerScript[])
-            if (p.owner == player) playerData = p;
+        foreach (PlayerScript p in FindObjectsOfType<PlayerScript>()) {
+            if (p.owner == player) {
+                playerData = p;
+            }
+
+        }
         playerData.enabled = true;
         Transform location = playerData.transform;
 
