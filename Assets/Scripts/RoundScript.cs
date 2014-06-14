@@ -68,15 +68,15 @@ public class RoundScript : MonoBehaviour {
         roundTimeEvents.Add(roundDuration - 60, (time) => announceTimeLeft(60));
         roundTimeEvents.Add(roundDuration - 30, (time) => announceTimeLeft(30));
         roundTimeEvents.Add(roundDuration - 10, (time) => announceTimeLeft(10));
-        roundTimeEvents.Add(roundDuration, (time) => postRound(10));
-        roundTimeEvents.Add(roundDuration + postRoundDuration, (time) => endRound(10));
+        roundTimeEvents.Add(roundDuration, (time) => postRound());
+        roundTimeEvents.Add(roundDuration + postRoundDuration, (time) => endRound());
     }
 
     void announceTimeLeft(int time) {
         ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player, time.ToString() + " seconds remaining...", true, true);
     }
 
-    void postRound(int time) {
+    void postRound() {
         Debug.Log("postRound: " + roundsRemaining);
         networkView.RPC("StopRound", RPCMode.All);
         roundsRemaining--;
@@ -89,7 +89,7 @@ public class RoundScript : MonoBehaviour {
         }
     }
 
-    void endRound(int time) {
+    void endRound() {
         Debug.Log("endRound: " + roundsRemaining);
         if (roundsRemaining <= 0) {
             // Have the server change level
