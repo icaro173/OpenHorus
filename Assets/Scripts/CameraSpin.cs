@@ -22,6 +22,7 @@ public class CameraSpin : MonoBehaviour {
     }
 
     void Update() {
+        //todo This is not how you do lerping, change it to a proper, nice transition
         if (transform.localEulerAngles.y > 150) sign *= -1;
         if (transform.localEulerAngles.y < 100) sign *= -1;
 
