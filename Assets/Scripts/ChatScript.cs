@@ -135,10 +135,10 @@ public class ChatScript : MonoBehaviour {
                                 } else if (Application.loadedLevelName == messageParts[1]) {
                                     LogChat(Network.player, "You're already in " + messageParts[1] + ", dummy.",
                                             true, true);
-                                } else if (!ServerScript.Instance.allowedLevels.Contains(messageParts[1])) {
+                                } else if (!RoundScript.Instance.allowedLevels.Contains(messageParts[1])) {
                                     LogChat(Network.player,
                                             "Level " + messageParts[1] + " does not exist. " +
-                                            StringHelper.DeepToString(ServerScript.Instance.allowedLevels), true, true);
+                                            StringHelper.DeepToString(RoundScript.Instance.allowedLevels), true, true);
                                 } else {
                                     RoundScript.Instance.networkView.RPC("ChangeLevelAndRestart", RPCMode.All, messageParts[1]);
                                 }
