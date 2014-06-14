@@ -40,15 +40,15 @@ Material:
       data:
         first:
           name: _Color
-        second: {r: .470588237, g: .442418218, b: .396770477, a: 1}
-      data:
-        first:
-          name: _SpecColor
-        second: {r: 1, g: 1, b: 1, a: 1}
+        second: {r: .396770447, g: .440042913, b: .470588207, a: 1}
       data:
         first:
           name: _Emission
         second: {r: .299295187, g: .147278577, b: .0605168268, a: 1}
+      data:
+        first:
+          name: _SpecColor
+        second: {r: 1, g: 1, b: 1, a: 1}
       data:
         first:
           name: _RimColor

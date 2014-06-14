@@ -40,7 +40,7 @@ Material:
       data:
         first:
           name: _Color
-        second: {r: .278222322, g: .45588237, b: .404422224, a: 0}
+        second: {r: .238970593, g: .382352948, b: .340821505, a: 0}
       data:
         first:
           name: _Emission
