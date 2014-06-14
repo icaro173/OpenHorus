@@ -19,7 +19,6 @@ public class PlayerScript : MonoBehaviour {
     // air velocity damping: 0.05f -> speed drops to 5% in one second
     public float airVelocityDamping = 0.05f;
     public float recoilDamping = 0.0005f;
-    public string username = "";
     
     public float IdleTransitionFadeLength = 1.0f;
 
@@ -109,8 +108,7 @@ public class PlayerScript : MonoBehaviour {
     IEnumerator WaitAndLabel() {
         while (!PlayerRegistry.Has(owner.Value))
             yield return new WaitForSeconds(1 / 30f);
-        username = PlayerRegistry.For(owner.Value).Username;
-        UpdateLabel();
+        UpdateLabel(PlayerRegistry.For(owner.Value).Username);
     }
 
     void OnGUI() {
@@ -171,7 +169,7 @@ public class PlayerScript : MonoBehaviour {
         fallingVelocity = Vector3.zero;
     }
 
-    public void UpdateLabel() {
+    public void UpdateLabel(string username) {
         TextMesh label = GetComponentInChildren<TextMesh>();
         label.text = username;
     }
