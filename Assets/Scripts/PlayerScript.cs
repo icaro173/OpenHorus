@@ -400,7 +400,7 @@ public class PlayerScript : MonoBehaviour {
         stream.Serialize(ref textBubbleVisible);
         stream.Serialize(ref playDashSound);
         stream.Serialize(ref playJumpSound);
-        stream.Serialize(ref lookRotationEuler);
+        //stream.Serialize(ref lookRotationEuler);
 
         if (stream.isReading) {
             //if (lastNetworkFramePosition == pPosition)
