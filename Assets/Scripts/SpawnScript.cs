@@ -28,8 +28,8 @@ public class SpawnScript : MonoBehaviour {
     public void Spawn() {
         if (ServerScript.Spectating) return;
 
-        Network.Instantiate(PlayerTemplate, RespawnZone.GetRespawnPoint(), Quaternion.identity, 0);
         TaskManager.Instance.WaitUntil(_ => PlayerRegistry.Instance != null).Then(() => PlayerRegistry.RegisterCurrentPlayer(chosenUsername, networkView.owner.guid));
+        Network.Instantiate(PlayerTemplate, RespawnZone.GetRespawnPoint(), Quaternion.identity, 0);
     }
 
     void OnPlayerDisconnected(NetworkPlayer player) {
@@ -50,7 +50,7 @@ public class SpawnScript : MonoBehaviour {
             else
                 Debug.Log("Successfully diconnected from the server");
 
-        foreach (PlayerScript p in FindObjectsOfType(typeof(PlayerScript)).Cast<PlayerScript>())
+        foreach (PlayerScript p in FindObjectsOfType<PlayerScript>())
             Destroy(p.gameObject);
     }
 

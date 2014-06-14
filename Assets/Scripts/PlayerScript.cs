@@ -19,7 +19,8 @@ public class PlayerScript : MonoBehaviour {
     // air velocity damping: 0.05f -> speed drops to 5% in one second
     public float airVelocityDamping = 0.05f;
     public float recoilDamping = 0.0005f;
-
+    public string username = "";
+    
     public float IdleTransitionFadeLength = 1.0f;
 
     public Transform cameraPivot;
@@ -96,12 +97,20 @@ public class PlayerScript : MonoBehaviour {
 
         if (!networkView.isMine) {
             owner = networkView.owner;
+            StartCoroutine(WaitAndLabel());
             iPosition = new VectorInterpolator();
             enabled = false;
         } else {
             owner = Network.player;
             gameObject.layer = LayerMask.NameToLayer("LocalPlayer");
         }
+    }
+
+    IEnumerator WaitAndLabel() {
+        while (!PlayerRegistry.Has(owner.Value))
+            yield return new WaitForSeconds(1 / 30f);
+        username = PlayerRegistry.For(owner.Value).Username;
+        UpdateLabel();
     }
 
     void OnGUI() {
@@ -160,6 +169,11 @@ public class PlayerScript : MonoBehaviour {
         if (!networkView.isMine) return;
         recoilVelocity = Vector3.zero;
         fallingVelocity = Vector3.zero;
+    }
+
+    public void UpdateLabel() {
+        TextMesh label = GetComponentInChildren<TextMesh>();
+        label.text = username;
     }
 
     void Update() {
