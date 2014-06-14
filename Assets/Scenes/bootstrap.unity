@@ -175,13 +175,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ca73633617af3843b5c4b80f9d3dd87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  allowedLevels:
-  - pi_rah
-  - pi_mar
-  - pi_ven
-  - pi_gho
-  - pi_set
-  - pi_jsf
   lanMode: 0
   peerType: 0
   guiSkin: {fileID: 11400000, guid: ca3d138dd65c2564f9ccc4895664196a, type: 2}
@@ -713,6 +706,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7abaee3f0789e4bf7a899e986163edc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  allowedLevels:
+  - pi_rah
+  - pi_jsf
+  - pi_mar
+  - pi_ven
+  - pi_gho
+  - pi_set
 --- !u!1 &1834919049
 GameObject:
   m_ObjectHideFlags: 0
