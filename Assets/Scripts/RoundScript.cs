@@ -6,18 +6,24 @@ public class RoundScript : MonoBehaviour {
     const float RoundDuration = 60 * 5;
     const float PauseDuration = 20;
     const int SameLevelRounds = 2;
+    int[] warnings = { 60, 30, 10, -1 };
+    public string[] allowedLevels = { "pi_rah", "pi_jst", "pi_mar", "pi_ven", "pi_gho", "pi_set" };
 
     float sinceRoundTransition;
     public bool RoundStopped { get; private set; }
     public string CurrentLevel { get; set; }
     float sinceInteround;
-    bool said60secWarning, said30secWarning, said10secWarning, said5secWarning;
+    bool startWarning;
+    int endWarning, currentWarning = 0;
     int toLevelChange;
 
     public static RoundScript Instance { get; private set; }
 
     void Awake() {
         Instance = this;
+        currentWarning = 0;
+        endWarning = warnings[currentWarning];
+        startWarning = false;
         toLevelChange = SameLevelRounds;
     }
 
@@ -26,26 +32,16 @@ public class RoundScript : MonoBehaviour {
             sinceRoundTransition += Time.deltaTime;
 
             if (!RoundStopped) {
-                if (!said60secWarning && RoundDuration - sinceRoundTransition < 60) {
+                if (RoundDuration - sinceRoundTransition < endWarning) {
                     ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player,
-                                                        "60 seconds remaining...", true, true);
-                    said60secWarning = true;
-                }
-                if (!said30secWarning && RoundDuration - sinceRoundTransition < 30) {
-                    ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player,
-                                                        "30 seconds remaining...", true, true);
-                    said30secWarning = true;
-                }
-                if (!said10secWarning && RoundDuration - sinceRoundTransition < 10) {
-                    ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player,
-                                                        "10 seconds remaining!", true, true);
-                    said10secWarning = true;
+                                                        endWarning.ToString()+" seconds remaining...", true, true);
+                    endWarning = warnings[++currentWarning];
                 }
             } else {
-                if (!said5secWarning && PauseDuration - sinceRoundTransition < 5) {
+                if (!startWarning && PauseDuration - sinceRoundTransition < 5) {
                     ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player,
                                                         "Game starts in 5 seconds...", true, true);
-                    said5secWarning = true;
+                    startWarning = true;
                 }
             }
 
@@ -73,26 +69,22 @@ public class RoundScript : MonoBehaviour {
                                     "Game start!", true, true);
                 }
                 sinceRoundTransition = 0;
-                said60secWarning = said30secWarning = said10secWarning = said5secWarning = false;
+                startWarning = false;
+                currentWarning = 0;
+                endWarning = warnings[currentWarning];
             }
         }
     }
 
     [RPC]
-    public void ChangeLevel() {
-        transform.parent.SendMessage("ChangeLevel");
-        toLevelChange = SameLevelRounds;
-    }
-
-    [RPC]
     public void ChangeLevelTo(string levelName) {
-        transform.parent.SendMessage("ChangeLevelIfNeeded", levelName);
+        ChangeLevelIfNeeded(levelName);
         toLevelChange = SameLevelRounds;
     }
 
     [RPC]
     public void SyncLevel(string toLevel) {
-        transform.parent.SendMessage("SyncAndSpawn", toLevel);
+        SyncAndSpawn(toLevel);
     }
 
     [RPC]
@@ -128,5 +120,24 @@ public class RoundScript : MonoBehaviour {
         ChangeLevelTo(toLevelName);
         RestartRound();
     }
+
+    public void ChangeLevel() {
+        ChangeLevelIfNeeded(RandomHelper.InEnumerable(allowedLevels.Except(new[] { RoundScript.Instance.CurrentLevel })));
+    }
+
+    void SyncAndSpawn(string newLevel) {
+        ChangeLevelIfNeeded(newLevel);
+        SpawnScript.Instance.Spawn();
+    }
+
+    public void ChangeLevelIfNeeded(string newLevel) {
+        if (Application.loadedLevelName != newLevel) {
+            Application.LoadLevel(newLevel);
+            ChatScript.Instance.LogChat(Network.player, "Changed level to " + newLevel + ".", true, true);
+            RoundScript.Instance.CurrentLevel = newLevel;
+            ServerScript.Instance.SetMap(RoundScript.Instance.CurrentLevel);
+        }
+    }
+
 
 }

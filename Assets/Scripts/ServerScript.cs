@@ -20,7 +20,6 @@ public class ServerScript : MonoBehaviour {
     public const string buildVersion = "14062014";
     public const string MasterServerUri = "http://ohs.padrepio.in/";
 
-    public string[] allowedLevels = { "pi_rah", "pi_jst", "pi_mar", "pi_ven", "pi_gho", "pi_set" };
     public bool lanMode = false;
     public NetworkPeerType peerType;
     public GUISkin guiSkin;
@@ -116,6 +115,12 @@ public class ServerScript : MonoBehaviour {
         Connected
     }
 
+    public void SetMap(string currentMap) {
+        if (currentServer != null) {
+            currentServer.Map = currentMap;
+        }
+    }
+
     void Awake() {
         // Set global instance
         Instance = this;
@@ -135,8 +140,8 @@ public class ServerScript : MonoBehaviour {
         chosenUsername = PlayerPrefs.GetString("username", "Anon");
 
         // Select a random level as background and map for hosting
-        RoundScript.Instance.CurrentLevel = RandomHelper.InEnumerable(allowedLevels);
-        ChangeLevelIfNeeded(RoundScript.Instance.CurrentLevel);
+        RoundScript.Instance.CurrentLevel = RandomHelper.InEnumerable(RoundScript.Instance.allowedLevels);
+        RoundScript.Instance.ChangeLevelIfNeeded(RoundScript.Instance.CurrentLevel);
 
         // Startup the state chain
         hostState = HostingState.Startup;
@@ -426,26 +431,6 @@ public class ServerScript : MonoBehaviour {
             return true;
         }
         return false;
-    }
-
-    public void ChangeLevel() {
-        ChangeLevelIfNeeded(RandomHelper.InEnumerable(allowedLevels.Except(new[] { RoundScript.Instance.CurrentLevel })));
-    }
-
-    void SyncAndSpawn(string newLevel) {
-        ChangeLevelIfNeeded(newLevel);
-        SpawnScript.Instance.Spawn();
-    }
-
-    public void ChangeLevelIfNeeded(string newLevel) {
-        if (Application.loadedLevelName != newLevel) {
-            Application.LoadLevel(newLevel);
-            ChatScript.Instance.LogChat(Network.player, "Changed level to " + newLevel + ".", true, true);
-            RoundScript.Instance.CurrentLevel = newLevel;
-            if (currentServer != null) {
-                currentServer.Map = RoundScript.Instance.CurrentLevel;
-            }
-        }
     }
 
     bool Connect() {
