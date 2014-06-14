@@ -178,7 +178,7 @@ public class ServerScript : MonoBehaviour {
 
         if (currentServer == null) {
             // TODO: Somehow put this on screen
-            Debug.Log("Tried to find server, failed. Returning to interactive state.");
+            Debug.Log("Tried to find server, failed. Returning to startup state.");
             serverList = null;
             // Failed to find a server, restart the search
             hostState = HostingState.Startup;
@@ -194,7 +194,7 @@ public class ServerScript : MonoBehaviour {
         } else {
             currentServer.ConnectionFailed = true;
             // TODO: Get this on the screen
-            Debug.Log("Couldn't connect, will try choosing another server");
+            Debug.LogWarning("Couldn't connect, will try choosing another server");
             hostState = HostingState.Startup;
         }
     }
@@ -236,7 +236,7 @@ public class ServerScript : MonoBehaviour {
                     if (mappingResults.Any(x => x.Status == MappingStatus.Success)) {
                         Debug.Log("Some mapping attempts failed, but will proceed with hosting anyway");
                     } else {
-                        Debug.LogWarning("Can't map UPnP ports, but will proceed with hosting anyway");
+                        Debug.Log("Can't map UPnP ports, but will proceed with hosting anyway");
                     }
                     hostState = HostingState.ReadyToHost;
                 }
@@ -324,8 +324,6 @@ public class ServerScript : MonoBehaviour {
             hostState = HostingState.WaitingForInitialServers;
         }
 
-        Debug.Log("Updating servers");
-
         // Grab new server list
         if (ThreadPool.Instance != null) {
             ThreadPool.Instance.Fire(() => {
@@ -347,7 +345,7 @@ public class ServerScript : MonoBehaviour {
                         serverList = servers;
                         hostState = HostingState.WaitingForInput;
                     } catch (Exception ex) {
-                        Debug.Log(ex.ToString());
+                        Debug.LogWarning(ex.ToString());
                         throw ex;
                     }
                 }
@@ -406,14 +404,12 @@ public class ServerScript : MonoBehaviour {
 
     // Delete our server from the list
     void DeleteServer() {
-        Debug.Log("DeleteServer");
         // Do nothing on LAN-only mode
         if (lanMode) { return; }
 
         using (WebClient client = new WebClient()) {
             // TODO: Handle if the server is down
             client.UploadString(MasterServerUri + "/delete", serverToken);
-            Debug.Log("DeleteServer DONE");
         }
     }
 
@@ -483,7 +479,7 @@ public class ServerScript : MonoBehaviour {
 
                     result.Status = MappingStatus.Success;
                 } catch (Exception ex) {
-                    Debug.Log("Failed to validate mapping :\n" + ex.ToString());
+                    Debug.LogWarning("Failed to validate mapping :\n" + ex.ToString());
                     result.Status = MappingStatus.Failure;
                 }
             }
@@ -523,9 +519,9 @@ public class ServerScript : MonoBehaviour {
                     result.Device.DeletePortMap(result.Mapping);
                 } catch (Exception) {
                     if (result.Status == MappingStatus.Failure) {
-                        Debug.Log("Tried to delete invalid port mapping and failed");
+                        Debug.LogWarning("Tried to delete invalid port mapping and failed");
                     } else {
-                        Debug.Log("Failed to delete port mapping : " + result.Mapping);
+                        Debug.LogWarning("Failed to delete port mapping : " + result.Mapping);
                     }
                 }
             }
