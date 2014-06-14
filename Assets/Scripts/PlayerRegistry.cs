@@ -18,6 +18,7 @@ class PlayerRegistry : MonoBehaviour {
     }
 
     void Awake() {
+        DontDestroyOnLoad(this);
         Instance = this;
     }
 
@@ -34,10 +35,6 @@ class PlayerRegistry : MonoBehaviour {
 
     int ConnectedCount() {
         return registry.Values.Count(x => !x.Disconnected);
-    }
-
-    void OnNetworkInstantiate(NetworkMessageInfo info) {
-        DontDestroyOnLoad(gameObject);
     }
 
     public static void RegisterCurrentPlayer(string username, string guid) {
@@ -104,8 +101,11 @@ class PlayerRegistry : MonoBehaviour {
                 PlayerInfo info = registry[otherPlayer];
                 if (info.Disconnected) continue;
 
-
-                networkView.RPC("RegisterPlayerFull", player, otherPlayer, info.Username, info.GUID,
+                networkView.RPC("RegisterPlayerFull",
+                                player,
+                                otherPlayer,
+                                info.Username,
+                                info.GUID,
                                 new Vector3(info.Color.r, info.Color.g, info.Color.b),
                                 info.Spectating);
 

@@ -107,13 +107,13 @@ public class RoundScript : MonoBehaviour {
 
     [RPC]
     public void ChangeLevelTo(string levelName) {
-        ChangeLevelIfNeeded(levelName);
         roundsRemaining = roundPerLevel;
+        ChangeLevelIfNeeded(levelName);
     }
 
     [RPC]
-    public void SyncLevel(string toLevel) {
-        SyncAndSpawn(toLevel);
+    public void SyncLevel(string levelName) {
+        ChangeLevelIfNeeded(levelName);
     }
 
     [RPC]
@@ -174,9 +174,10 @@ public class RoundScript : MonoBehaviour {
         ChangeLevelIfNeeded(RandomHelper.InEnumerable(allowedLevels.Except(new[] { RoundScript.Instance.currentLevel })));
     }
 
-    void SyncAndSpawn(string newLevel) {
-        ChangeLevelIfNeeded(newLevel);
-        SpawnScript.Instance.Spawn();
+    void OnLevelWasLoaded(int id) {
+        if (Network.peerType != NetworkPeerType.Disconnected) {
+            SpawnScript.Instance.Spawn();
+        }
     }
 
     // Load new map

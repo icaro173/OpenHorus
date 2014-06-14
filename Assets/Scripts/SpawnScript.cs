@@ -8,7 +8,6 @@ public class SpawnScript : MonoBehaviour {
     public static SpawnScript Instance { get; private set; }
 
     public GameObject PlayerTemplate;
-    public GameObject PlayerRegistryPrefab;
 
     string chosenUsername;
 
@@ -17,7 +16,6 @@ public class SpawnScript : MonoBehaviour {
     }
 
     void OnServerInitialized() {
-        Network.Instantiate(PlayerRegistryPrefab, Vector3.zero, Quaternion.identity, 0);
         Spawn();
     }
 
@@ -26,6 +24,7 @@ public class SpawnScript : MonoBehaviour {
     }
 
     public void Spawn() {
+        Debug.Log("Spawning");
         if (ServerScript.Spectating) return;
 
         TaskManager.Instance.WaitUntil(_ => PlayerRegistry.Instance != null).Then(() => PlayerRegistry.RegisterCurrentPlayer(chosenUsername, networkView.owner.guid));

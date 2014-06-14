@@ -173,6 +173,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ca73633617af3843b5c4b80f9d3dd87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PlayerRegistryPrefab: {fileID: 100000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
   lanMode: 0
   peerType: 0
   guiSkin: {fileID: 11400000, guid: ca3d138dd65c2564f9ccc4895664196a, type: 2}
@@ -189,7 +190,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerTemplate: {fileID: 100000, guid: 11a4e5f239d167a44bfaf435661ccd48, type: 2}
-  PlayerRegistryPrefab: {fileID: 100000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
 --- !u!148 &502558921
 NetworkView:
   m_ObjectHideFlags: 0

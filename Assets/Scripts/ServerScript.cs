@@ -20,6 +20,7 @@ public class ServerScript : MonoBehaviour {
     public const string buildVersion = "14062014";
     public const string MasterServerUri = "http://ohs.padrepio.in/";
 
+    public GameObject PlayerRegistryPrefab;
     public bool lanMode = false;
     public NetworkPeerType peerType;
     public GUISkin guiSkin;
@@ -430,17 +431,17 @@ public class ServerScript : MonoBehaviour {
 
     bool Connect() {
         Debug.Log("Connecting to " + currentServer.GUID);
+        //peerType = NetworkPeerType.Connecting;
         NetworkConnectionError result = Network.Connect(currentServer.GUID);
         if (result != NetworkConnectionError.NoError) {
             return false;
         }
-        peerType = NetworkPeerType.Connecting;
         return true;
     }
 
-    void OnConnectedToServer() {
+    /*void OnConnectedToServer() {
         peerType = NetworkPeerType.Client;
-    }
+    }*/
 
     void OnPlayerConnected(NetworkPlayer player) {
         RoundScript.Instance.networkView.RPC("SyncLevel", player, RoundScript.Instance.currentLevel);
@@ -509,6 +510,7 @@ public class ServerScript : MonoBehaviour {
     void OnServerInitialized() {
         Debug.Log("GUID is " + Network.player.guid + ". Use this on clients to connect with NAT punchthrough.");
         Debug.Log("Local IP/port is " + Network.player.ipAddress + "/" + Network.player.port + ". Use this on clients to connect directly.");
+        Network.Instantiate(PlayerRegistryPrefab, Vector3.zero, Quaternion.identity, 0);
     }
 
     void OnApplicationQuit() {
