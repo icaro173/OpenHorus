@@ -55,8 +55,8 @@ public class PlayerScript : MonoBehaviour {
     public bool Paused { get; set; }
 
     // for interpolation on remote computers only
-    VectorInterpolator iPosition;
-    Vector3 lastNetworkFramePosition;
+    //VectorInterpolator iPosition;
+    //Vector3 lastNetworkFramePosition;
     Quaternion smoothLookRotation;
     float smoothYaw;
     List<NetworkPlayer> targetedBy { get; set; }
@@ -97,7 +97,7 @@ public class PlayerScript : MonoBehaviour {
         if (!networkView.isMine) {
             owner = networkView.owner;
             StartCoroutine(WaitAndLabel());
-            iPosition = new VectorInterpolator();
+            //iPosition = new VectorInterpolator();
             enabled = false;
         } else {
             owner = Network.player;
@@ -213,7 +213,7 @@ public class PlayerScript : MonoBehaviour {
 
             if (Input.GetKeyDown("i"))
                 invertMouse = !invertMouse;
-
+            
             if (Input.GetMouseButtonUp(0))
                 Screen.lockCursor = true;
 
@@ -227,9 +227,9 @@ public class PlayerScript : MonoBehaviour {
             transform.rotation = Quaternion.Euler(euler);
             cameraPivot.rotation = smoothLookRotation;
         } else {
-            if (iPosition.IsRunning) {
-                transform.position += iPosition.Update();
-            }
+            //if (iPosition.IsRunning) {
+                //transform.position += iPosition.Update();
+            //}
 
             smoothYaw = Mathf.LerpAngle(smoothYaw, lookRotationEuler.y, 0.4f);
             smoothLookRotation = Quaternion.Slerp(smoothLookRotation, Quaternion.Euler(lookRotationEuler), 0.3f);
@@ -248,14 +248,6 @@ public class PlayerScript : MonoBehaviour {
         }
         textBubble.transform.LookAt(Camera.main.transform);
         textBubble.transform.localRotation = textBubble.transform.localRotation * Quaternion.Euler(90, 0, 0);
-
-        // sync up actual player and camera transforms
-        /*
-        Vector3 euler = transform.rotation.eulerAngles;
-        euler.y = smoothYaw;
-        transform.rotation = Quaternion.Euler(euler);
-        cameraPivot.rotation = smoothLookRotation;
-        */
        
         // dash animation
         Color color = dashEffectRenderer.material.GetColor("_TintColor");
@@ -375,6 +367,7 @@ public class PlayerScript : MonoBehaviour {
         }
 
         // move!
+        if (networkView.isMine)
         controller.Move((smoothFallingVelocity + smoothedInputVelocity + recoilVelocity) * Time.deltaTime);
 
         if (sinceNotGrounded > 0.25f && controller.isGrounded) {
@@ -401,10 +394,10 @@ public class PlayerScript : MonoBehaviour {
         //Vector3 pPosition = stream.isWriting ? transform.position : Vector3.zero;
 
         //stream.Serialize(ref pPosition);
-        //stream.Serialize(ref inputVelocity);
-        //stream.Serialize(ref fallingVelocity);
+        stream.Serialize(ref inputVelocity);
+        stream.Serialize(ref fallingVelocity);
         stream.Serialize(ref activelyJumping);
-        //stream.Serialize(ref recoilVelocity);
+        stream.Serialize(ref recoilVelocity);
         stream.Serialize(ref textBubbleVisible);
         stream.Serialize(ref playDashSound);
         stream.Serialize(ref playJumpSound);
@@ -412,10 +405,10 @@ public class PlayerScript : MonoBehaviour {
 
         if (stream.isReading) {
             //if (lastNetworkFramePosition == pPosition)
-                //transform.position = pPosition;
+            //    transform.position = pPosition;
 
             //if (!iPosition.Start(pPosition - transform.position))
-                //transform.position = pPosition;
+            //    transform.position = pPosition;
 
             if (playDashSound && GlobalSoundsScript.soundEnabled) dashSound.Play();
             if (playJumpSound && GlobalSoundsScript.soundEnabled) jumpSound.Play();
