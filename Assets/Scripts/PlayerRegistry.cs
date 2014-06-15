@@ -18,6 +18,8 @@ class PlayerRegistry : MonoBehaviour {
     }
 
     void Awake() {
+        if (Instance != null)
+            DestroyImmediate(Instance.gameObject);
         DontDestroyOnLoad(this);
         Instance = this;
     }
@@ -95,7 +97,7 @@ class PlayerRegistry : MonoBehaviour {
 
     void OnNetworkInstantiate(NetworkMessageInfo info) {
         if (!Network.isServer) {
-            networkView.RPC("RequestRegister", Network.player);
+            networkView.RPC("RequestRegister", RPCMode.Server, Network.player);
         }
     }
 
