@@ -14,7 +14,7 @@ class PlayerRegistry : MonoBehaviour {
     }
 
     public static bool Has(NetworkPlayer player) {
-        return Instance.registry.ContainsKey(player);
+        return Instance != null && Instance.registry.ContainsKey(player);
     }
 
     void Awake() {
