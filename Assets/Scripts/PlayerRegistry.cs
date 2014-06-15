@@ -19,7 +19,7 @@ class PlayerRegistry : MonoBehaviour {
 
     void Awake() {
         if (Instance != null)
-            DestroyImmediate(Instance.gameObject);
+            Instance.Clear();
         DontDestroyOnLoad(this);
         Instance = this;
     }

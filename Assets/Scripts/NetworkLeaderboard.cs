@@ -21,7 +21,8 @@ class NetworkLeaderboard : MonoBehaviour {
 
     void OnNetworkInstantiate(NetworkMessageInfo info) {
         if (instance != null)
-            DestroyImmediate(Instance.gameObject);
+            instance.Clear();
+
         instance = this;
 
         DontDestroyOnLoad(gameObject);
