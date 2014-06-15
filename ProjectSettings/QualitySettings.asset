@@ -4,19 +4,19 @@
 QualitySettings:
   m_ObjectHideFlags: 0
   serializedVersion: 5
-  m_CurrentQuality: 4
+  m_CurrentQuality: 0
   m_QualitySettings:
   - serializedVersion: 2
-    name: Lowest
-    pixelLightCount: 0
-    shadows: 1
-    shadowResolution: 0
+    name: Legacy
+    pixelLightCount: 1
+    shadows: 0
+    shadowResolution: 3
     shadowProjection: 1
-    shadowCascades: 1
-    shadowDistance: 200
+    shadowCascades: 4
+    shadowDistance: 400
     blendWeights: 1
-    textureQuality: 0
-    anisotropicTextures: 1
+    textureQuality: 3
+    anisotropicTextures: 0
     antiAliasing: 0
     softParticles: 0
     softVegetation: 1
@@ -27,14 +27,14 @@ QualitySettings:
     excludedTargetPlatforms: []
   - serializedVersion: 2
     name: Low
-    pixelLightCount: 1
+    pixelLightCount: 0
     shadows: 1
     shadowResolution: 0
     shadowProjection: 1
     shadowCascades: 1
     shadowDistance: 200
     blendWeights: 1
-    textureQuality: 0
+    textureQuality: 2
     anisotropicTextures: 1
     antiAliasing: 0
     softParticles: 0
@@ -67,25 +67,6 @@ QualitySettings:
     name: High
     pixelLightCount: 2
     shadows: 1
-    shadowResolution: 2
-    shadowProjection: 1
-    shadowCascades: 2
-    shadowDistance: 300
-    blendWeights: 1
-    textureQuality: 0
-    anisotropicTextures: 1
-    antiAliasing: 4
-    softParticles: 0
-    softVegetation: 1
-    vSyncCount: 0
-    lodBias: 5
-    maximumLODLevel: 0
-    particleRaycastBudget: 4
-    excludedTargetPlatforms: []
-  - serializedVersion: 2
-    name: Highest
-    pixelLightCount: 2
-    shadows: 1
     shadowResolution: 3
     shadowProjection: 1
     shadowCascades: 4
@@ -101,4 +82,11 @@ QualitySettings:
     maximumLODLevel: 0
     particleRaycastBudget: 4
     excludedTargetPlatforms: []
-  m_PerPlatformDefaultQuality: {}
+  m_PerPlatformDefaultQuality:
+    Android: 0
+    BlackBerry: 0
+    Standalone: 0
+    WP8: 0
+    Web: 0
+    Windows Store Apps: 0
+    iPhone: 0
