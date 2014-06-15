@@ -36375,7 +36375,7 @@ Light:
     m_Type: 1
     m_Resolution: -1
     m_Strength: .5
-    m_Bias: .0500000007
+    m_Bias: .400000006
     m_Softness: 8
     m_SoftnessFade: 5
   m_Cookie: {fileID: 0}
