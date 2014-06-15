@@ -271,11 +271,15 @@ public class ServerScript : MonoBehaviour {
         if (peerType == NetworkPeerType.Disconnected && hostState == HostingState.WaitingForInput) {
             GUI.skin = guiSkin;
 
-            // Welcome message is now a chat prompt
-            if (serverList != null) {
+            if (lanMode) {
+                GUI.Box(new Rect((Screen.width / 2) - 122, Screen.height - 145, 248, 35), "Lan Mode - Master server is disabled".ToUpperInvariant());
+            } else if (serverList != null) {
                 string message = "Server activity : " + serverList.Connections + " players in " + serverList.Activegames + " games.";
                 GUI.Box(new Rect((Screen.width / 2) - 122, Screen.height - 145, 248, 35), message.ToUpperInvariant());
             }
+
+            // Write the current version somewhere
+            GUI.Box(new Rect(0, 0, 80, 35), (buildVersion.ToString()).ToUpperInvariant());
 
             Screen.showCursor = true;
             GUILayout.Window(0, new Rect((Screen.width / 2) - 122, Screen.height - 110, 77, 35), Login, string.Empty);
@@ -314,6 +318,9 @@ public class ServerScript : MonoBehaviour {
 
     // Get list of servers from the master server
     void QueryServerList() {
+        // If we're in LAN-only mode we all the fetching
+        if (lanMode) { hostState = HostingState.WaitingForInput; }
+
         // Create server blacklist (remove servers we failed to connect to)
         string[] blackList = null;
         if (serverList != null && serverList != null) {
