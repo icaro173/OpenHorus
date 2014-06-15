@@ -388,9 +388,9 @@ SceneSettings:
 --- !u!104 &2
 RenderSettings:
   m_Fog: 1
-  m_FogColor: {r: .996078432, g: .921568632, b: .870588243, a: 1}
+  m_FogColor: {r: .639976203, g: .824108839, b: .977941155, a: 1}
   m_FogMode: 3
-  m_FogDensity: .00100000005
+  m_FogDensity: .0013
   m_LinearFogStart: 100
   m_LinearFogEnd: 410.100006
   m_AmbientLight: {r: 1, g: .926943004, b: .874509811, a: 1}
@@ -8267,7 +8267,7 @@ Transform:
   m_Children:
   - {fileID: 343442596}
   m_Father: {fileID: 1613302600}
-  m_RootOrder: 0
+  m_RootOrder: 1
 --- !u!1 &296057652
 GameObject:
   m_ObjectHideFlags: 0
@@ -19742,7 +19742,7 @@ Transform:
   m_Children:
   - {fileID: 1592124465}
   m_Father: {fileID: 1613302600}
-  m_RootOrder: 1
+  m_RootOrder: 0
 --- !u!1 &717182528
 GameObject:
   m_ObjectHideFlags: 0
@@ -42019,8 +42019,8 @@ Transform:
   m_LocalPosition: {x: 260.594543, y: 62.5, z: 146.809219}
   m_LocalScale: {x: 1.02499998, y: .574999988, z: 1.02499998}
   m_Children:
-  - {fileID: 294540293}
   - {fileID: 716443178}
+  - {fileID: 294540293}
   m_Father: {fileID: 1333200397}
   m_RootOrder: 14
 --- !u!1 &1618608121
