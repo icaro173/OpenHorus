@@ -554,6 +554,12 @@ public class ServerScript : MonoBehaviour {
             DeleteServer();
         }
 
+        if (PlayerRegistry.Instance != null)
+            PlayerRegistry.Instance.Clear();
+
+        if (NetworkLeaderboard.Instance != null)
+            NetworkLeaderboard.Instance.Clear();
+
         hostState = HostingState.Startup;
     }
 }
