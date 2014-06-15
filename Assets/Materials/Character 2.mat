@@ -6,8 +6,10 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: character - Copy
+  m_Name: Character 2
   m_Shader: {fileID: 4800000, guid: ba30d7897889d90408b9c37484f0708b, type: 3}
+  m_ShaderKeywords: []
+  m_CustomRenderQueue: -1
   m_SavedProperties:
     serializedVersion: 2
     m_TexEnvs:
@@ -53,6 +55,18 @@ Material:
         first:
           name: _TexAmount
         second: .202898517
+      data:
+        first:
+          name: _Contrast
+        second: 1
+      data:
+        first:
+          name: _Saturation
+        second: 1
+      data:
+        first:
+          name: _Brightness
+        second: 1
     m_Colors:
       data:
         first:
@@ -60,9 +74,9 @@ Material:
         second: {r: 1, g: 1, b: 1, a: 1}
       data:
         first:
-          name: _SpecColor
-        second: {r: 0, g: 0, b: 0, a: 1}
-      data:
-        first:
           name: _Emission
         second: {r: 0, g: 0, b: 0, a: 0}
+      data:
+        first:
+          name: _SpecColor
+        second: {r: 0, g: 0, b: 0, a: 1}

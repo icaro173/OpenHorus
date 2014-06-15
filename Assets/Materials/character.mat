@@ -6,7 +6,7 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: character
+  m_Name: Character
   m_Shader: {fileID: 4800000, guid: ba30d7897889d90408b9c37484f0708b, type: 3}
   m_ShaderKeywords: []
   m_CustomRenderQueue: -1
@@ -45,6 +45,10 @@ Material:
         second: .699999988
       data:
         first:
+          name: _EmissionLM
+        second: 0
+      data:
+        first:
           name: _DiffuseAmount
         second: .0803571418
       data:
@@ -63,10 +67,6 @@ Material:
         first:
           name: _Brightness
         second: 1.12713516
-      data:
-        first:
-          name: _EmissionLM
-        second: 0
     m_Colors:
       data:
         first:

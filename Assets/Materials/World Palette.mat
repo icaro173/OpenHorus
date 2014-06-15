@@ -6,7 +6,7 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: World - Copy
+  m_Name: World Palette
   m_Shader: {fileID: 4800000, guid: ba30d7897889d90408b9c37484f0708b, type: 3}
   m_ShaderKeywords: []
   m_CustomRenderQueue: -1
@@ -63,7 +63,7 @@ Material:
       data:
         first:
           name: _DiffuseAmount
-        second: .419642866
+        second: 0
       data:
         first:
           name: _TexAmount
@@ -71,15 +71,15 @@ Material:
       data:
         first:
           name: _Contrast
-        second: 1.02807975
+        second: 1.09057975
       data:
         first:
           name: _Saturation
-        second: .904244363
+        second: 1.0471015
       data:
         first:
           name: _Brightness
-        second: 1.13392842
+        second: .999999881
       data:
         first:
           name: _SpecBoost
@@ -124,12 +124,12 @@ Material:
       data:
         first:
           name: _Color
-        second: {r: 1, g: .925841868, b: .845814884, a: 1}
-      data:
-        first:
-          name: _SpecColor
-        second: {r: 1, g: 1, b: 1, a: 1}
+        second: {r: 1, g: .977472603, b: .961304605, a: 1}
       data:
         first:
           name: _Emission
         second: {r: 0, g: 0, b: 0, a: 0}
+      data:
+        first:
+          name: _SpecColor
+        second: {r: 1, g: 1, b: 1, a: 1}
