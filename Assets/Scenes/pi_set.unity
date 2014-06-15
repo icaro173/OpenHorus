@@ -5240,6 +5240,10 @@ Prefab:
       propertyPath: m_LightmapTilingOffset.w
       value: .657226562
       objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 55a777919d7a948228d95230a855e60c, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 55a777919d7a948228d95230a855e60c, type: 3}
   m_RootGameObject: {fileID: 716443177}
@@ -6398,6 +6402,10 @@ Prefab:
     - target: {fileID: 2300000, guid: d782ab936d0ec49e3afbfd6e6979b8ff, type: 2}
       propertyPath: m_LightmapTilingOffset.w
       value: .426834106
+      objectReference: {fileID: 0}
+    - target: {fileID: 400002, guid: d782ab936d0ec49e3afbfd6e6979b8ff, type: 2}
+      propertyPath: m_RootOrder
+      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: d782ab936d0ec49e3afbfd6e6979b8ff, type: 2}
@@ -8259,7 +8267,7 @@ Transform:
   m_Children:
   - {fileID: 343442596}
   m_Father: {fileID: 1613302600}
-  m_RootOrder: 1
+  m_RootOrder: 0
 --- !u!1 &296057652
 GameObject:
   m_ObjectHideFlags: 0
@@ -19734,7 +19742,7 @@ Transform:
   m_Children:
   - {fileID: 1592124465}
   m_Father: {fileID: 1613302600}
-  m_RootOrder: 0
+  m_RootOrder: 1
 --- !u!1 &717182528
 GameObject:
   m_ObjectHideFlags: 0
@@ -36359,7 +36367,7 @@ Light:
   serializedVersion: 3
   m_Type: 1
   m_Color: {r: 1, g: .926943004, b: .874509811, a: 1}
-  m_Intensity: 1
+  m_Intensity: .600000024
   m_Range: 10
   m_SpotAngle: 30
   m_CookieSize: 10
@@ -36644,7 +36652,7 @@ Transform:
   m_PrefabInternal: {fileID: 1925929606}
   m_GameObject: {fileID: 1375120982}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.74744272, y: 0, z: 12.948863}
+  m_LocalPosition: {x: 1.74746847, y: -1.4649632, z: 12.9488764}
   m_LocalScale: {x: 1.10925245, y: 1.1092521, z: 1.1092521}
   m_Children: []
   m_Father: {fileID: 797498659}
@@ -36658,7 +36666,7 @@ Renderer:
   m_GameObject: {fileID: 1375120982}
   m_Enabled: 1
   m_CastShadows: 0
-  m_ReceiveShadows: 0
+  m_ReceiveShadows: 1
   m_LightmapIndex: 0
   m_LightmapTilingOffset: {x: .307617188, y: .307617188, z: .68239212, w: -.00120162964}
   m_Materials:
@@ -37931,7 +37939,7 @@ Renderer:
   m_LightmapIndex: 255
   m_LightmapTilingOffset: {x: 1, y: 1, z: 0, w: 0}
   m_Materials:
-  - {fileID: 2100000, guid: e1025ef8eea7b4c1986ef6c8e420eaa5, type: 2}
+  - {fileID: 2100000, guid: aa869c4582bd03642a213cd6806c7267, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -37954,7 +37962,7 @@ Transform:
   m_PrefabInternal: {fileID: 1925929606}
   m_GameObject: {fileID: 1443379260}
   m_LocalRotation: {x: 0, y: 1.29101466e-07, z: 0, w: 1}
-  m_LocalPosition: {x: 14.3594904, y: 1.47369421, z: -4.37298727}
+  m_LocalPosition: {x: 14.3595247, y: .458125979, z: -4.37298298}
   m_LocalScale: {x: 1.76819599, y: 1.76819539, z: 1.76819575}
   m_Children: []
   m_Father: {fileID: 797498659}
@@ -42011,8 +42019,8 @@ Transform:
   m_LocalPosition: {x: 260.594543, y: 62.5, z: 146.809219}
   m_LocalScale: {x: 1.02499998, y: .574999988, z: 1.02499998}
   m_Children:
-  - {fileID: 716443178}
   - {fileID: 294540293}
+  - {fileID: 716443178}
   m_Father: {fileID: 1333200397}
   m_RootOrder: 14
 --- !u!1 &1618608121
@@ -51181,7 +51189,7 @@ Prefab:
     - target: {fileID: 2300000, guid: 09ff75cf4be97c649937e6ac69bc404f, type: 2}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: e1025ef8eea7b4c1986ef6c8e420eaa5, type: 2}
+      objectReference: {fileID: 2100000, guid: aa869c4582bd03642a213cd6806c7267, type: 2}
     - target: {fileID: 100000, guid: 09ff75cf4be97c649937e6ac69bc404f, type: 2}
       propertyPath: m_StaticEditorFlags
       value: 4294967295
@@ -51216,15 +51224,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 400004, guid: 09ff75cf4be97c649937e6ac69bc404f, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 1.74744272
+      value: 1.74746847
       objectReference: {fileID: 0}
     - target: {fileID: 400004, guid: 09ff75cf4be97c649937e6ac69bc404f, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -1.4649632
       objectReference: {fileID: 0}
     - target: {fileID: 400004, guid: 09ff75cf4be97c649937e6ac69bc404f, type: 2}
       propertyPath: m_LocalPosition.z
-      value: 12.948863
+      value: 12.9488764
       objectReference: {fileID: 0}
     - target: {fileID: 400004, guid: 09ff75cf4be97c649937e6ac69bc404f, type: 2}
       propertyPath: m_LocalScale.x
@@ -51244,15 +51252,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: 09ff75cf4be97c649937e6ac69bc404f, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 14.3594904
+      value: 14.3595247
       objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: 09ff75cf4be97c649937e6ac69bc404f, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 1.47369421
+      value: .458125979
       objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: 09ff75cf4be97c649937e6ac69bc404f, type: 2}
       propertyPath: m_LocalPosition.z
-      value: -4.37298727
+      value: -4.37298298
       objectReference: {fileID: 0}
     - target: {fileID: 400002, guid: 09ff75cf4be97c649937e6ac69bc404f, type: 2}
       propertyPath: m_LocalScale.x
@@ -51281,6 +51289,14 @@ Prefab:
     - target: {fileID: 2300002, guid: 09ff75cf4be97c649937e6ac69bc404f, type: 2}
       propertyPath: m_LightmapTilingOffset.w
       value: -.00120162964
+      objectReference: {fileID: 0}
+    - target: {fileID: 100002, guid: 09ff75cf4be97c649937e6ac69bc404f, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2300002, guid: 09ff75cf4be97c649937e6ac69bc404f, type: 2}
+      propertyPath: m_ReceiveShadows
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 09ff75cf4be97c649937e6ac69bc404f, type: 2}
