@@ -6,7 +6,7 @@ public class GlobalSoundsScript : MonoBehaviour {
     public AudioSource buttonPressSound;
 
     static GlobalSoundsScript Instance;
-    static bool playing = false; //work around the fact that TaskManager does a DontDestroyOnLoad
+    static bool playing = false;
 
     public int lastSongId = -1;
 
@@ -28,13 +28,15 @@ public class GlobalSoundsScript : MonoBehaviour {
     }
 
     void Update() {
-        if (Input.GetKeyDown("m"))
-            audio.mute = !audio.mute; // Disable music
+        if (Input.GetKeyDown("m")) {
+            audio.mute = !audio.mute;
+        }
 
-        if (Input.GetKeyDown("n"))
+        if (Input.GetKeyDown("n")) {
             GlobalSoundsScript.soundEnabled = !GlobalSoundsScript.soundEnabled;
+        }
 
-        if (!audio.mute && !audio.isPlaying)
+        if (!audio.mute && !audio.isPlaying && Application.loadedLevel != 0)
             PlaySong();
     }
 
