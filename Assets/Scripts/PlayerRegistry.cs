@@ -93,7 +93,14 @@ class PlayerRegistry : MonoBehaviour {
         Debug.Log("Unregistering player : " + player + " (" + ConnectedCount() + " left)");
     }
 
-    public void OnPlayerConnected(NetworkPlayer player) {
+    void OnNetworkInstantiate(NetworkMessageInfo info) {
+        if (!Network.isServer) {
+            networkView.RPC("RequestRegister", Network.player);
+        }
+    }
+
+    [RPC]
+    public void RequestRegister(NetworkPlayer player) {
         Debug.Log("Propagating player registry to player " + player);
 
         foreach (NetworkPlayer otherPlayer in registry.Keys) {
@@ -101,6 +108,7 @@ class PlayerRegistry : MonoBehaviour {
                 PlayerInfo info = registry[otherPlayer];
                 if (info.Disconnected) continue;
 
+                Debug.Log("RegisterPlayerFull");
                 networkView.RPC("RegisterPlayerFull",
                                 player,
                                 otherPlayer,

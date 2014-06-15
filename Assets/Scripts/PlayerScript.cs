@@ -98,7 +98,6 @@ public class PlayerScript : MonoBehaviour {
         if (!networkView.isMine) {
             owner = networkView.owner;
             StartCoroutine(WaitAndLabel());
-            //iPosition = new VectorInterpolator();
             enabled = false;
         } else {
             owner = Network.player;
