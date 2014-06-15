@@ -384,7 +384,7 @@ public class ServerScript : MonoBehaviour {
         serverItem.Info = currentServer;
 
         // Set player count
-        currentServer.CurrentPlayers = Network.connections.Length;
+        currentServer.CurrentPlayers = Network.connections.Length + 1;
 
         // Create JSON string
         string serverItemJSON = JsonConvert.SerializeObject(serverItem);
