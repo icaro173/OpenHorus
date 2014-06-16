@@ -158,7 +158,6 @@ public class BulletScript : MonoBehaviour {
         // max lifetime
         lifetime -= Time.deltaTime;
         if (lifetime <= 0) {
-            Debug.Log("BulletDeath");
             Destroy(gameObject);
         }
     }

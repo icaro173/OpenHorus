@@ -156,9 +156,11 @@ public class RoundScript : MonoBehaviour {
 
     public void ChangeLevelAndRestart(string toLevelName)
     {
+        // Destroy all old calls
         Network.RemoveRPCsInGroup(0);
         Network.RemoveRPCsInGroup(1);
-        networkView.RPC("ChangeLevelAndRestartRCP", RPCMode.AllBuffered, toLevelName, lastLevelPrefix + 1);
+        networkView.RPC("ChangeLevelAndRestartRCP", RPCMode.OthersBuffered, toLevelName, lastLevelPrefix + 1);
+        ChangeLevelAndRestartRCP(toLevelName, lastLevelPrefix + 1);
     }
 
     // Force map change (used from chat)
@@ -204,6 +206,7 @@ public class RoundScript : MonoBehaviour {
         Network.SetSendingEnabled(0, true);
 
         if (Network.peerType != NetworkPeerType.Disconnected) {
+            PlayerRegistry.Clear();
             SpawnScript.Instance.CreatePlayer();
         }
     }

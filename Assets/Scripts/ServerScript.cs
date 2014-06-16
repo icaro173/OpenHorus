@@ -17,7 +17,7 @@ public class ServerScript : MonoBehaviour {
 
     //Public
     public const int port = 31414;
-    public const string buildVersion = "15062014";
+    public const string buildVersion = "16062014";
     public const string MasterServerUri = "http://ohs.padrepio.in/";
 
     //public GameObject PlayerRegistryPrefab;

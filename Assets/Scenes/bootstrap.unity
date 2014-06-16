@@ -198,59 +198,11 @@ NetworkView:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 502558917}
   m_Enabled: 1
-  m_StateSynchronization: 0
+  m_StateSynchronization: 1
   m_Observed: {fileID: 0}
   m_ViewID:
     m_ID: 4
     m_Type: 1
---- !u!1001 &506307641
-Prefab:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 502558918}
-    m_Modifications:
-    - target: {fileID: 400000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
-      propertyPath: m_LocalPosition.x
-      value: -80.3732224
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
-      propertyPath: m_LocalPosition.y
-      value: 94.6052322
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
-      propertyPath: m_LocalPosition.z
-      value: -44.0989571
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 14800000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
-      propertyPath: m_ViewID.m_ID
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 14800000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
-      propertyPath: m_ViewID.m_Type
-      value: 1
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-  m_ParentPrefab: {fileID: 100100000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
-  m_RootGameObject: {fileID: 844585323}
-  m_IsPrefabParent: 0
-  m_IsExploded: 1
 --- !u!1 &650575160
 GameObject:
   m_ObjectHideFlags: 0
@@ -425,7 +377,7 @@ MonoBehaviour:
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 100000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
-  m_PrefabInternal: {fileID: 506307641}
+  m_PrefabInternal: {fileID: 1496007404}
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 844585324}
@@ -442,7 +394,7 @@ GameObject:
 Transform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 400000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
-  m_PrefabInternal: {fileID: 506307641}
+  m_PrefabInternal: {fileID: 1496007404}
   m_GameObject: {fileID: 844585323}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -80.3732224, y: 94.6052322, z: -44.0989571}
@@ -454,11 +406,11 @@ NetworkView:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 14800000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300,
     type: 2}
-  m_PrefabInternal: {fileID: 506307641}
+  m_PrefabInternal: {fileID: 1496007404}
   m_GameObject: {fileID: 844585323}
   m_Enabled: 1
-  m_StateSynchronization: 0
-  m_Observed: {fileID: 844585326}
+  m_StateSynchronization: 1
+  m_Observed: {fileID: 0}
   m_ViewID:
     m_ID: 5
     m_Type: 1
@@ -467,7 +419,7 @@ MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 11400000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300,
     type: 2}
-  m_PrefabInternal: {fileID: 506307641}
+  m_PrefabInternal: {fileID: 1496007404}
   m_GameObject: {fileID: 844585323}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -790,6 +742,54 @@ MonoBehaviour:
   explosionHitPrefab: {fileID: 100000, guid: 55246ff3c507476458227ef1615a081f, type: 2}
   areaExplosionPrefab: {fileID: 100000, guid: 1aa3b4ef5d08ba648bdc957a48c7b97a, type: 2}
   hitConePrefab: {fileID: 100004, guid: a41ba4945ea359346a14ec46a438c3c3, type: 2}
+--- !u!1001 &1496007404
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 502558918}
+    m_Modifications:
+    - target: {fileID: 400000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: -80.3732224
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 94.6052322
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: -44.0989571
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 400000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 14800000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
+      propertyPath: m_ViewID.m_ID
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 14800000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
+      propertyPath: m_ViewID.m_Type
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: 9f79dcc20d27bcb48a621f4e6b8e2300, type: 2}
+  m_RootGameObject: {fileID: 844585323}
+  m_IsPrefabParent: 0
+  m_IsExploded: 1
 --- !u!1 &1568228815
 GameObject:
   m_ObjectHideFlags: 0
@@ -826,7 +826,7 @@ NetworkView:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1568228815}
   m_Enabled: 1
-  m_StateSynchronization: 0
+  m_StateSynchronization: 1
   m_Observed: {fileID: 0}
   m_ViewID:
     m_ID: 2
@@ -940,8 +940,8 @@ NetworkView:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1834919049}
   m_Enabled: 1
-  m_StateSynchronization: 0
-  m_Observed: {fileID: 0}
+  m_StateSynchronization: 1
+  m_Observed: {fileID: 1834919052}
   m_ViewID:
     m_ID: 3
     m_Type: 1

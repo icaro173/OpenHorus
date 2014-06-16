@@ -23,6 +23,10 @@ class PlayerRegistry : MonoBehaviour {
         Instance = this;
     }
 
+    public static void Clear() {
+        Instance.registry.Clear();
+    }
+
     public static NetworkPlayer For(Transform player) {
         for (int i = 0; i < PlayerRegistry.Instance.registry.Count; i++) {
             PlayerRegistry.PlayerInfo otherPlayer = PlayerRegistry.Instance.registry.ElementAt(i).Value;
