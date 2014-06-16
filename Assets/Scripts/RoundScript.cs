@@ -183,10 +183,12 @@ public class RoundScript : MonoBehaviour {
         lastLevelPrefix = levelPrefix;
         PlayerRegistry.Clear();
 
+        // Destroy our old stuff
+        Network.RemoveRPCs(Network.player);
+
         // Disable sending
         // Stop recieving
         // Move to new level prefix
-        Network.RemoveRPCs(Network.player);
         Network.SetSendingEnabled(0, false);
         Network.isMessageQueueRunning = false;
         Network.SetLevelPrefix(levelPrefix);
