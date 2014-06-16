@@ -6,7 +6,7 @@ using System.Collections.Generic;
 public class RoundScript : MonoBehaviour {
     // Public
     public string[] allowedLevels = { "pi_rah", "pi_jst", "pi_mar", "pi_ven", "pi_gho", "pi_set" };
-    public static int lastLevelPrefix = 0;
+    private static int lastLevelPrefix = 0;
 
     // Private
     private const int roundDuration = 60*3;
@@ -95,7 +95,7 @@ public class RoundScript : MonoBehaviour {
     void endRound(int timeout) {
         if (roundsRemaining <= 0) {
             // Have the players change level
-            networkView.RPC("ChangeLevelAndRestart", RPCMode.Others, getRandomMap(), lastLevelPrefix + 1);
+            ChangeLevelAndRestart(getRandomMap());
         }
 
         // Announce new round
@@ -154,9 +154,14 @@ public class RoundScript : MonoBehaviour {
         roundStopped = false;
     }
 
+    public void ChangeLevelAndRestart(string toLevelName)
+    {
+        networkView.RPC("ChangeLevelAndRestartRCP", RPCMode.AllBuffered, getRandomMap(), lastLevelPrefix + 1);
+    }
+
     // Force map change (used from chat)
     [RPC]
-    public void ChangeLevelAndRestart(string toLevelName, int levelPrefix) {
+    private void ChangeLevelAndRestartRCP(string toLevelName, int levelPrefix) {
         roundsRemaining = roundPerLevel;
         ChangeLevel(toLevelName, levelPrefix);
         RestartRound();

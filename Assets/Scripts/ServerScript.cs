@@ -508,7 +508,7 @@ public class ServerScript : MonoBehaviour {
     void OnServerInitialized() {
         Debug.Log("GUID is " + Network.player.guid + ". Use this on clients to connect with NAT punchthrough.");
         Debug.Log("Local IP/port is " + Network.player.ipAddress + "/" + Network.player.port + ". Use this on clients to connect directly.");
-        RoundScript.Instance.networkView.RPC("ChangeLevelAndRestart", RPCMode.AllBuffered, Application.loadedLevelName, RoundScript.lastLevelPrefix+1);
+        RoundScript.Instance.ChangeLevelAndRestart(Application.loadedLevelName);
     }
 
     void OnApplicationQuit() {

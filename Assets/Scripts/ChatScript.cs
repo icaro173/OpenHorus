@@ -140,7 +140,7 @@ public class ChatScript : MonoBehaviour {
                                             "Level " + messageParts[1] + " does not exist. " +
                                             StringHelper.DeepToString(RoundScript.Instance.allowedLevels), true, true);
                                 } else {
-                                    RoundScript.Instance.networkView.RPC("ChangeLevelAndRestart", RPCMode.All, messageParts[1]);
+                                    RoundScript.Instance.ChangeLevelAndRestart(messageParts[1]);
                                 }
                                 break;
 
