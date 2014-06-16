@@ -446,14 +446,6 @@ public class ServerScript : MonoBehaviour {
         return true;
     }
 
-    /*void OnConnectedToServer() {
-        peerType = NetworkPeerType.Client;
-    }*/
-
-    void OnPlayerConnected(NetworkPlayer player) {
-        RoundScript.Instance.networkView.RPC("SyncLevel", player, RoundScript.Instance.currentLevel);
-    }
-
     void StartNatDiscovery() {
         natDiscoveryStarted = true;
 
@@ -516,7 +508,7 @@ public class ServerScript : MonoBehaviour {
     void OnServerInitialized() {
         Debug.Log("GUID is " + Network.player.guid + ". Use this on clients to connect with NAT punchthrough.");
         Debug.Log("Local IP/port is " + Network.player.ipAddress + "/" + Network.player.port + ". Use this on clients to connect directly.");
-        //Network.Instantiate(PlayerRegistryPrefab, Vector3.zero, Quaternion.identity, 0);
+        networkView.RPC("ChangeLevelAndRestart", RPCMode.AllBuffered, Application.loadedLevelName);
     }
 
     void OnApplicationQuit() {

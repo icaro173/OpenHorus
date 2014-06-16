@@ -49,6 +49,8 @@ class PlayerRegistry : MonoBehaviour {
 
     [RPC]
     public void RegisterPlayer(NetworkPlayer player, string username, string guid, Vector3 color, bool isSpectating = false) {
+        Debug.Log("RegisterPlayer");
+
         if (registry.ContainsKey(player)) {
             Debug.Log("Tried to register player " + player + " but was already registered. Current username : " + registry[player].Username + " | wanted username : " + username + " (removing...)");
             registry.Remove(player);
@@ -64,7 +66,7 @@ class PlayerRegistry : MonoBehaviour {
         Transform location = playerData.transform;
 
         registry.Add(player, new PlayerInfo { Username = username, Color = new Color(color.x, color.y, color.z), Spectating = isSpectating, Location = location, GUID = guid });
-        Debug.Log("Registered other player : " + player + " = " + username + " now)");
+        Debug.Log("Registered other player : " + player + " = " + username + " now");
     }
 
     [RPC]
@@ -86,7 +88,6 @@ class PlayerRegistry : MonoBehaviour {
                 PlayerInfo info = registry[otherPlayer];
                 if (info.Disconnected) continue;
 
-                Debug.Log("RegisterPlayer");
                 networkView.RPC("RegisterPlayer",
                                 player,
                                 otherPlayer,

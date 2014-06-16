@@ -40,10 +40,6 @@ public class RoundScript : MonoBehaviour {
         }
     }
 
-    void OnServerInitialized() {
-        networkView.RPC("ChangeLevelAndRestart", RPCMode.All, Application.loadedLevelName);
-    }
-
     // Time Events
     void handleTimeEvents(float time) {
         if (roundTimeEvents == null) {
