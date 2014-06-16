@@ -158,7 +158,6 @@ public class RoundScript : MonoBehaviour {
     public void ChangeLevelAndRestart(string toLevelName)
     {
         // Destroy all old calls
-        //Network.RemoveRPCsInGroup(0);
         Network.RemoveRPCsInGroup(1);
         networkView.RPC("ChangeLevelAndRestartRCP", RPCMode.OthersBuffered, toLevelName, lastLevelPrefix + 1);
         ChangeLevelAndRestartRCP(toLevelName, lastLevelPrefix + 1);
@@ -186,7 +185,9 @@ public class RoundScript : MonoBehaviour {
         // Disable sending
         // Stop recieving
         // Move to new level prefix
-        Network.RemoveRPCsInGroup(0);
+        if (Network.isServer) {
+            Network.RemoveRPCsInGroup(0);
+        }
         Network.SetSendingEnabled(0, false);
         Network.isMessageQueueRunning = false;
         Network.SetLevelPrefix(levelPrefix);

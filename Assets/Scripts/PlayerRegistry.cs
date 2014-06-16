@@ -11,7 +11,6 @@ class PlayerRegistry : MonoBehaviour {
         public string GUID;
         public Color Color;
         public bool Spectating;
-        public bool Disconnected;
         public Transform Location;
     }
 
@@ -48,7 +47,8 @@ class PlayerRegistry : MonoBehaviour {
     }
 
     public static void RegisterCurrentPlayer(string username) {
-        Instance.networkView.RPC("RegisterPlayer", RPCMode.AllBuffered, Network.player, username, Network.player.guid, new Vector3(1, 1, 1), false);
+        Instance.networkView.RPC("RegisterPlayer", RPCMode.OthersBuffered, Network.player, username, Network.player.guid, new Vector3(1, 1, 1), false);
+        Instance.RegisterPlayer(Network.player, username, Network.player.guid, new Vector3(1, 1, 1), false);
     }
 
     [RPC]
@@ -78,7 +78,7 @@ class PlayerRegistry : MonoBehaviour {
             return;
         }
 
-        registry[player].Disconnected = true;
+        registry.Remove(player);
         Debug.Log("Unregistering player : " + player + " left)");
     }
 
@@ -89,7 +89,6 @@ class PlayerRegistry : MonoBehaviour {
         foreach (NetworkPlayer otherPlayer in registry.Keys) {
             if (otherPlayer != player) {
                 PlayerInfo info = registry[otherPlayer];
-                if (info.Disconnected) continue;
 
                 networkView.RPC("RegisterPlayer",
                                 player,
