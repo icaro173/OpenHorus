@@ -87,14 +87,6 @@ public class PlayerScript : MonoBehaviour {
     }
 
     void OnNetworkInstantiate(NetworkMessageInfo info) {
-        if (Network.isServer) {
-            foreach (NetworkView nv in GetComponents<NetworkView>()) {
-                foreach (NetworkPlayer np in Network.connections) {
-                    nv.SetScope(np, true);
-                }
-            }
-        }
-
         if (!networkView.isMine) {
             owner = networkView.owner;
             StartCoroutine(WaitAndLabel());

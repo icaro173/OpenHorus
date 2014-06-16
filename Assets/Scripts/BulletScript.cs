@@ -34,16 +34,6 @@ public class BulletScript : MonoBehaviour {
     private Vector3 previousPosition;
     private Rigidbody myRigidbody;
 
-    void OnNetworkInstantiate(NetworkMessageInfo info) {
-        if (Network.isServer) {
-            foreach (NetworkView nv in GetComponents<NetworkView>())
-                foreach (NetworkPlayer np in Network.connections)
-                    nv.SetScope(np, true);
-        }
-
-        randomBrightness = RandomHelper.Between(0.125f, 1.0f);
-    }
-
     void Awake() {
         // Auxillary Collision Testing
         myRigidbody = rigidbody;
@@ -61,6 +51,8 @@ public class BulletScript : MonoBehaviour {
             5 * new Vector3(-0.5f - Random.value, -Random.value * 0.1f, -0.5f - Random.value),
             ForceMode.Impulse);
         casing.rigidbody.useGravity = true;
+
+        randomBrightness = RandomHelper.Between(0.125f, 1.0f);
     }
 
     bool DoDamageTo(Transform t) {
