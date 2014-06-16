@@ -141,7 +141,7 @@ public class ServerScript : MonoBehaviour {
 
         // Select a random level as background and map for hosting
         RoundScript.Instance.currentLevel = RandomHelper.InEnumerable(RoundScript.Instance.allowedLevels);
-        RoundScript.Instance.ChangeLevel(RoundScript.Instance.currentLevel);
+        RoundScript.Instance.ChangeLevel(RoundScript.Instance.currentLevel, 0);
 
         // Startup the state chain
         hostState = HostingState.Startup;
@@ -508,7 +508,7 @@ public class ServerScript : MonoBehaviour {
     void OnServerInitialized() {
         Debug.Log("GUID is " + Network.player.guid + ". Use this on clients to connect with NAT punchthrough.");
         Debug.Log("Local IP/port is " + Network.player.ipAddress + "/" + Network.player.port + ". Use this on clients to connect directly.");
-        networkView.RPC("ChangeLevelAndRestart", RPCMode.AllBuffered, Application.loadedLevelName);
+        RoundScript.Instance.networkView.RPC("ChangeLevelAndRestart", RPCMode.AllBuffered, Application.loadedLevelName, RoundScript.lastLevelPrefix+1);
     }
 
     void OnApplicationQuit() {
