@@ -84,6 +84,10 @@ public class PlayerScript : MonoBehaviour {
         }*/
     }
 
+    void OnDestroy() {
+        Network.RemoveRPCs(networkView.viewID);
+    }
+
     void OnNetworkInstantiate(NetworkMessageInfo info) {
         if (!networkView.isMine) {
             owner = networkView.owner;
