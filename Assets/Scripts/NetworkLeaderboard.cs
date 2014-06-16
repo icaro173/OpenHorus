@@ -12,35 +12,18 @@ public class LeaderboardEntry {
 
 class NetworkLeaderboard : MonoBehaviour {
     public List<LeaderboardEntry> Entries = new List<LeaderboardEntry>();
-    bool disposed;
 
     static NetworkLeaderboard instance;
     public static NetworkLeaderboard Instance {
         get { return instance; }
     }
 
-    void OnNetworkInstantiate(NetworkMessageInfo info) {
-        if (instance != null)
-            instance.Clear();
-
-        instance = this;
-
+    void Awake() {
         DontDestroyOnLoad(gameObject);
-
-        if (Network.isServer) {
-            Entries.Add(new LeaderboardEntry {
-                Ping = Network.GetLastPing(Network.player),
-                NetworkPlayer = Network.player
-            });
-        }
+        instance = this;
     }
 
     void Update() {
-        if (disposed) {
-            Debug.Log("Disposed leaderboards still updating...?");
-            return;
-        }
-
         if (Network.isServer) {
             foreach (LeaderboardEntry entry in Entries)
                 entry.Ping = Network.GetLastPing(entry.NetworkPlayer);
@@ -71,11 +54,6 @@ class NetworkLeaderboard : MonoBehaviour {
     }
 
     void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info) {
-        if (disposed) {
-            Debug.Log("Trying to serialize disposed leaderboards");
-            return;
-        }
-
         // Sync entry count
         int entryCount = stream.isWriting ? Entries.Count : 0;
         stream.Serialize(ref entryCount);
@@ -148,10 +126,5 @@ class NetworkLeaderboard : MonoBehaviour {
     }
     void OnPlayerDisconnected(NetworkPlayer player) {
         Entries.RemoveAll(x => x.NetworkPlayer == player);
-    }
-    public void Clear() {
-        disposed = true;
-        Destroy(gameObject);
-        instance = null;
     }
 }

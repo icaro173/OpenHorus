@@ -477,7 +477,6 @@ public class ServerScript : MonoBehaviour {
             if (state.IsCompleted) {
                 try {
                     Mapping m = device.GetSpecificMapping(protocol, port);
-
                     // Mapping failed, throw
                     if (m == null) {
                         throw new InvalidOperationException("Mapping not found");
@@ -560,12 +559,6 @@ public class ServerScript : MonoBehaviour {
         if (Network.isServer && currentServer != null) {
             DeleteServer();
         }
-
-        if (PlayerRegistry.Instance != null)
-            PlayerRegistry.Instance.Clear();
-
-        if (NetworkLeaderboard.Instance != null)
-            NetworkLeaderboard.Instance.Clear();
 
         hostState = HostingState.Startup;
     }

@@ -28,8 +28,6 @@ class PlayerRegistry : MonoBehaviour {
     }
 
     void Awake() {
-        if (Instance != null)
-            Instance.Clear();
         DontDestroyOnLoad(this);
         Instance = this;
     }
@@ -142,10 +140,5 @@ class PlayerRegistry : MonoBehaviour {
 
     public void OnPlayerDisconnected(NetworkPlayer player) {
         networkView.RPC("UnregisterPlayer", RPCMode.All, player);
-    }
-
-    public void Clear() {
-        Destroy(gameObject);
-        Instance = null;
     }
 }

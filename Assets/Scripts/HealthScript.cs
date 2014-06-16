@@ -121,8 +121,7 @@ public class HealthScript : MonoBehaviour {
             if (Health <= 0) {
                 if (Network.player == shootingPlayer) {
                     NetworkLeaderboard.Instance.networkView.RPC("RegisterKill", RPCMode.All, shootingPlayer, GetComponent<PlayerScript>().owner);
-                    networkView.RPC("ScheduleRespawn", RPCMode.All,
-                        RespawnZone.GetRespawnPoint());
+                    networkView.RPC("ScheduleRespawn", RPCMode.All, RespawnZone.GetRespawnPoint());
                 }
 
                 Health = 0;

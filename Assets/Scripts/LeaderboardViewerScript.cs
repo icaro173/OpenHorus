@@ -7,9 +7,6 @@ class LeaderboardViewerScript : MonoBehaviour {
     public GUISkin Skin = null;
     GUIStyle RowStyle, MyRowStyle, MultiRowWindowStyle;
 
-    public GameObject LeaderboardPrefab = null;
-    NetworkLeaderboard Leaderboard;
-
     bool visible;
 
     void Awake() {
@@ -19,13 +16,6 @@ class LeaderboardViewerScript : MonoBehaviour {
         MyRowStyle = new GUIStyle(Skin.box) { };
     }
 
-    void OnServerInitialized() {
-        Network.Instantiate(LeaderboardPrefab, Vector3.zero, Quaternion.identity, 0);
-    }
-    void OnDisconnectedFromServer(NetworkDisconnection info) {
-        Leaderboard = null;
-    }
-
     void Update() {
         visible = Input.GetKey(KeyCode.Tab) || RoundScript.Instance.roundStopped;
     }
@@ -33,19 +23,16 @@ class LeaderboardViewerScript : MonoBehaviour {
     void OnGUI() {
         if (Network.peerType == NetworkPeerType.Disconnected || Network.peerType == NetworkPeerType.Connecting) return;
 
-        if (Leaderboard == null)
-            Leaderboard = NetworkLeaderboard.Instance;
-
         GUI.skin = Skin;
 
         if (visible) {
-            int height = Leaderboard.Entries.Count(x => PlayerRegistry.Has(x.NetworkPlayer) && PlayerRegistry.For(x.NetworkPlayer).Spectating) * 32;
+            int height = NetworkLeaderboard.Instance.Entries.Count(x => PlayerRegistry.Has(x.NetworkPlayer) && PlayerRegistry.For(x.NetworkPlayer).Spectating) * 32;
             GUILayout.Window(2, new Rect(Screen.width - 445, (40) - height / 2, 376, height), BoardWindow, string.Empty, MultiRowWindowStyle);
         }
     }
 
     void BoardRow(int windowId) {
-        LeaderboardEntry log = Leaderboard.Entries.FirstOrDefault(x => x.NetworkPlayer == Network.player);
+        LeaderboardEntry log = NetworkLeaderboard.Instance.Entries.FirstOrDefault(x => x.NetworkPlayer == Network.player);
         if (log == null || !PlayerRegistry.Has(Network.player)) 
             return;
         
@@ -65,7 +52,7 @@ class LeaderboardViewerScript : MonoBehaviour {
     }
 
     void BoardWindow(int windowId) {
-        foreach (LeaderboardEntry log in Leaderboard.Entries.OrderByDescending(x => x.Kills)) {
+        foreach (LeaderboardEntry log in NetworkLeaderboard.Instance.Entries.OrderByDescending(x => x.Kills)) {
             if (!PlayerRegistry.Has(Network.player))
                 continue;
             if (!PlayerRegistry.Has(log.NetworkPlayer) || PlayerRegistry.For(log.NetworkPlayer).Spectating)
