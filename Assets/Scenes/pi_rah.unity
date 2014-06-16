@@ -1171,7 +1171,7 @@ Prefab:
     - target: {fileID: 2300000, guid: 19f885b5ce1e6489881106bef5962bc5, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: aa869c4582bd03642a213cd6806c7267, type: 2}
+      objectReference: {fileID: 2100000, guid: 30212c76250404492bd8b09db99558a1, type: 2}
     - target: {fileID: 100000, guid: 19f885b5ce1e6489881106bef5962bc5, type: 3}
       propertyPath: m_Name
       value: water
@@ -1235,6 +1235,10 @@ Prefab:
     - target: {fileID: 400000, guid: 19f885b5ce1e6489881106bef5962bc5, type: 3}
       propertyPath: m_RootOrder
       value: 44
+      objectReference: {fileID: 0}
+    - target: {fileID: 100002, guid: 19f885b5ce1e6489881106bef5962bc5, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 19f885b5ce1e6489881106bef5962bc5, type: 3}
@@ -11292,7 +11296,7 @@ Renderer:
   m_LightmapIndex: 0
   m_LightmapTilingOffset: {x: .232421875, y: .232421875, z: .590888977, w: .230537415}
   m_Materials:
-  - {fileID: 2100000, guid: aa869c4582bd03642a213cd6806c7267, type: 2}
+  - {fileID: 2100000, guid: 30212c76250404492bd8b09db99558a1, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0

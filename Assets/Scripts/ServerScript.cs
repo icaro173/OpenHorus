@@ -338,7 +338,7 @@ public class ServerScript : MonoBehaviour {
                 using (WebClient client = new WebClient()) {
                     // HTTP GET
                     // TODO: Handle if the server is down
-                    string response = client.DownloadString(MasterServerUri);
+                    string response = client.DownloadString(MasterServerUri+"/"+buildVersion);
 
                     try {
                         ServerList servers = JsonConvert.DeserializeObject<ServerList>(response, jsonSettings);
