@@ -22,7 +22,9 @@ public class SpawnScript : MonoBehaviour {
     public void CreatePlayer() {
         if (ServerScript.Spectating || PlayerRegistry.Has(Network.player)) return;
 
+        Debug.Log("Creating new player for self");
         Network.Instantiate(PlayerTemplate, RespawnZone.GetRespawnPoint(), Quaternion.identity, 0);
+        Debug.Log("Registering self");
         PlayerRegistry.RegisterCurrentPlayer(chosenUsername);
     }
 

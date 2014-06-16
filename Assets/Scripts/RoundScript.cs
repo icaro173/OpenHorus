@@ -181,6 +181,7 @@ public class RoundScript : MonoBehaviour {
     // Load new map
     public void ChangeLevel(string newLevel, int levelPrefix) {
         lastLevelPrefix = levelPrefix;
+        PlayerRegistry.Clear();
 
         // Disable sending
         // Stop recieving
@@ -210,7 +211,6 @@ public class RoundScript : MonoBehaviour {
         ServerScript.Instance.SetMap(RoundScript.Instance.currentLevel);
 
         if (Network.peerType != NetworkPeerType.Disconnected) {
-            PlayerRegistry.Clear();
             SpawnScript.Instance.CreatePlayer();
         }
 

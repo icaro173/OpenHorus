@@ -60,8 +60,6 @@ public class PlayerScript : MonoBehaviour {
     private List<GameObject> warningSpheres;
 
     void Awake() {
-        //DontDestroyOnLoad(gameObject);
-
         warningSpheres = new List<GameObject>();
 
         //Find player parts
