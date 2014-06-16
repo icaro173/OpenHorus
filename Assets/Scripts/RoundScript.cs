@@ -156,7 +156,9 @@ public class RoundScript : MonoBehaviour {
 
     public void ChangeLevelAndRestart(string toLevelName)
     {
-        networkView.RPC("ChangeLevelAndRestartRCP", RPCMode.AllBuffered, getRandomMap(), lastLevelPrefix + 1);
+        Network.RemoveRPCsInGroup(0);
+        Network.RemoveRPCsInGroup(1);
+        networkView.RPC("ChangeLevelAndRestartRCP", RPCMode.AllBuffered, toLevelName, lastLevelPrefix + 1);
     }
 
     // Force map change (used from chat)
