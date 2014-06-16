@@ -20,7 +20,7 @@ public class ServerScript : MonoBehaviour {
     public const string buildVersion = "15062014";
     public const string MasterServerUri = "http://ohs.padrepio.in/";
 
-    public GameObject PlayerRegistryPrefab;
+    //public GameObject PlayerRegistryPrefab;
     public bool lanMode = false;
     public NetworkPeerType peerType;
     public GUISkin guiSkin;
@@ -141,7 +141,7 @@ public class ServerScript : MonoBehaviour {
 
         // Select a random level as background and map for hosting
         RoundScript.Instance.currentLevel = RandomHelper.InEnumerable(RoundScript.Instance.allowedLevels);
-        RoundScript.Instance.ChangeLevelIfNeeded(RoundScript.Instance.currentLevel);
+        RoundScript.Instance.ChangeLevel(RoundScript.Instance.currentLevel);
 
         // Startup the state chain
         hostState = HostingState.Startup;
@@ -517,7 +517,7 @@ public class ServerScript : MonoBehaviour {
     void OnServerInitialized() {
         Debug.Log("GUID is " + Network.player.guid + ". Use this on clients to connect with NAT punchthrough.");
         Debug.Log("Local IP/port is " + Network.player.ipAddress + "/" + Network.player.port + ". Use this on clients to connect directly.");
-        Network.Instantiate(PlayerRegistryPrefab, Vector3.zero, Quaternion.identity, 0);
+        //Network.Instantiate(PlayerRegistryPrefab, Vector3.zero, Quaternion.identity, 0);
     }
 
     void OnApplicationQuit() {

@@ -5,7 +5,17 @@ using System.Linq;
 using UnityEngine;
 
 class PlayerRegistry : MonoBehaviour {
-    readonly Dictionary<NetworkPlayer, PlayerInfo> registry = new Dictionary<NetworkPlayer, PlayerInfo>();
+    
+    public class PlayerInfo {
+        public string Username;
+        public string GUID;
+        public Color Color;
+        public bool Spectating;
+        public bool Disconnected;
+        public Transform Location;
+    }
+
+    private readonly Dictionary<NetworkPlayer, PlayerInfo> registry = new Dictionary<NetworkPlayer, PlayerInfo>();
 
     public static PlayerRegistry Instance;
 
@@ -137,14 +147,5 @@ class PlayerRegistry : MonoBehaviour {
     public void Clear() {
         Destroy(gameObject);
         Instance = null;
-    }
-
-    public class PlayerInfo {
-        public string Username;
-        public string GUID;
-        public Color Color;
-        public bool Spectating;
-        public bool Disconnected;
-        public Transform Location;
     }
 }
