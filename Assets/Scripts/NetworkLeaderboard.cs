@@ -118,7 +118,7 @@ class NetworkLeaderboard : MonoBehaviour {
             ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, shooter, "is merciless!", true, false);
     }
 
-    void OnPlayerConnected(NetworkPlayer player) {
+    public void OnPlayerConnected(NetworkPlayer player) {
         Entries.Add(new LeaderboardEntry {
             Ping = Network.GetLastPing(player),
             NetworkPlayer = player
