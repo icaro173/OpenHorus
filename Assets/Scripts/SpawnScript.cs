@@ -43,9 +43,8 @@ public class SpawnScript : MonoBehaviour {
             }
         }
 
-        foreach (PlayerScript p in FindObjectsOfType<PlayerScript>()) {
-            Destroy(p.gameObject);
-        }
+        // Back to main menu
+        Application.LoadLevel("bootstrap");
     }
 
     public void SetChosenUsername(string chosenUsername) {

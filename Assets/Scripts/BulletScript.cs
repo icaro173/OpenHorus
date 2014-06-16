@@ -19,7 +19,6 @@ public class BulletScript : MonoBehaviour {
     public float accelerationSpeed = 0.1f;
     public Transform target;
     public float TrailAlpha = 0.5f;
-    bool dead;
     float acceleration = 1.0f;
     float randomBrightness = 1.0f;
 
@@ -32,26 +31,21 @@ public class BulletScript : MonoBehaviour {
     private float partialExtent;
     private float sqrMinimumExtent;
     private Vector3 previousPosition;
-    private Rigidbody myRigidbody;
 
     void Awake() {
         // Auxillary Collision Testing
-        myRigidbody = rigidbody;
-        previousPosition = myRigidbody.position;
+        previousPosition = rigidbody.position;
         minimumExtent = Mathf.Min(Mathf.Min(collider.bounds.extents.x, collider.bounds.extents.y), collider.bounds.extents.z);
         partialExtent = minimumExtent * (1.0f - skinWidth);
         sqrMinimumExtent = minimumExtent * minimumExtent;
 
-        GameObject casing = (GameObject)
-            Instantiate(bulletCasingPrefab, transform.position, transform.rotation);
-        casing.rigidbody.AddRelativeForce(
-            new Vector3(1 + Random.value, Random.value + 1, 0),
-            ForceMode.Impulse);
-        casing.rigidbody.AddTorque(
-            5 * new Vector3(-0.5f - Random.value, -Random.value * 0.1f, -0.5f - Random.value),
-            ForceMode.Impulse);
+        // Create bullet casing effect
+        GameObject casing = (GameObject)Instantiate(bulletCasingPrefab, transform.position, transform.rotation);
+        casing.rigidbody.AddRelativeForce(new Vector3(1 + Random.value, Random.value + 1, 0), ForceMode.Impulse);
+        casing.rigidbody.AddTorque(5 * new Vector3(-0.5f - Random.value, -Random.value * 0.1f, -0.5f - Random.value), ForceMode.Impulse);
         casing.rigidbody.useGravity = true;
 
+        // Set random brightness
         randomBrightness = RandomHelper.Between(0.125f, 1.0f);
     }
 
@@ -61,16 +55,18 @@ public class BulletScript : MonoBehaviour {
         // directly inside the damaged object rather than on it,
         // useful when the damage collider is different from the
         // real collider
-        if (health == null && t.parent != null)
+        if (health == null && t.parent != null) {
             health = t.parent.GetComponent<HealthScript>();
+        }
 
         if (health != null) {
             if (health.networkView.owner != Player) // No Friendly Fire
 			{
-                if (networkView.isMine)
+                // Another way of notifying owner of hit
+                //if (networkView.isMine) {
                     audio.Play(); //Hitreg Sound
+                //}
                 health.DoDamage(damage, Player);
-
                 return true;
             }
         }
@@ -81,8 +77,9 @@ public class BulletScript : MonoBehaviour {
     void DoRecoil(Vector3 point, bool playerWasHit) {
         Collider[] colliders = Physics.OverlapSphere(point, 15, (1 << LayerMask.NameToLayer("Player Hit")));
         foreach (Collider c in colliders) {
-            if (c.gameObject.name != "PlayerHit")
+            if (c.gameObject.name != "PlayerHit") {
                 continue;
+            }
 
             Transform t = c.transform;
             NetworkView view = t.networkView;
@@ -99,13 +96,15 @@ public class BulletScript : MonoBehaviour {
             direction.Normalize();
 
             Vector3 impulse = direction * (45 / dist);
-            if (impulse.y > 0)
+            if (impulse.y > 0) {
                 impulse.y *= 2.25f;
-            else
+            } else {
                 impulse.y = 0;
+            }
 
-            if (playerWasHit) // && hitInfo.transform == c.transform
+            if (playerWasHit) {
                 impulse *= 10;
+            }
 
             view.RPC("AddRecoil", RPCMode.All, impulse);
         }
@@ -116,42 +115,41 @@ public class BulletScript : MonoBehaviour {
         if (recoil > 0)
             DoRecoil(point, playerWasHit);
 
-        if (playerWasHit)
+        if (playerWasHit) {
             EffectsScript.ExplosionHit(point, Quaternion.LookRotation(normal));
-        else
+        } else {
             EffectsScript.Explosion(point, Quaternion.LookRotation(normal));
+        }
 
-        dead = true;
-        Destroy(rigidbody);
-        renderer.enabled = false;
+        Destroy(gameObject);
     }
 
     void OnCollisionEnter(Collision collision) {
         BulletScript hitBullet = collision.gameObject.GetComponent<BulletScript>();
-        if (!dead && hitBullet == null)
+        if (hitBullet == null) {
             Collide(collision.transform, collision.contacts[0].point, collision.contacts[0].normal);
+        }
     }
 
     void OnCollisionStay(Collision collision) {
         BulletScript hitBullet = collision.gameObject.GetComponent<BulletScript>();
-        if (!dead && hitBullet == null)
+        if (hitBullet == null) {
             Collide(collision.transform, collision.contacts[0].point, collision.contacts[0].normal);
+        }
     }
 
     void Update() {
-        if (!dead) {
-            acceleration += accelerationSpeed * Time.deltaTime;
-            float distance = speed * Time.deltaTime;
-            distance *= acceleration;
+        acceleration += accelerationSpeed * Time.deltaTime;
+        float distance = speed * Time.deltaTime;
+        distance *= acceleration;
 
-            transform.position += transform.forward * distance;
+        transform.position += transform.forward * distance;
 
-            // homing
-            if (target != null && homing > 0) {
-                Vector3 lookVec = (target.position - transform.position).normalized;
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(lookVec),
-                                                      Mathf.Clamp01(homing * Time.deltaTime * 9));
-            }
+        // homing
+        if (target != null && homing > 0) {
+            Vector3 lookVec = (target.position - transform.position).normalized;
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(lookVec),
+                                                    Mathf.Clamp01(homing * Time.deltaTime * 9));
         }
 
         float o = randomBrightness * lifetime / 2f * 0.75f;
@@ -160,18 +158,14 @@ public class BulletScript : MonoBehaviour {
         // max lifetime
         lifetime -= Time.deltaTime;
         if (lifetime <= 0) {
-            if (networkView.isMine) {
-                Network.RemoveRPCs(networkView.viewID);
-                Network.Destroy(gameObject);
-            }
+            Debug.Log("BulletDeath");
+            Destroy(gameObject);
         }
     }
 
     void FixedUpdate() {
-        if (dead) return;
-
         //have we moved more than our minimum extent? 
-        Vector3 movementThisStep = myRigidbody.position - previousPosition;
+        Vector3 movementThisStep = rigidbody.position - previousPosition;
         float movementSqrMagnitude = movementThisStep.sqrMagnitude;
 
         if (movementSqrMagnitude > sqrMinimumExtent) {
@@ -180,11 +174,11 @@ public class BulletScript : MonoBehaviour {
 
             //check for obstructions we might have missed 
             if (Physics.Raycast(previousPosition, movementThisStep, out hitInfo, movementMagnitude, layerMask.value)) {
-                myRigidbody.position = hitInfo.point - (movementThisStep / movementMagnitude) * partialExtent;
+                rigidbody.position = hitInfo.point - (movementThisStep / movementMagnitude) * partialExtent;
                 Collide(hitInfo.transform, hitInfo.point, hitInfo.normal);
             }
 
-            previousPosition = myRigidbody.position;
+            previousPosition = rigidbody.position;
         }
     }
 }
