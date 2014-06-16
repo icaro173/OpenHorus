@@ -16,7 +16,7 @@ public class ServerScript : MonoBehaviour {
     public static ServerScript Instance { get; private set; }
 
     //Public
-    public const int port = 31415;
+    public const int port = 31414;
     public const string buildVersion = "15062014";
     public const string MasterServerUri = "http://ohs.padrepio.in/";
 

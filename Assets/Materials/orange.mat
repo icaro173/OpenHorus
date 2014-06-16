@@ -7,7 +7,9 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: orange
-  m_Shader: {fileID: 6, guid: 0000000000000000e000000000000000, type: 0}
+  m_Shader: {fileID: 6, guid: 0000000000000000f000000000000000, type: 0}
+  m_ShaderKeywords: []
+  m_CustomRenderQueue: -1
   m_SavedProperties:
     serializedVersion: 2
     m_TexEnvs:
@@ -22,7 +24,7 @@ Material:
       data:
         first:
           name: _Shininess
-        second: .699999988
+        second: .552649856
     m_Colors:
       data:
         first:
@@ -30,9 +32,9 @@ Material:
         second: {r: 0, g: 0, b: 0, a: 1}
       data:
         first:
-          name: _SpecColor
-        second: {r: 0, g: 0, b: 0, a: 1}
+          name: _Emission
+        second: {r: .475994796, g: .785541654, b: .911764681, a: .368627459}
       data:
         first:
-          name: _Emission
-        second: {r: .416864812, g: .273819506, b: .0960523486, a: 0}
+          name: _SpecColor
+        second: {r: 0, g: 0, b: 0, a: 1}
