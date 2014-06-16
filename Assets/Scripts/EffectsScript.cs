@@ -4,10 +4,6 @@ using System.Collections;
 public class EffectsScript : MonoBehaviour {
     public static EffectsScript Instance { get; private set; }
 
-    public static void DoEffect(string effect, params object[] args) {
-        Instance.networkView.RPC(effect, RPCMode.All, args);
-    }
-
     public GameObject explosionPrefab;
     public GameObject explosionHitPrefab;
     public GameObject areaExplosionPrefab;
@@ -15,10 +11,6 @@ public class EffectsScript : MonoBehaviour {
 
     void Awake() {
         Instance = this;
-    }
-
-    void Update() {
-
     }
 
     // [RPC]
