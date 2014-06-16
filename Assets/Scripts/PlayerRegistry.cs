@@ -16,16 +16,7 @@ class PlayerRegistry : MonoBehaviour {
     }
 
     private readonly Dictionary<NetworkPlayer, PlayerInfo> registry = new Dictionary<NetworkPlayer, PlayerInfo>();
-
     public static PlayerRegistry Instance;
-
-    public static PlayerInfo For(NetworkPlayer player) {
-        return Instance.registry[player];
-    }
-
-    public static bool Has(NetworkPlayer player) {
-        return Instance != null && Instance.registry.ContainsKey(player);
-    }
 
     void Awake() {
         DontDestroyOnLoad(this);
@@ -40,40 +31,24 @@ class PlayerRegistry : MonoBehaviour {
             }
         }
 
+        Debug.LogError("Could not find player!");
         return PlayerRegistry.Instance.registry.ElementAt(0).Key; // SHOULD NEVER HAPPEN!!!
     }
 
-    int ConnectedCount() {
-        return registry.Values.Count(x => !x.Disconnected);
+    public static PlayerInfo For(NetworkPlayer player) {
+        return Instance.registry[player];
+    }
+
+    public static bool Has(NetworkPlayer player) {
+        return Instance.registry.ContainsKey(player);
     }
 
     public static void RegisterCurrentPlayer(string username, string guid) {
-        Instance.networkView.RPC("RegisterPlayer", RPCMode.All, Network.player, username, guid);
+        Instance.networkView.RPC("RegisterPlayer", RPCMode.All, Network.player, username, guid, new Vector3(1,1,1), false);
     }
 
     [RPC]
-    public void RegisterPlayer(NetworkPlayer player, string username, string guid) {
-        Color color = Color.white;
-        if (registry.ContainsKey(player)) {
-            Debug.Log("Tried to register player " + player + " but was already registered. Current username : " + registry[player].Username + " | wanted username : " + username);
-            registry.Remove(player);
-        }
-
-        PlayerScript playerData = null;
-        foreach (PlayerScript p in FindObjectsOfType<PlayerScript>()) {
-            if (p.owner == player) {
-                playerData = p;
-            }
-
-        }
-        playerData.enabled = true;
-        Transform location = playerData.transform;
-
-        registry.Add(player, new PlayerInfo { Username = username, Color = color, Location = location, GUID = guid });
-        Debug.Log("Registered this player : " + player + " = " + username + " (" + ConnectedCount() + " now)");
-    }
-    [RPC]
-    public void RegisterPlayerFull(NetworkPlayer player, string username, string guid, Vector3 color, bool isSpectating) {
+    public void RegisterPlayer(NetworkPlayer player, string username, string guid, Vector3 color, bool isSpectating = false) {
         if (registry.ContainsKey(player)) {
             Debug.Log("Tried to register player " + player + " but was already registered. Current username : " + registry[player].Username + " | wanted username : " + username + " (removing...)");
             registry.Remove(player);
@@ -89,7 +64,7 @@ class PlayerRegistry : MonoBehaviour {
         Transform location = playerData.transform;
 
         registry.Add(player, new PlayerInfo { Username = username, Color = new Color(color.x, color.y, color.z), Spectating = isSpectating, Location = location, GUID = guid });
-        Debug.Log("Registered other player : " + player + " = " + username + " (" + ConnectedCount() + " now)");
+        Debug.Log("Registered other player : " + player + " = " + username + " now)");
     }
 
     [RPC]
@@ -100,17 +75,10 @@ class PlayerRegistry : MonoBehaviour {
         }
 
         registry[player].Disconnected = true;
-        Debug.Log("Unregistering player : " + player + " (" + ConnectedCount() + " left)");
+        Debug.Log("Unregistering player : " + player + " left)");
     }
 
-    void OnNetworkInstantiate(NetworkMessageInfo info) {
-        if (!Network.isServer) {
-            networkView.RPC("RequestRegister", RPCMode.Server, Network.player);
-        }
-    }
-
-    [RPC]
-    public void RequestRegister(NetworkPlayer player) {
+    public void OnPlayerConnected(NetworkPlayer player) {
         Debug.Log("Propagating player registry to player " + player);
 
         foreach (NetworkPlayer otherPlayer in registry.Keys) {
@@ -118,8 +86,8 @@ class PlayerRegistry : MonoBehaviour {
                 PlayerInfo info = registry[otherPlayer];
                 if (info.Disconnected) continue;
 
-                Debug.Log("RegisterPlayerFull");
-                networkView.RPC("RegisterPlayerFull",
+                Debug.Log("RegisterPlayer");
+                networkView.RPC("RegisterPlayer",
                                 player,
                                 otherPlayer,
                                 info.Username,

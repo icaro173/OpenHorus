@@ -8,49 +8,44 @@ public class SpawnScript : MonoBehaviour {
     public static SpawnScript Instance { get; private set; }
 
     public GameObject PlayerTemplate;
-
-    string chosenUsername;
+    private string chosenUsername;
 
     void Awake() {
         Instance = this;
     }
 
-    void OnServerInitialized() {
-        Spawn();
-    }
-
+    // TODO: Move
     void OnConnectedToServer() {
         ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player, "connected", true, false);
     }
 
-    public void Spawn() {
-        Debug.Log("Spawning");
-        if (ServerScript.Spectating) return;
+    public void CreatePlayer(NetworkPlayer player) {
+        if (ServerScript.Spectating || PlayerRegistry.Has(player)) return;
 
-        TaskManager.Instance.WaitUntil(_ => PlayerRegistry.Instance != null).Then(() => PlayerRegistry.RegisterCurrentPlayer(chosenUsername, networkView.owner.guid));
         Network.Instantiate(PlayerTemplate, RespawnZone.GetRespawnPoint(), Quaternion.identity, 0);
+        PlayerRegistry.RegisterCurrentPlayer(chosenUsername, player.guid);
     }
 
     void OnPlayerDisconnected(NetworkPlayer player) {
-        if (Network.isServer)
-            ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, player, "disconnected", true, false);
-
         Debug.Log("Clean up after player " + player);
         Network.RemoveRPCs(player);
         Network.DestroyPlayerObjects(player);
     }
 
     void OnDisconnectedFromServer(NetworkDisconnection info) {
-        if (Network.isServer)
+        if (Network.isServer) {
             Debug.Log("Local server connection disconnected");
-        else
-            if (info == NetworkDisconnection.LostConnection)
+        } else {
+            if (info == NetworkDisconnection.LostConnection) {
                 Debug.Log("Lost connection to the server");
-            else
+            } else {
                 Debug.Log("Successfully diconnected from the server");
+            }
+        }
 
-        foreach (PlayerScript p in FindObjectsOfType<PlayerScript>())
+        foreach (PlayerScript p in FindObjectsOfType<PlayerScript>()) {
             Destroy(p.gameObject);
+        }
     }
 
     public void SetChosenUsername(string chosenUsername) {

@@ -41,7 +41,7 @@ public class RoundScript : MonoBehaviour {
     }
 
     void OnServerInitialized() {
-        networkView.RPC("RestartRound", RPCMode.All);
+        networkView.RPC("ChangeLevelAndRestart", RPCMode.All, Application.loadedLevelName);
     }
 
     // Time Events
@@ -99,7 +99,7 @@ public class RoundScript : MonoBehaviour {
             // Have the server change level
             changeRandomMap();
             // Have the players change level
-            networkView.RPC("ChangeLevelTo", RPCMode.Others, currentLevel);
+            networkView.RPC("ChangeLevelAndRestart", RPCMode.Others, currentLevel);
         }
 
         // Announce new round
@@ -112,11 +112,6 @@ public class RoundScript : MonoBehaviour {
     }
 
     // Remote Protocol Calls
-    [RPC]
-    public void ChangeLevelTo(string levelName) {
-        roundsRemaining = roundPerLevel;
-        ChangeLevel(levelName);
-    }
 
     [RPC]
     public void SyncLevel(string levelName) {
@@ -172,7 +167,8 @@ public class RoundScript : MonoBehaviour {
     // Force map change (used from chat)
     [RPC]
     public void ChangeLevelAndRestart(string toLevelName) {
-        ChangeLevelTo(toLevelName);
+        roundsRemaining = roundPerLevel;
+        ChangeLevel(toLevelName);
         RestartRound();
     }
 
@@ -189,12 +185,15 @@ public class RoundScript : MonoBehaviour {
             ChatScript.Instance.LogChat(Network.player, "Changed level to " + newLevel + ".", true, true);
             RoundScript.Instance.currentLevel = newLevel;
             ServerScript.Instance.SetMap(RoundScript.Instance.currentLevel);
+        } else {
+            // Call the callback manually
+            OnLevelWasLoaded(Application.loadedLevel);
         }
     }
 
     void OnLevelWasLoaded(int id) {
         if (Network.peerType != NetworkPeerType.Disconnected) {
-            SpawnScript.Instance.Spawn();
+            SpawnScript.Instance.CreatePlayer(Network.player);
         }
     }
 }
