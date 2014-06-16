@@ -180,12 +180,10 @@ public class RoundScript : MonoBehaviour {
         lastLevelPrefix = levelPrefix;
 
         // Disable sending
-        Network.SetSendingEnabled(0, false);
-
         // Stop recieving
-        Network.isMessageQueueRunning = false;
-
         // Move to new level prefix
+        Network.SetSendingEnabled(0, false);
+        Network.isMessageQueueRunning = false;
         Network.SetLevelPrefix(levelPrefix);
 
         Debug.Log("ChangeLevel");
@@ -206,7 +204,7 @@ public class RoundScript : MonoBehaviour {
         Network.SetSendingEnabled(0, true);
 
         if (Network.peerType != NetworkPeerType.Disconnected) {
-            SpawnScript.Instance.CreatePlayer(Network.player);
+            SpawnScript.Instance.CreatePlayer();
         }
     }
 }

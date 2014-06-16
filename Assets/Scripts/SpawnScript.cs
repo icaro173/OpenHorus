@@ -19,11 +19,11 @@ public class SpawnScript : MonoBehaviour {
         ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player, "connected", true, false);
     }
 
-    public void CreatePlayer(NetworkPlayer player) {
-        if (ServerScript.Spectating || PlayerRegistry.Has(player)) return;
+    public void CreatePlayer() {
+        if (ServerScript.Spectating || PlayerRegistry.Has(Network.player)) return;
 
         Network.Instantiate(PlayerTemplate, RespawnZone.GetRespawnPoint(), Quaternion.identity, 0);
-        PlayerRegistry.RegisterCurrentPlayer(chosenUsername, player.guid);
+        PlayerRegistry.RegisterCurrentPlayer(chosenUsername);
     }
 
     void OnPlayerDisconnected(NetworkPlayer player) {

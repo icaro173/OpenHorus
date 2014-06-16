@@ -43,8 +43,9 @@ class PlayerRegistry : MonoBehaviour {
         return Instance.registry.ContainsKey(player);
     }
 
-    public static void RegisterCurrentPlayer(string username, string guid) {
-        Instance.networkView.RPC("RegisterPlayer", RPCMode.All, Network.player, username, guid, new Vector3(1,1,1), false);
+    public static void RegisterCurrentPlayer(string username) {
+        Instance.networkView.RPC("RegisterPlayer", RPCMode.All, Network.player, username, Network.player.guid, new Vector3(1, 1, 1), false);
+        Instance.networkView.RPC("RegisteryRequestedRPC", RPCMode.All, Network.player);
     }
 
     [RPC]
@@ -80,7 +81,8 @@ class PlayerRegistry : MonoBehaviour {
         Debug.Log("Unregistering player : " + player + " left)");
     }
 
-    public void OnPlayerConnected(NetworkPlayer player) {
+    [RPC]
+    public void RegisteryRequestedRPC(NetworkPlayer player) {
         Debug.Log("Propagating player registry to player " + player);
 
         foreach (NetworkPlayer otherPlayer in registry.Keys) {
