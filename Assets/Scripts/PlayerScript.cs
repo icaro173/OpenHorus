@@ -267,7 +267,7 @@ public class PlayerScript : MonoBehaviour {
         lastInputVelocity = smoothedInputVelocity;
 
         // jump and dash
-        dashCooldown -= Time.deltaTime;
+        dashCooldown -= Time.fixedDeltaTime;
         bool justJumped = false;
         if (networkView.isMine && Time.time - lastJumpInputTime <= JumpInputQueueTime) {
             if ((controller.isGrounded || sinceNotGrounded < 0.25f) && recoilVelocity.y <= 0) {
@@ -312,13 +312,13 @@ public class PlayerScript : MonoBehaviour {
             }
             // infinite friction
             if (fallingVelocity.y <= 0)
-                fallingVelocity = Vector3.up * gravity * Time.deltaTime;
+                fallingVelocity = Vector3.up * gravity * Time.fixedDeltaTime;
         } else {
-            sinceNotGrounded += Time.deltaTime;
+            sinceNotGrounded += Time.fixedDeltaTime;
             // air drag / gravity
-            fallingVelocity.y += gravity * Time.deltaTime;
-            fallingVelocity.x *= Mathf.Pow(airVelocityDamping, Time.deltaTime);
-            fallingVelocity.z *= Mathf.Pow(airVelocityDamping, Time.deltaTime);
+            fallingVelocity.y += gravity * Time.fixedDeltaTime;
+            fallingVelocity.x *= Mathf.Pow(airVelocityDamping, Time.fixedDeltaTime);
+            fallingVelocity.z *= Mathf.Pow(airVelocityDamping, Time.fixedDeltaTime);
         }
 
         // Update running animation
@@ -352,17 +352,17 @@ public class PlayerScript : MonoBehaviour {
 
         // damp recoil
         if (!controller.isGrounded) {
-            recoilVelocity.x *= Mathf.Pow(recoilDamping * 10, Time.deltaTime);
-            recoilVelocity.y *= Mathf.Pow(recoilDamping * 100, Time.deltaTime);
-            recoilVelocity.z *= Mathf.Pow(recoilDamping * 10, Time.deltaTime);
+            recoilVelocity.x *= Mathf.Pow(recoilDamping * 10, Time.fixedDeltaTime);
+            recoilVelocity.y *= Mathf.Pow(recoilDamping * 100, Time.fixedDeltaTime);
+            recoilVelocity.z *= Mathf.Pow(recoilDamping * 10, Time.fixedDeltaTime);
         } else {
-            recoilVelocity.x *= Mathf.Pow(recoilDamping * 0.04f, Time.deltaTime);
-            recoilVelocity.y *= Mathf.Pow(recoilDamping * 100f, Time.deltaTime);
-            recoilVelocity.z *= Mathf.Pow(recoilDamping * 0.04f, Time.deltaTime);
+            recoilVelocity.x *= Mathf.Pow(recoilDamping * 0.04f, Time.fixedDeltaTime);
+            recoilVelocity.y *= Mathf.Pow(recoilDamping * 100f, Time.fixedDeltaTime);
+            recoilVelocity.z *= Mathf.Pow(recoilDamping * 0.04f, Time.fixedDeltaTime);
         }
 
         // move!
-        controller.Move((smoothFallingVelocity + smoothedInputVelocity + recoilVelocity) * Time.deltaTime);
+        controller.Move((smoothFallingVelocity + smoothedInputVelocity + recoilVelocity) * Time.fixedDeltaTime);
 
         if (sinceNotGrounded > 0.25f && controller.isGrounded) {
             landingSound.Play();
