@@ -222,7 +222,7 @@ public class ServerScript : MonoBehaviour {
 
     void Update() {
         // Automatic host/connect logic follows
-        switch (hostState) {          
+        switch (hostState) {
             case HostingState.WaitingForNat:
                 // No mapping results or anything still in progress? Stop
                 if (mappingResults.Count == 0 || mappingResults.Any(x => x.Status == MappingStatus.InProgress))
@@ -232,7 +232,7 @@ public class ServerScript : MonoBehaviour {
                 if (mappingResults.All(x => x.Status == MappingStatus.Success)) {
                     hostState = HostingState.ReadyToHost;
 
-                // We failed mapping all or some
+                    // We failed mapping all or some
                 } else {
                     if (mappingResults.Any(x => x.Status == MappingStatus.Success)) {
                         Debug.Log("Some mapping attempts failed, but will proceed with hosting anyway");
@@ -265,19 +265,43 @@ public class ServerScript : MonoBehaviour {
         }
     }
 
+    string dots(float t) { return "...".Substring(0, (int)Math.Floor(t) % 4); }
+
     void OnGUI() {
         peerType = Network.peerType;
 
-        if (peerType == NetworkPeerType.Disconnected && hostState == HostingState.WaitingForInput) {
+        if (peerType == NetworkPeerType.Disconnected || peerType == NetworkPeerType.Connecting) {
             GUI.skin = guiSkin;
+            string currentStatus = "";
 
-            if (lanMode) {
-                GUI.Box(new Rect((Screen.width / 2) - 122, Screen.height - 145, 248, 35), "Lan Mode - Master server is disabled".ToUpperInvariant());
-            } else if (serverList != null) {
-                string message = "Server activity : " + serverList.Connections + " players in " + serverList.Activegames + " games.";
-                GUI.Box(new Rect((Screen.width / 2) - 122, Screen.height - 145, 248, 35), message.ToUpperInvariant());
+            switch (hostState) {
+                case HostingState.AttemptingToHost:
+                    currentStatus = "Attempting to host" + dots(Time.time * 2); break;
+                case HostingState.WaitingForNat:
+                    currentStatus = "Waiting for NAT" + dots(Time.time * 2); break;
+                case HostingState.Connecting:
+                    currentStatus = "Connecting to server" + dots(Time.time * 2); break;
+                case HostingState.DiscoveringNAT:
+                    currentStatus = "NAT punching" + dots(Time.time * 2); break;
+                case HostingState.WaitingForInitialServers:
+                    currentStatus = "Waiting for server list" + dots(Time.time * 2); break;
+                case HostingState.ChoosingServer:
+                    currentStatus = "Choosing server" + dots(Time.time * 2); break;
+                default:
+                    if (lanMode) {
+                        currentStatus = "Lan Mode - Master server is disabled";
+                    } else if (serverList != null) {
+                        currentStatus = "Server activity : " + serverList.Connections + " players in " + serverList.Activegames + " games.";
+                    }
+                    break;
             }
 
+            // Status box
+            GUI.Box(new Rect((Screen.width / 2) - 122, Screen.height - 145, 248, 35), currentStatus.ToUpperInvariant());
+        }
+
+
+        if (peerType == NetworkPeerType.Disconnected && hostState == HostingState.WaitingForInput) {
             // Write the current version somewhere
             GUI.Box(new Rect(0, 0, 80, 35), (buildVersion.ToString()).ToUpperInvariant());
 
@@ -294,25 +318,25 @@ public class ServerScript : MonoBehaviour {
 
     void Login(int windowId) {
         if (peerType == NetworkPeerType.Disconnected) {
-                GUILayout.BeginHorizontal();
-                chosenUsername = RemoveSpecialCharacters(GUILayout.TextField(chosenUsername));
-                PlayerPrefs.SetString("username", chosenUsername.Trim());
-                SendMessage("SetChosenUsername", chosenUsername.Trim());
+            GUILayout.BeginHorizontal();
+            chosenUsername = RemoveSpecialCharacters(GUILayout.TextField(chosenUsername));
+            PlayerPrefs.SetString("username", chosenUsername.Trim());
+            SendMessage("SetChosenUsername", chosenUsername.Trim());
 
-                GUILayout.Box("", new GUIStyle(guiSkin.box) { fixedWidth = 1 });
-                if (GUILayout.Button("HOST")) {
-                    PlayerPrefs.Save();
-                    GlobalSoundsScript.PlayButtonPress();
-                    hostState = HostingState.DiscoveringNAT;
-                }
-                GUILayout.Box("", new GUIStyle(guiSkin.box) { fixedWidth = 1 });
-                if (GUILayout.Button("JOIN")) {
-                    PlayerPrefs.Save();
-                    GlobalSoundsScript.PlayButtonPress();
-                    hostState = HostingState.ChoosingServer;
-                }
-                GUILayout.EndHorizontal();
-                GUI.enabled = (hostState == HostingState.WaitingForInput);
+            GUILayout.Box("", new GUIStyle(guiSkin.box) { fixedWidth = 1 });
+            if (GUILayout.Button("HOST")) {
+                PlayerPrefs.Save();
+                GlobalSoundsScript.PlayButtonPress();
+                hostState = HostingState.DiscoveringNAT;
+            }
+            GUILayout.Box("", new GUIStyle(guiSkin.box) { fixedWidth = 1 });
+            if (GUILayout.Button("JOIN")) {
+                PlayerPrefs.Save();
+                GlobalSoundsScript.PlayButtonPress();
+                hostState = HostingState.ChoosingServer;
+            }
+            GUILayout.EndHorizontal();
+            GUI.enabled = (hostState == HostingState.WaitingForInput);
         }
     }
 
@@ -338,7 +362,7 @@ public class ServerScript : MonoBehaviour {
                 using (WebClient client = new WebClient()) {
                     // HTTP GET
                     // TODO: Handle if the server is down
-                    string response = client.DownloadString(MasterServerUri+"/"+buildVersion);
+                    string response = client.DownloadString(MasterServerUri + "/" + buildVersion);
 
                     try {
                         ServerList servers = JsonConvert.DeserializeObject<ServerList>(response, jsonSettings);
