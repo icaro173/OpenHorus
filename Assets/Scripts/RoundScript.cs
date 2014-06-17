@@ -159,13 +159,13 @@ public class RoundScript : MonoBehaviour {
     {
         // Destroy all old calls
         Network.RemoveRPCsInGroup(1);
-        networkView.RPC("ChangeLevelAndRestartRCP", RPCMode.OthersBuffered, toLevelName, lastLevelPrefix + 1);
-        ChangeLevelAndRestartRCP(toLevelName, lastLevelPrefix + 1);
+        networkView.RPC("ChangeLevelAndRestartRPC", RPCMode.OthersBuffered, toLevelName, lastLevelPrefix + 1);
+        ChangeLevelAndRestartRPC(toLevelName, lastLevelPrefix + 1);
     }
 
     // Force map change (used from chat)
     [RPC]
-    private void ChangeLevelAndRestartRCP(string toLevelName, int levelPrefix) {
+    private void ChangeLevelAndRestartRPC(string toLevelName, int levelPrefix) {
         roundsRemaining = roundPerLevel;
         ChangeLevel(toLevelName, levelPrefix);
         doRestart = true;
