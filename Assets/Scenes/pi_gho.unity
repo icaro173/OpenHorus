@@ -716,7 +716,7 @@ Transform:
   - {fileID: 785586130}
   - {fileID: 1129089508}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 4
 --- !u!1 &200361850
 GameObject:
   m_ObjectHideFlags: 0
@@ -1440,7 +1440,7 @@ MeshCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_SmoothSphereCollisions: 0
+  m_SmoothSphereCollisions: 1
   m_Convex: 0
   m_Mesh: {fileID: 4300006, guid: dd6bb784bf6af4c0f85c742a6cd9afe4, type: 3}
 --- !u!1 &514692930
@@ -4803,7 +4803,7 @@ Transform:
   m_Children:
   - {fileID: 831502949}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
 --- !u!1001 &1393822654
 Prefab:
   m_ObjectHideFlags: 0
@@ -5634,6 +5634,10 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 2300006, guid: dd6bb784bf6af4c0f85c742a6cd9afe4, type: 3}
       propertyPath: m_LightmapTilingOffset.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2300006, guid: dd6bb784bf6af4c0f85c742a6cd9afe4, type: 3}
+      propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -6554,7 +6558,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 3
 --- !u!198 &1951762621
 ParticleSystem:
   m_ObjectHideFlags: 0
