@@ -13,7 +13,6 @@ public class RoundScript : MonoBehaviour {
     private const int preRoundDuration = 5;
     private const int postRoundDuration = 20;
     private const int roundPerLevel = 2;
-    private bool doRestart = false;
 
     float roundTime;
     public bool roundStopped { get; private set; }
@@ -165,7 +164,6 @@ public class RoundScript : MonoBehaviour {
     private void ChangeLevelAndRestartRPC(string toLevelName, int levelPrefix) {
         roundsRemaining = roundPerLevel;
         ChangeLevel(toLevelName, levelPrefix);
-        doRestart = true;
     }
 
     // Map loading
@@ -221,12 +219,10 @@ public class RoundScript : MonoBehaviour {
         // If we are playing, build the player again and register
         if (Network.peerType != NetworkPeerType.Disconnected) {
             SpawnScript.Instance.CreatePlayer();
-        }
 
-        // Restart the round
-        if (doRestart == true) {
-            doRestart = false;
+            // Restart round
             RestartRound();
         }
+
     }
 }
