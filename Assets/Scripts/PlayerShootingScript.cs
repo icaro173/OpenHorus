@@ -115,8 +115,7 @@ public class PlayerShootingScript : MonoBehaviour {
                 if (bulletsLeft != BurstCount && Input.GetButton("Reload")) {
                     bulletsLeft = BurstCount;
 
-                    if (GlobalSoundsScript.soundEnabled)
-                        reloadSound.Play();
+                    reloadSound.Play();
 
                     cooldownLeft += ReloadTime;
                 }
@@ -124,8 +123,7 @@ public class PlayerShootingScript : MonoBehaviour {
 
             if (bulletsLeft <= 0) {
                 bulletsLeft = BurstCount;
-                if (GlobalSoundsScript.soundEnabled)
-                    reloadSound.Play();
+                reloadSound.Play();
             }
 
             Vector2 screenCenter = new Vector2(Screen.width / 2f, Screen.height / 2f);
@@ -154,8 +152,7 @@ public class PlayerShootingScript : MonoBehaviour {
 
                     if (!data.WasLocked && data.Locked) // Send target notification
 					{
-                        if (GlobalSoundsScript.soundEnabled)
-                            targetSound.Play();
+                        targetSound.Play();
 
                         data.Script.networkView.RPC("Targeted", RPCMode.All, gameObject.networkView.owner);
                     }
@@ -235,8 +232,7 @@ public class PlayerShootingScript : MonoBehaviour {
         BulletScript bullet = (BulletScript)Instantiate(bulletPrefab, position, rotation);
         bullet.Player = player;
 
-        if (GlobalSoundsScript.soundEnabled)
-            burstGunSound.Play();
+        burstGunSound.Play();
     }
 
     [RPC]
@@ -260,9 +256,7 @@ public class PlayerShootingScript : MonoBehaviour {
         bullet.recoil = 1;
 
         if (doSound) {
-            if (GlobalSoundsScript.soundEnabled) {
-                pepperGunSound.Play();
-            }
+            pepperGunSound.Play();
         }
     }
 }

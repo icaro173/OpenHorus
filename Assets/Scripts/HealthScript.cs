@@ -193,7 +193,7 @@ public class HealthScript : MonoBehaviour {
         if (isSpectating) Hide();
         else UnHide();
 
-        PlayerRegistry.For(networkView.owner).Spectating = isSpectating;
+        PlayerRegistry.Get(networkView.owner).Spectating = isSpectating;
     }
 
     public void Respawn(Vector3 position) {

@@ -26,19 +26,7 @@ class PlayerRegistry : MonoBehaviour {
         Instance.registry.Clear();
     }
 
-    /*public static NetworkPlayer For(Transform player) {
-        for (int i = 0; i < PlayerRegistry.Instance.registry.Count; i++) {
-            PlayerRegistry.PlayerInfo otherPlayer = PlayerRegistry.Instance.registry.ElementAt(i).Value;
-            if (otherPlayer.Location == player) {
-                return PlayerRegistry.Instance.registry.ElementAt(i).Key;
-            }
-        }
-
-        Debug.LogError("Could not find player!");
-        return PlayerRegistry.Instance.registry.ElementAt(0).Key; // SHOULD NEVER HAPPEN!!!
-    }*/
-
-    public static PlayerInfo For(NetworkPlayer player) {
+    public static PlayerInfo Get(NetworkPlayer player) {
         return Instance.registry[player];
     }
 

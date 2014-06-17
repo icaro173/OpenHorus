@@ -26,7 +26,7 @@ class LeaderboardViewerScript : MonoBehaviour {
         GUI.skin = Skin;
 
         if (visible) {
-            int height = NetworkLeaderboard.Instance.Entries.Count(x => PlayerRegistry.Has(x.NetworkPlayer) && PlayerRegistry.For(x.NetworkPlayer).Spectating) * 32;
+            int height = NetworkLeaderboard.Instance.Entries.Count(x => PlayerRegistry.Has(x.NetworkPlayer) && PlayerRegistry.Get(x.NetworkPlayer).Spectating) * 32;
             GUILayout.Window(2, new Rect(Screen.width - 445, (40) - height / 2, 376, height), BoardWindow, string.Empty, MultiRowWindowStyle);
         }
     }
@@ -40,7 +40,7 @@ class LeaderboardViewerScript : MonoBehaviour {
         // rowStyle.normal.textColor = PlayerRegistry.For(log.NetworkPlayer).Color;
 
         GUILayout.BeginHorizontal();
-        GUILayout.Box(PlayerRegistry.For(log.NetworkPlayer).Username.ToUpper(), rowStyle, GUILayout.MinWidth(125), GUILayout.MaxWidth(125));
+        GUILayout.Box(PlayerRegistry.Get(log.NetworkPlayer).Username.ToUpper(), rowStyle, GUILayout.MinWidth(125), GUILayout.MaxWidth(125));
 
         //rowStyle.normal.textColor = Color.white;
 
@@ -55,7 +55,7 @@ class LeaderboardViewerScript : MonoBehaviour {
         foreach (LeaderboardEntry log in NetworkLeaderboard.Instance.Entries.OrderByDescending(x => x.Kills)) {
             if (!PlayerRegistry.Has(Network.player))
                 continue;
-            if (!PlayerRegistry.Has(log.NetworkPlayer) || PlayerRegistry.For(log.NetworkPlayer).Spectating)
+            if (!PlayerRegistry.Has(log.NetworkPlayer) || PlayerRegistry.Get(log.NetworkPlayer).Spectating)
                 continue;
 
             GUIStyle rowStyle = RowStyle;
@@ -65,7 +65,7 @@ class LeaderboardViewerScript : MonoBehaviour {
             //rowStyle.normal.textColor = PlayerRegistry.For(log.NetworkPlayer).Color;
 
             GUILayout.BeginHorizontal();
-            GUILayout.Box(PlayerRegistry.For(log.NetworkPlayer).Username.ToUpper(), rowStyle, GUILayout.MinWidth(125), GUILayout.MaxWidth(125));
+            GUILayout.Box(PlayerRegistry.Get(log.NetworkPlayer).Username.ToUpper(), rowStyle, GUILayout.MinWidth(125), GUILayout.MaxWidth(125));
 
             // rowStyle.normal.textColor = Color.white;
 

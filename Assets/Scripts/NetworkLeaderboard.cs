@@ -37,7 +37,7 @@ class NetworkLeaderboard : MonoBehaviour {
                 !PlayerRegistry.Has(entry.NetworkPlayer))
                 continue;
 
-            PlayerRegistry.PlayerInfo player = PlayerRegistry.For(entry.NetworkPlayer);
+            PlayerRegistry.PlayerInfo player = PlayerRegistry.Get(entry.NetworkPlayer);
             if (isSecond)
                 player.Color = new Color(114 / 255f, 222 / 255f, 194 / 255f); // cyan
             else if (isFirst)
@@ -108,7 +108,7 @@ class NetworkLeaderboard : MonoBehaviour {
         if (victim == shooter)
             ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, shooter, "commited suicide", true, false);
         else
-            ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, shooter, "killed " + (endedSpree ? "and stopped " : "") + PlayerRegistry.For(victim).Username.ToUpper(), true, false);
+            ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, shooter, "killed " + (endedSpree ? "and stopped " : "") + PlayerRegistry.Get(victim).Username.ToUpper(), true, false);
 
         if (scheduledMessage == 1)
             ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, shooter, "is threatening!", true, false);
