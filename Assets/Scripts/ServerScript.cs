@@ -73,6 +73,7 @@ public class ServerScript : MonoBehaviour {
     private int lastPlayerCount;
     private string lastLevelName;
     private string currentStatus = "";
+    private bool masterIsDown = false;
 
     class ServerList {
         public string Message = null;
@@ -169,6 +170,8 @@ public class ServerScript : MonoBehaviour {
         hostStateCallbacks.Add(HostingState.WaitingForInput, (old, current) => {
             if (lanMode) {
                 currentStatus = "Lan Mode - Master server is disabled";
+            } else if (masterIsDown) {
+                currentStatus = "The master server is down";
             } else if (serverList != null) {
                 currentStatus = "Server activity : " + serverList.Connections + " players in " + serverList.Activegames + " games.";
             }
@@ -357,10 +360,12 @@ public class ServerScript : MonoBehaviour {
             ThreadPool.Instance.Fire(() => {
                 using (WebClient client = new WebClient()) {
                     // HTTP GET
-                    // TODO: Handle if the server is down
-                    string response = client.DownloadString(MasterServerUri + "/" + buildVersion);
-
                     try {
+                        string response = client.DownloadString(MasterServerUri + "/" + buildVersion);
+
+                        // Master is up, hooray
+                        masterIsDown = false;
+
                         ServerList servers = JsonConvert.DeserializeObject<ServerList>(response, jsonSettings);
 
                         // Blacklist things that failed before
@@ -371,6 +376,11 @@ public class ServerScript : MonoBehaviour {
                         }
 
                         serverList = servers;
+                        hostState = HostingState.WaitingForInput;
+                    } catch (WebException) {
+                        // Master server is down, everybody panics
+                        Debug.Log("Master server has gone down");
+                        masterIsDown = true;
                         hostState = HostingState.WaitingForInput;
                     } catch (Exception ex) {
                         Debug.LogWarning(ex.ToString());
@@ -385,24 +395,29 @@ public class ServerScript : MonoBehaviour {
     void AddServerToList() {
         // Do nothing on LAN-only mode
         if (lanMode) { serverToken = ""; }
+        if (!masterIsDown && !lanMode) {
+            using (WebClient client = new WebClient()) {
+                try {
+                    // Serialize server info to JSON
+                    string currentServerJSON = JsonConvert.SerializeObject(currentServer);
 
-        using (WebClient client = new WebClient()) {
-            // Serialize server info to JSON
-            string currentServerJSON = JsonConvert.SerializeObject(currentServer);
-
-            // then add new server
-            // TODO: Handle if the server is down
-            serverToken = client.UploadString(MasterServerUri + "/add", currentServerJSON);
-
-            // We are now hosting
-            hostState = HostingState.Hosting;
+                    // then add new server
+                    serverToken = client.UploadString(MasterServerUri + "/add", currentServerJSON);
+                } catch (WebException) {
+                    Debug.Log("Master server has gone down");
+                    masterIsDown = true;
+                }
+            }
         }
+
+        // We are now hosting
+        hostState = HostingState.Hosting;
     }
 
     // Update our server status on the master server
     void UpdateServer() {
         // Do nothing on LAN-only mode
-        if (lanMode) { return; }
+        if (lanMode || masterIsDown) { return; }
 
         // Setup data to send
         ServerItem serverItem = new ServerItem();
@@ -422,9 +437,9 @@ public class ServerScript : MonoBehaviour {
             using (WebClient client = new WebClient()) {
                 try {
                     client.UploadString(MasterServerUri + "/update", serverItemJSON);
-                } catch (System.Net.WebException ex) {
-                    // TODO: Exit gracefully when server is down or expired
-                    Debug.LogError(ex.Message);
+                } catch (WebException) {
+                    Debug.Log("Master server has gone down");
+                    masterIsDown = true;
                 }
             }
         });
@@ -433,10 +448,9 @@ public class ServerScript : MonoBehaviour {
     // Delete our server from the list
     void DeleteServer() {
         // Do nothing on LAN-only mode
-        if (lanMode) { return; }
+        if (lanMode || masterIsDown) { return; }
 
         using (WebClient client = new WebClient()) {
-            // TODO: Handle if the server is down
             client.UploadString(MasterServerUri + "/delete", serverToken);
         }
     }
