@@ -44,9 +44,6 @@ public class SpawnScript : MonoBehaviour {
                 Debug.Log("Successfully diconnected from the server");
             }
         }
-
-        // Back to main menu
-        Application.LoadLevel("bootstrap");
     }
 
     public void SetChosenUsername(string chosenUsername) {

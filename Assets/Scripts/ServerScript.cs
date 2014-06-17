@@ -572,6 +572,13 @@ public class ServerScript : MonoBehaviour {
             DeleteServer();
         }
 
+        PlayerRegistry.Clear();
+
+        // Clear players
+        foreach (PlayerScript o in FindObjectsOfType<PlayerScript>()) {
+            Destroy(o.gameObject);
+        }
+
         hostState = HostingState.Startup;
     }
 }
