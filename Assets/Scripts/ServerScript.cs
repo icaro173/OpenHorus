@@ -11,6 +11,7 @@ using System.Threading;
 using Newtonsoft.Json;
 using Mono.Nat;
 using UnityEngine;
+using System.Reflection;
 
 public class ServerScript : MonoBehaviour {
     public static ServerScript Instance { get; private set; }
