@@ -11,7 +11,7 @@ class PlayerRegistry : MonoBehaviour {
         public string GUID;
         public Color Color;
         public bool Spectating;
-        public Transform Location;
+        public PlayerScript Player;
     }
 
     private readonly Dictionary<NetworkPlayer, PlayerInfo> registry = new Dictionary<NetworkPlayer, PlayerInfo>();
@@ -26,7 +26,7 @@ class PlayerRegistry : MonoBehaviour {
         Instance.registry.Clear();
     }
 
-    public static NetworkPlayer For(Transform player) {
+    /*public static NetworkPlayer For(Transform player) {
         for (int i = 0; i < PlayerRegistry.Instance.registry.Count; i++) {
             PlayerRegistry.PlayerInfo otherPlayer = PlayerRegistry.Instance.registry.ElementAt(i).Value;
             if (otherPlayer.Location == player) {
@@ -36,7 +36,7 @@ class PlayerRegistry : MonoBehaviour {
 
         Debug.LogError("Could not find player!");
         return PlayerRegistry.Instance.registry.ElementAt(0).Key; // SHOULD NEVER HAPPEN!!!
-    }
+    }*/
 
     public static PlayerInfo For(NetworkPlayer player) {
         return Instance.registry[player];
@@ -65,9 +65,8 @@ class PlayerRegistry : MonoBehaviour {
             }
         }
         playerData.enabled = true;
-        Transform location = playerData.transform;
 
-        registry.Add(player, new PlayerInfo { Username = username, Color = new Color(color.x, color.y, color.z), Spectating = isSpectating, Location = location, GUID = guid });
+        registry.Add(player, new PlayerInfo { Username = username, Color = new Color(color.x, color.y, color.z), Spectating = isSpectating, Player = playerData, GUID = guid });
         Debug.Log("Registered other player : " + player + " = " + username + " now");
     }
 

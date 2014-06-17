@@ -20,7 +20,7 @@ public class PlayerScript : MonoBehaviour {
     public float recoilDamping = 0.0005f;       // TODO: Fix! recoil works bad with lag
     public float IdleTransitionFadeLength = 1.0f;
 
-    public bool Paused;
+    public bool paused { get; private set; }
 
     //References
     public Transform cameraPivot;
@@ -123,7 +123,7 @@ public class PlayerScript : MonoBehaviour {
 
         GameObject sphere = (GameObject)Instantiate(warningSphereFab, transform.position, transform.rotation);
         sphere.transform.parent = gameObject.transform;
-        sphere.GetComponent<Billboard>().target = PlayerRegistry.For(aggressor).Location;
+        sphere.GetComponent<Billboard>().target = PlayerRegistry.For(aggressor).Player.transform;
 
         warningSpheres.Add(sphere);
     }
@@ -135,11 +135,16 @@ public class PlayerScript : MonoBehaviour {
         print("Untargeted by: " + PlayerRegistry.For(aggressor).Username);
 
         int id = -1;
-        id = warningSpheres.FindIndex(a => a.GetComponent<Billboard>().target == PlayerRegistry.For(aggressor).Location);
+        id = warningSpheres.FindIndex(a => a.GetComponent<Billboard>().target == PlayerRegistry.For(aggressor).Player.transform);
         if (id == -1) return;
 
         Destroy(warningSpheres[id]);
         warningSpheres.RemoveAt(id);
+    }
+
+    [RPC]
+    private void setPaused(bool status) {
+        paused = status;
     }
 
     public void ResetWarnings() {
@@ -170,7 +175,7 @@ public class PlayerScript : MonoBehaviour {
 
     void Update() {
         if (Network.peerType == NetworkPeerType.Disconnected) return;
-        if (Paused) return;
+        if (paused) return;
 
         if (networkView.isMine) {
             textBubbleVisible = ChatScript.Instance.showChat;
@@ -257,7 +262,7 @@ public class PlayerScript : MonoBehaviour {
 
     void FixedUpdate() {
         if (!controller.enabled) return;
-        if (Paused) return;
+        if (paused) return;
 
         Vector3 smoothedInputVelocity = inputVelocity * 0.6f + lastInputVelocity * 0.45f;
         lastInputVelocity = smoothedInputVelocity;

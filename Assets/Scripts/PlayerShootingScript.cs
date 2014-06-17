@@ -62,10 +62,10 @@ public class PlayerShootingScript : MonoBehaviour {
     void Update() {
         gun.LookAt(playerCamera.GetTargetPosition());
 
-        if (playerScript.Paused)
+        if (playerScript.paused)
             bulletsLeft = BurstCount;
 
-        if (networkView.isMine && Screen.lockCursor && !playerScript.Paused) {
+        if (networkView.isMine && Screen.lockCursor && !playerScript.paused) {
             cooldownLeft = Mathf.Max(0, cooldownLeft - Time.deltaTime);
             heat = Mathf.Clamp01(heat - Time.deltaTime);
             weaponIndicator.CooldownStep = 1 - Math.Min(Math.Max(cooldownLeft - ShotCooldown, 0) / ReloadTime, 1);

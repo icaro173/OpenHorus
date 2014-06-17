@@ -155,9 +155,7 @@ public class ChatScript : MonoBehaviour {
                                                 isDead = true;
                                                 break;
                                             }
-
-                                            p.GetComponent<HealthScript>().networkView.RPC("ToggleSpectate",
-                                                                                           RPCMode.All, true);
+                                            p.GetComponent<HealthScript>().networkView.RPC("ToggleSpectate", RPCMode.All, true);
                                         }
 
                                     if (!isDead) {

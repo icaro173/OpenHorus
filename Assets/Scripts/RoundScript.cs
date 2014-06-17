@@ -112,30 +112,27 @@ public class RoundScript : MonoBehaviour {
     [RPC]
     public void StopRound() {
         foreach (PlayerScript player in FindObjectsOfType<PlayerScript>()) {
-            player.Paused = true;
+            player.networkView.RPC("setPaused", RPCMode.All, true);
         }
         roundStopped = true;
     }
 
     [RPC]
     public void RestartRound() {
-        // Get all player scripts in the current game
-        PlayerScript[] players = FindObjectsOfType<PlayerScript>();
+        // Get player info
+        PlayerRegistry.PlayerInfo info = PlayerRegistry.For(Network.player);
 
-        if (!ServerScript.Spectating) {
-            // Respawn all players
-            foreach (PlayerScript player in players) {
-                if (player.networkView.isMine) {
-                    player.networkView.RPC("ImmediateRespawn", RPCMode.All);
-                }
-            }
+        // Respawn own player
+        if (!info.Spectating) {
+            info.Player.networkView.RPC("ImmediateRespawn", RPCMode.All);
         }
 
         // Unpause players
-        foreach (PlayerScript player in players) {
-            player.Paused = false;
-        }
+        info.Player.networkView.RPC("setPaused", RPCMode.All, false);
 
+
+        // Clean leaderboard
+        // TODO: Check
         foreach (LeaderboardEntry entry in NetworkLeaderboard.Instance.Entries) {
             entry.Deaths = 0;
             entry.Kills = 0;
@@ -184,9 +181,7 @@ public class RoundScript : MonoBehaviour {
 
         // Clean old player object (load is async and we dont want it to update while loading)
         if (PlayerRegistry.Has(Network.player)) {
-            NetworkView pview = PlayerRegistry.For(Network.player).Location.networkView;
-            Network.RemoveRPCs(pview.viewID);
-            Network.Destroy(pview.gameObject);
+            Destroy(PlayerRegistry.For(Network.player).Player.gameObject);
         }
 
         // Clean the player register, it will be rebuild when the level is loaded
