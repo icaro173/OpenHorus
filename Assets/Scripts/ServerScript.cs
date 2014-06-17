@@ -283,16 +283,17 @@ public class ServerScript : MonoBehaviour {
         }
     }
 
-    string dots(float t) { return "...".Substring(0, (int)Math.Floor(t) % 4); }
-
     void OnGUI() {
         peerType = Network.peerType;
 
         if (peerType == NetworkPeerType.Disconnected || peerType == NetworkPeerType.Connecting) {
             GUI.skin = guiSkin;
 
+            // Animated dots
+            string dots = "...".Substring(0, (int)Math.Floor(Time.time * 2) % 4);
+
             // Status box
-            GUI.Box(new Rect((Screen.width / 2) - 122, Screen.height - 145, 248, 35), currentStatus.Replace("...", dots(Time.time * 2)).ToUpperInvariant());
+            GUI.Box(new Rect((Screen.width / 2) - 122, Screen.height - 145, 248, 35), currentStatus.Replace("...", dots).ToUpperInvariant());
         }
 
 
