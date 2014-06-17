@@ -102,7 +102,7 @@ public class PlayerScript : MonoBehaviour {
     IEnumerator WaitAndLabel() {
         while (!PlayerRegistry.Has(owner))
             yield return new WaitForSeconds(1 / 30f);
-        UpdateLabel(PlayerRegistry.For(owner).Username);
+        UpdateLabel(PlayerRegistry.Get(owner).Username);
     }
 
     void OnGUI() {
@@ -116,14 +116,13 @@ public class PlayerScript : MonoBehaviour {
     public void Targeted(NetworkPlayer aggressor) {
         if (!networkView.isMine) return;
 
-        if (GlobalSoundsScript.soundEnabled)
-            warningSound.Play();
+        warningSound.Play();
 
-        print("Targeted by: " + PlayerRegistry.For(aggressor).Username);
+        print("Targeted by: " + PlayerRegistry.Get(aggressor).Username);
 
         GameObject sphere = (GameObject)Instantiate(warningSphereFab, transform.position, transform.rotation);
         sphere.transform.parent = gameObject.transform;
-        sphere.GetComponent<Billboard>().target = PlayerRegistry.For(aggressor).Player.transform;
+        sphere.GetComponent<Billboard>().target = PlayerRegistry.Get(aggressor).Player.transform;
 
         warningSpheres.Add(sphere);
     }
@@ -132,10 +131,10 @@ public class PlayerScript : MonoBehaviour {
     public void Untargeted(NetworkPlayer aggressor) {
         if (!networkView.isMine) return;
 
-        print("Untargeted by: " + PlayerRegistry.For(aggressor).Username);
+        print("Untargeted by: " + PlayerRegistry.Get(aggressor).Username);
 
         int id = -1;
-        id = warningSpheres.FindIndex(a => a.GetComponent<Billboard>().target == PlayerRegistry.For(aggressor).Player.transform);
+        id = warningSpheres.FindIndex(a => a.GetComponent<Billboard>().target == PlayerRegistry.Get(aggressor).Player.transform);
         if (id == -1) return;
 
         Destroy(warningSpheres[id]);
@@ -279,8 +278,7 @@ public class PlayerScript : MonoBehaviour {
                 characterAnimation.CrossFade(currentAnim = "jump", IdleTransitionFadeLength);
                 playJumpSound = true;
 
-                if (GlobalSoundsScript.soundEnabled)
-                    jumpSound.Play();
+                jumpSound.Play();
 
                 sinceNotGrounded = 0.25f;
             } else if (dashCooldown <= 0) {
@@ -293,9 +291,7 @@ public class PlayerScript : MonoBehaviour {
                 characterAnimation.CrossFade(currentAnim = "jump", IdleTransitionFadeLength);
                 playDashSound = true;
 
-                if (GlobalSoundsScript.soundEnabled) {
-                    dashSound.Play();
-                }
+                dashSound.Play();
 
                 Vector3 dashDirection = inputVelocity.normalized;
                 if (dashDirection == Vector3.zero)
@@ -369,9 +365,7 @@ public class PlayerScript : MonoBehaviour {
         controller.Move((smoothFallingVelocity + smoothedInputVelocity + recoilVelocity) * Time.deltaTime);
 
         if (sinceNotGrounded > 0.25f && controller.isGrounded) {
-            if (GlobalSoundsScript.soundEnabled) {
-                landingSound.Play();
-            }
+            landingSound.Play();
         }
 
         if (controller.isGrounded)
@@ -399,8 +393,8 @@ public class PlayerScript : MonoBehaviour {
 
         if (stream.isReading) {
             // Play sounds
-            if (playDashSound && GlobalSoundsScript.soundEnabled) dashSound.Play();
-            if (playJumpSound && GlobalSoundsScript.soundEnabled) jumpSound.Play();
+            if (playDashSound) dashSound.Play();
+            if (playJumpSound) jumpSound.Play();
         }
 
         playJumpSound = playDashSound = false;

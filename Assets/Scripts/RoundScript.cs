@@ -119,7 +119,7 @@ public class RoundScript : MonoBehaviour {
     [RPC]
     public void RestartRound() {
         // Get player info
-        PlayerRegistry.PlayerInfo info = PlayerRegistry.For(Network.player);
+        PlayerRegistry.PlayerInfo info = PlayerRegistry.Get(Network.player);
 
         // Respawn own player
         if (!info.Spectating) {
@@ -179,7 +179,7 @@ public class RoundScript : MonoBehaviour {
 
         // Clean old player object (load is async and we dont want it to update while loading)
         if (PlayerRegistry.Has(Network.player)) {
-            Destroy(PlayerRegistry.For(Network.player).Player.gameObject);
+            Destroy(PlayerRegistry.Get(Network.player).Player.gameObject);
         }
 
         // Clean the player register, it will be rebuild when the level is loaded

@@ -80,7 +80,7 @@ public class ChatScript : MonoBehaviour {
                     continue;
                 }
 
-                GUIStyle rowStyle = new GUIStyle(Skin.box) { fixedWidth = 200 };
+                //GUIStyle rowStyle = new GUIStyle(Skin.box) { fixedWidth = 200 };
 
                 GUILayout.BeginHorizontal();
 
@@ -234,7 +234,7 @@ public class ChatScript : MonoBehaviour {
     [RPC]
     public void LogChat(NetworkPlayer player, string message, bool systemMessage, bool isSourceless) {
         if (!PlayerRegistry.Has(player)) return;
-        ChatLog.Add(new ChatMessage { Player = PlayerRegistry.For(player).Username, Message = message, IsSystem = systemMessage, IsSourceless = isSourceless });
+        ChatLog.Add(new ChatMessage { Player = PlayerRegistry.Get(player).Username, Message = message, IsSystem = systemMessage, IsSourceless = isSourceless });
         if (ChatLog.Count > 60)
             ChatLog.RemoveAt(0);
     }

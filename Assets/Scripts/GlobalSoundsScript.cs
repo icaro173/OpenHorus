@@ -2,7 +2,10 @@ using UnityEngine;
 using System.Collections;
 
 public class GlobalSoundsScript : MonoBehaviour {
-    public static bool soundEnabled = true;
+    public static bool soundEnabled { 
+        get { return !AudioListener.pause; }
+        set { AudioListener.pause = !value; } 
+    }
     public AudioSource buttonPressSound;
 
     static GlobalSoundsScript Instance;

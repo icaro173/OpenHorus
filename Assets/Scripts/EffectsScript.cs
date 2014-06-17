@@ -17,8 +17,7 @@ public class EffectsScript : MonoBehaviour {
     public static void Explosion(Vector3 position, Quaternion rotation) {
         GameObject exp = (GameObject)Instantiate(Instance.explosionPrefab, position, rotation);
 
-        //sounds disabled? don't play this one then
-        exp.GetComponent<AudioSource>().mute = !GlobalSoundsScript.soundEnabled;
+        exp.GetComponent<AudioSource>().mute = false;
 
         int count = RandomHelper.Random.Next(1, 4);
         for (int i = 0; i < count; i++)
