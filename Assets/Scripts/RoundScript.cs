@@ -184,9 +184,7 @@ public class RoundScript : MonoBehaviour {
 
         // Clean old player object (load is async and we dont want it to update while loading)
         if (PlayerRegistry.Has(Network.player)) {
-            NetworkView pview = PlayerRegistry.For(Network.player).Location.networkView;
-            Network.RemoveRPCs(pview.viewID);
-            Network.Destroy(pview.gameObject);
+            Destroy(PlayerRegistry.For(Network.player).Location.gameObject);
         }
 
         // Clean the player register, it will be rebuild when the level is loaded

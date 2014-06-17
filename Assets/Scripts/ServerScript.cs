@@ -72,6 +72,7 @@ public class ServerScript : MonoBehaviour {
     private float sinceRefreshedPlayers;
     private int lastPlayerCount;
     private string lastLevelName;
+    private string currentStatus = "";
 
     class ServerList {
         public string Message = null;
@@ -161,10 +162,25 @@ public class ServerScript : MonoBehaviour {
         hostStateCallbacks.Add(HostingState.Connecting, onConnecting);
         hostStateCallbacks.Add(HostingState.DiscoveringNAT, onDiscoveringNAT);
         hostStateCallbacks.Add(HostingState.ReadyToHost, onReadyToHost);
+
+        // UI messages
+        hostStateCallbacks.Add(HostingState.AttemptingToHost, (old, current) => currentStatus = "Attempting to host...");
+        hostStateCallbacks.Add(HostingState.WaitingForNat, (old, current) => currentStatus = "Waiting for NAT...");
+        hostStateCallbacks.Add(HostingState.WaitingForInput, (old, current) => {
+            if (lanMode) {
+                currentStatus = "Lan Mode - Master server is disabled";
+            } else if (serverList != null) {
+                currentStatus = "Server activity : " + serverList.Connections + " players in " + serverList.Activegames + " games.";
+            }
+        });
+        hostStateCallbacks.Add(HostingState.WaitingForInitialServers, (old, current) => currentStatus = "Waiting for servers...");
     }
 
     // This state is when the payer has pressed Join, auto select a server
     void onChoosingServer(HostingState oldstate, HostingState currentstate) {
+        // Set UI
+        currentStatus = "Choosing server...";
+
         // We got not servers from the master, refresh again in 1 second
         if (serverList == null || serverList.Servers == null || serverList.Servers.Length == 0) {
             hostState = HostingState.Startup;
@@ -190,6 +206,7 @@ public class ServerScript : MonoBehaviour {
     }
 
     void onConnecting(HostingState oldstate, HostingState currentstate) {
+        currentStatus = "Connecting to server...";
         if (Connect()) {
             hostState = HostingState.Connected;
         } else {
@@ -201,6 +218,7 @@ public class ServerScript : MonoBehaviour {
     }
 
     void onDiscoveringNAT(HostingState oldstate, HostingState currentstate) {
+        currentStatus = "Discovering NAT...";
         if (!natDiscoveryStarted) {
             StartNatDiscovery();
         }
@@ -272,32 +290,9 @@ public class ServerScript : MonoBehaviour {
 
         if (peerType == NetworkPeerType.Disconnected || peerType == NetworkPeerType.Connecting) {
             GUI.skin = guiSkin;
-            string currentStatus = "";
-
-            switch (hostState) {
-                case HostingState.AttemptingToHost:
-                    currentStatus = "Attempting to host" + dots(Time.time * 2); break;
-                case HostingState.WaitingForNat:
-                    currentStatus = "Waiting for NAT" + dots(Time.time * 2); break;
-                case HostingState.Connecting:
-                    currentStatus = "Connecting to server" + dots(Time.time * 2); break;
-                case HostingState.DiscoveringNAT:
-                    currentStatus = "NAT punching" + dots(Time.time * 2); break;
-                case HostingState.WaitingForInitialServers:
-                    currentStatus = "Waiting for server list" + dots(Time.time * 2); break;
-                case HostingState.ChoosingServer:
-                    currentStatus = "Choosing server" + dots(Time.time * 2); break;
-                default:
-                    if (lanMode) {
-                        currentStatus = "Lan Mode - Master server is disabled";
-                    } else if (serverList != null) {
-                        currentStatus = "Server activity : " + serverList.Connections + " players in " + serverList.Activegames + " games.";
-                    }
-                    break;
-            }
 
             // Status box
-            GUI.Box(new Rect((Screen.width / 2) - 122, Screen.height - 145, 248, 35), currentStatus.ToUpperInvariant());
+            GUI.Box(new Rect((Screen.width / 2) - 122, Screen.height - 145, 248, 35), currentStatus.Replace("...", dots(Time.time * 2)).ToUpperInvariant());
         }
 
 
