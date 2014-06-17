@@ -157,11 +157,6 @@ public class RoundScript : MonoBehaviour {
 
     public void ChangeLevelAndRestart(string toLevelName)
     {
-        foreach (NetworkPlayer player in Network.connections) {
-            Network.RemoveRPCs(player);
-            Network.DestroyPlayerObjects(player);
-        }
-
         // Destroy all old calls
         Network.RemoveRPCsInGroup(1);
         networkView.RPC("ChangeLevelAndRestartRCP", RPCMode.OthersBuffered, toLevelName, lastLevelPrefix + 1);
@@ -184,7 +179,17 @@ public class RoundScript : MonoBehaviour {
 
     // Load new map
     public void ChangeLevel(string newLevel, int levelPrefix) {
+        // Use a new prefix for the next level
         lastLevelPrefix = levelPrefix;
+
+        // Clean old player object (load is async and we dont want it to update while loading)
+        if (PlayerRegistry.Has(Network.player)) {
+            NetworkView pview = PlayerRegistry.For(Network.player).Location.networkView;
+            Network.RemoveRPCs(pview.viewID);
+            Network.Destroy(pview.gameObject);
+        }
+
+        // Clean the player register, it will be rebuild when the level is loaded
         PlayerRegistry.Clear();
 
         // Disable sending
@@ -194,11 +199,12 @@ public class RoundScript : MonoBehaviour {
         Network.isMessageQueueRunning = false;
         Network.SetLevelPrefix(levelPrefix);
 
+        // Remove al non-leveloading rpcs from the buffers, just in case
         if (Network.isServer) {
             Network.RemoveRPCsInGroup(0);
         }
 
-        Debug.Log("ChangeLevel");
+        // Load the actual level
         if (Application.loadedLevelName != newLevel) {
             Application.LoadLevel(newLevel);
         } else {
@@ -217,10 +223,12 @@ public class RoundScript : MonoBehaviour {
         RoundScript.Instance.currentLevel = Application.loadedLevelName;
         ServerScript.Instance.SetMap(RoundScript.Instance.currentLevel);
 
+        // If we are playing, build the player again and register
         if (Network.peerType != NetworkPeerType.Disconnected) {
             SpawnScript.Instance.CreatePlayer();
         }
 
+        // Restart the round
         if (doRestart == true) {
             doRestart = false;
             RestartRound();
