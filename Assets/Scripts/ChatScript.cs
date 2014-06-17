@@ -69,24 +69,22 @@ public class ChatScript : MonoBehaviour {
 
     void Chat(int windowId) {
         try {
+
             foreach (ChatMessage log in ChatLog) {
-                if (!PlayerRegistry.Has(log.Player))
-                    continue;
 
-                if (log.Life > 15)
+                if (log.Life > 15) {
                     log.Hidden = true;
+                }
 
-                if (log.Hidden && !forceVisible)
+                if (log.Hidden && !forceVisible) {
                     continue;
+                }
 
                 GUIStyle rowStyle = new GUIStyle(Skin.box) { fixedWidth = 200 };
 
                 GUILayout.BeginHorizontal();
 
-                if (!log.IsSourceless)
-                    rowStyle.normal.textColor = PlayerRegistry.For(log.Player).Color;
-
-                String message = (log.IsSourceless ? "" : (PlayerRegistry.For(log.Player).Username.ToUpper() + ": ")) + log.Message;
+                String message = (log.IsSourceless ? "" : (log.Player.ToUpper() + ": ")) + log.Message;
 
                 GUILayout.Box(message);
                 GUILayout.EndHorizontal();
@@ -235,13 +233,14 @@ public class ChatScript : MonoBehaviour {
 
     [RPC]
     public void LogChat(NetworkPlayer player, string message, bool systemMessage, bool isSourceless) {
-        ChatLog.Add(new ChatMessage { Player = player, Message = message, IsSystem = systemMessage, IsSourceless = isSourceless });
+        if (!PlayerRegistry.Has(player)) return;
+        ChatLog.Add(new ChatMessage { Player = PlayerRegistry.For(player).Username, Message = message, IsSystem = systemMessage, IsSourceless = isSourceless });
         if (ChatLog.Count > 60)
             ChatLog.RemoveAt(0);
     }
 
     public class ChatMessage {
-        public NetworkPlayer Player;
+        public string Player;
         public string Message;
         public bool IsSystem, IsSourceless;
         public float Life;
