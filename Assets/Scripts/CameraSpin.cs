@@ -10,14 +10,13 @@ public class CameraSpin : MonoBehaviour {
 
     void Start() {
         DontDestroyOnLoad(gameObject);
-
-        camPosOrigin = Camera.main.transform.localPosition;
-        transPosOrigin = transform.localPosition;
-
-        camRotOrigin = Camera.main.transform.localRotation;
-        transRotOrigin = transform.localRotation;
-
         Camera.main.depthTextureMode = DepthTextureMode.DepthNormals;
+    }
+
+    void OnLevelWasLoaded() {
+        if (ServerScript.hostState == ServerScript.HostingState.WaitingForInput) {
+            ResetTransforms();
+        }
     }
 
     void Update() {
@@ -27,22 +26,28 @@ public class CameraSpin : MonoBehaviour {
 
         transform.Rotate(0, rotateSpeed * Time.deltaTime * sign, 0);
 
-        if (ServerScript.Spectating && !wasSpectating)
-            ResetTransforms();
-        wasSpectating = ServerScript.Spectating;
+        if (ServerScript.Spectating) {
+            if (!wasSpectating) {
+                ResetTransforms();
+                wasSpectating = true;
+            }
+        } else {
+            wasSpectating = false;
+        }
+
     }
 
     void OnDisconnectedFromServer(NetworkDisconnection mode) {
-        if (TaskManager.Instance != null)
-            TaskManager.Instance.WaitFor(0.25f).Then(ResetTransforms);
+        ResetTransforms();
     }
 
-    void ResetTransforms() {
-        // Added a delay, it doesn't seem to work...?
-        Camera.main.transform.localPosition = camPosOrigin;
-        transform.localPosition = transPosOrigin;
+    public void ResetTransforms() {
+        Debug.Log("Resetting transforms");
+        transform.position = LevelSettings.instance.spectatorCameraPosition.position;
+        transform.rotation = LevelSettings.instance.spectatorCameraPosition.rotation;
 
-        Camera.main.transform.localRotation = camRotOrigin;
-        transform.localRotation = transRotOrigin;
+        Camera.main.transform.localPosition = new Vector3(-85.77416f, 32.8305f, -69.88891f);
+        Camera.main.transform.localRotation = Quaternion.Euler(16.48679f, 21.83607f, 6.487632f);
     }
+
 }

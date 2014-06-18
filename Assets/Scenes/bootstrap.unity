@@ -214,7 +214,6 @@ GameObject:
   m_Component:
   - 4: {fileID: 650575161}
   - 33: {fileID: 650575163}
-  - 64: {fileID: 650575164}
   - 23: {fileID: 650575162}
   m_Layer: 0
   m_Name: Plane
@@ -229,9 +228,9 @@ Transform:
   m_PrefabParentObject: {fileID: 400006, guid: c96dbb7712a004beb84ace25193b3eae, type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 650575160}
-  m_LocalRotation: {x: .151164412, y: .179181024, z: .0278737061, w: .971733809}
-  m_LocalPosition: {x: -84.6791306, y: 27.959259, z: -67.1563263}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: .151164412, y: .179181039, z: .0278737098, w: .971733868}
+  m_LocalPosition: {x: -85.0608521, y: 32.2629128, z: -68.1087418}
+  m_LocalScale: {x: .900000036, y: .900000036, z: 1}
   m_Children: []
   m_Father: {fileID: 1198184570}
   m_RootOrder: 1
@@ -264,20 +263,6 @@ MeshFilter:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 650575160}
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
---- !u!64 &650575164
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 6400000, guid: c96dbb7712a004beb84ace25193b3eae,
-    type: 2}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 650575160}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_SmoothSphereCollisions: 0
-  m_Convex: 0
-  m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &656731828
 GameObject:
   m_ObjectHideFlags: 0
@@ -304,8 +289,8 @@ Transform:
   m_PrefabParentObject: {fileID: 400010, guid: c96dbb7712a004beb84ace25193b3eae, type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 656731828}
-  m_LocalRotation: {x: .151164442, y: .179181039, z: .0278736949, w: .971733809}
-  m_LocalPosition: {x: -85.7741623, y: 28.8305035, z: -69.8889084}
+  m_LocalRotation: {x: .151164412, y: .179181039, z: .0278737042, w: .971733809}
+  m_LocalPosition: {x: -85.7741623, y: 32.8305016, z: -69.8889084}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1198184570}
@@ -854,12 +839,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   allowedLevels:
-  - pi_rah
   - pi_jsf
+  - pi_rah
   - pi_mar
+  - pi_set
   - pi_ven
   - pi_gho
-  - pi_set
   currentLevel: 
 --- !u!1 &1763971420
 GameObject:

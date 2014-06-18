@@ -16,19 +16,4 @@ public class LevelSettings : MonoBehaviour {
         if (instance == this)
             instance = null;
     }
-
-    void Start() {
-        // Set orbiting camera position
-        if (ServerScript.Instance != null) {
-            GameObject orbit = FindObjectOfType<CameraSpin>().gameObject;
-            orbit.transform.position = spectatorCameraPosition.position;
-            orbit.transform.rotation = spectatorCameraPosition.rotation;
-        }
-
-        // Are we starting this level directly? Do QuickPlay
-        //if (Application.isEditor && ServerScript.Instance == null) {
-            //todo Quick play here
-        //}
-    }
-
 }
