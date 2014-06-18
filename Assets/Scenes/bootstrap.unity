@@ -473,8 +473,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d634b6c68fdf1141aea370dc60cf03d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  skin: {fileID: 11400000, guid: ca3d138dd65c2564f9ccc4895664196a, type: 2}
-  baseSensitivity: 3
 --- !u!1 &1050480389
 GameObject:
   m_ObjectHideFlags: 0
@@ -972,7 +970,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Skin: {fileID: 11400000, guid: ca3d138dd65c2564f9ccc4895664196a, type: 2}
-  showChat: 0
+  chatTimeout: 15
 --- !u!1 &2049539267
 GameObject:
   m_ObjectHideFlags: 0
