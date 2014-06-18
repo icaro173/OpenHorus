@@ -579,6 +579,9 @@ public class ServerScript : MonoBehaviour {
 
         PlayerRegistry.Clear();
 
+        // Put camera back to spectate
+        FindObjectOfType<CameraSpin>().ResetTransforms();
+
         // Clear players
         foreach (PlayerScript o in FindObjectsOfType<PlayerScript>()) {
             Destroy(o.gameObject);
