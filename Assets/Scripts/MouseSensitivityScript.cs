@@ -9,6 +9,7 @@ public class MouseSensitivityScript : MonoBehaviour {
 
     void Awake() {
         sensitivityPercentage = PlayerPrefs.GetInt("sensitivity", 50);
+        changeSensitivity(0);
     }
 
     void Update() {
