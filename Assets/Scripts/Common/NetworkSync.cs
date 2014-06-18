@@ -27,7 +27,7 @@ public class NetworkSync : MonoBehaviour {
         networkView.group = 2;
 	}
 
-    private void runSynced() {
+    private static void runSynced() {
         Dictionary<string, syncInfo> completedSyncDict = new Dictionary<string, syncInfo>();
 
         // Check for completion
@@ -35,7 +35,7 @@ public class NetworkSync : MonoBehaviour {
             syncInfo info = pair.Value;
 
             // If all players are synced add to completed list
-            if (info.syncedPlayers.All(x => x.Value)) {
+            if (info.cb != null && !info.syncedPlayers.Any(x => !x.Value)) {
                 completedSyncDict.Add(pair.Key, info);
             }
         }
@@ -102,6 +102,6 @@ public class NetworkSync : MonoBehaviour {
 
         // If all players already called Sync on this key, call cb
         // Else set the cb to be called when the last player called
-
+        runSynced();
     }
 }
