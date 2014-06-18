@@ -1,5 +1,6 @@
-using System.Linq;
 using UnityEngine;
+using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
 
 public class RoundScript : MonoBehaviour {
@@ -8,7 +9,7 @@ public class RoundScript : MonoBehaviour {
     private static int lastLevelPrefix = 0;
 
     // Private
-    private const int roundDuration = 60 * 3;
+    private const int roundDuration = 10 * 3;
     private const int preRoundDuration = 5;
     private const int postRoundDuration = 15;
     private const int roundPerLevel = 2;
@@ -152,8 +153,7 @@ public class RoundScript : MonoBehaviour {
     public void ChangeLevelAndRestart(string toLevelName) {
         // Destroy all old calls
         Network.RemoveRPCsInGroup(1);
-        networkView.RPC("ChangeLevelAndRestartRPC", RPCMode.OthersBuffered, toLevelName, lastLevelPrefix + 1);
-        ChangeLevelAndRestartRPC(toLevelName, lastLevelPrefix + 1);
+        networkView.RPC("ChangeLevelAndRestartRPC", RPCMode.AllBuffered, toLevelName, lastLevelPrefix + 1);
     }
 
     // Force map change (used from chat)
@@ -190,12 +190,7 @@ public class RoundScript : MonoBehaviour {
         Network.SetLevelPrefix(levelPrefix);
 
         // Load the actual level
-        if (Application.loadedLevelName != newLevel) {
-            Application.LoadLevel(newLevel);
-        } else {
-            // Call the callback manually
-            OnLevelWasLoaded(Application.loadedLevel);
-        }
+        Application.LoadLevel(newLevel);
     }
 
     void OnLevelWasLoaded(int id) {
@@ -208,11 +203,9 @@ public class RoundScript : MonoBehaviour {
         RoundScript.Instance.currentLevel = Application.loadedLevelName;
         ServerScript.Instance.SetMap(RoundScript.Instance.currentLevel);
 
-        // If we are playing, build the player again and register
+        // If we are playing, build the player again, register and restart
         if (Network.peerType != NetworkPeerType.Disconnected) {
             SpawnScript.Instance.CreatePlayer();
-
-            // Restart round
             RestartRound();
         }
 
