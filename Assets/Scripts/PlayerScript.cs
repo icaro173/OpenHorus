@@ -35,7 +35,7 @@ public class PlayerScript : MonoBehaviour {
     public AudioSource dashSound;
     public AudioSource landingSound;
     public AudioSource jumpSound;
-    
+
     //Private
     private GameObject textBubble;
     private Vector3 fallingVelocity;
@@ -211,7 +211,7 @@ public class PlayerScript : MonoBehaviour {
 
             if (Input.GetKeyDown("i"))
                 invertMouse = !invertMouse;
-            
+
             if (Input.GetMouseButtonUp(0))
                 Screen.lockCursor = true;
 
@@ -226,7 +226,7 @@ public class PlayerScript : MonoBehaviour {
             cameraPivot.rotation = smoothLookRotation;
         } else {
             //if (iPosition.IsRunning) {
-                //transform.position += iPosition.Update();
+            //transform.position += iPosition.Update();
             //}
 
             smoothYaw = Mathf.LerpAngle(smoothYaw, lookRotationEuler.y, 0.4f);
@@ -246,7 +246,7 @@ public class PlayerScript : MonoBehaviour {
         }
         textBubble.transform.LookAt(Camera.main.transform);
         textBubble.transform.localRotation = textBubble.transform.localRotation * Quaternion.Euler(90, 0, 0);
-       
+
         // dash animation
         Color color = dashEffectRenderer.material.GetColor("_TintColor");
         Vector3 dashVelocity = new Vector3(fallingVelocity.x, activelyJumping ? 0 : Math.Max(fallingVelocity.y, 0), fallingVelocity.z);

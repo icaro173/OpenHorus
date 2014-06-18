@@ -1,10 +1,9 @@
 using UnityEngine;
-using System.Collections;
 
 public class GlobalSoundsScript : MonoBehaviour {
-    public static bool soundEnabled { 
+    public static bool soundEnabled {
         get { return !AudioListener.pause; }
-        set { AudioListener.pause = !value; } 
+        set { AudioListener.pause = !value; }
     }
     public AudioSource buttonPressSound;
 

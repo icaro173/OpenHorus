@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 public class CameraSpin : MonoBehaviour {
     public float rotateSpeed = 0.2f;

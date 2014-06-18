@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 public class PlayerDeathScript : MonoBehaviour {
     ParticleSystem p;

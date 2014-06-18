@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 public class HitConeScript : MonoBehaviour {
     const float Lifetime = 0.75f;

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 
 class LeaderboardViewerScript : MonoBehaviour {
@@ -33,9 +31,9 @@ class LeaderboardViewerScript : MonoBehaviour {
 
     void BoardRow(int windowId) {
         LeaderboardEntry log = NetworkLeaderboard.Instance.Entries.FirstOrDefault(x => x.NetworkPlayer == Network.player);
-        if (log == null || !PlayerRegistry.Has(Network.player)) 
+        if (log == null || !PlayerRegistry.Has(Network.player))
             return;
-        
+
         GUIStyle rowStyle = RowStyle;
         // rowStyle.normal.textColor = PlayerRegistry.For(log.NetworkPlayer).Color;
 

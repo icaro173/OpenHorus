@@ -1,6 +1,4 @@
-using System.Linq;
 using UnityEngine;
-using System.Collections;
 
 public class HealthScript : MonoBehaviour {
     public int maxShield = 1;
@@ -164,8 +162,7 @@ public class HealthScript : MonoBehaviour {
         dead = true;
         foreach (Renderer r in GetComponentsInChildren<Renderer>()) r.enabled = false;
         foreach (Collider r in GetComponentsInChildren<Collider>()) r.enabled = false;
-        foreach (PlayerShootingScript r in GetComponentsInChildren<PlayerShootingScript>())
-        {
+        foreach (PlayerShootingScript r in GetComponentsInChildren<PlayerShootingScript>()) {
             r.CheckTargets();
             r.targets.Clear();
             r.enabled = false;

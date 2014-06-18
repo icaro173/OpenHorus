@@ -70,10 +70,7 @@ public class ChatScript : MonoBehaviour {
         }
     }
     void Chat(int windowId) {
-
-
         foreach (ChatMessage log in ChatLog) {
-
             if (log.Life > 15) {
                 log.Hidden = true;
             }

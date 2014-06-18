@@ -243,10 +243,10 @@ public class PlayerShootingScript : MonoBehaviour {
         PlayerScript targetScript;
         try {
             targetScript = FindObjectsOfType<PlayerScript>()
-                .Where( x => x.owner == target)
+                .Where(x => x.owner == target)
                 .OrderBy(x => Vector3.Distance(x.transform.position, lastKnownPosition))
                 .FirstOrDefault();
-        } catch (Exception) { 
+        } catch (Exception) {
             targetScript = null;
         }
 

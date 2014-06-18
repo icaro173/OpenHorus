@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 public class EffectsScript : MonoBehaviour {
     public static EffectsScript Instance { get; private set; }
@@ -13,7 +12,6 @@ public class EffectsScript : MonoBehaviour {
         Instance = this;
     }
 
-    // [RPC]
     public static void Explosion(Vector3 position, Quaternion rotation) {
         GameObject exp = (GameObject)Instantiate(Instance.explosionPrefab, position, rotation);
 
@@ -24,7 +22,6 @@ public class EffectsScript : MonoBehaviour {
             Instantiate(Instance.hitConePrefab, position, rotation);
     }
 
-    // [RPC]
     public static void ExplosionHit(Vector3 position, Quaternion rotation) {
         Instantiate(Instance.explosionHitPrefab, position, rotation);
 
@@ -33,12 +30,10 @@ public class EffectsScript : MonoBehaviour {
             Instantiate(Instance.hitConePrefab, position, rotation);
     }
 
-    //[RPC]
     public static void ExplosionArea(Vector3 position, Quaternion rotation) {
         Instantiate(Instance.areaExplosionPrefab, position, rotation);
     }
 
-    //[RPC]
     public static void ExplosionHitArea(Vector3 position, Quaternion rotation) {
         ExplosionArea(position, rotation);
     }

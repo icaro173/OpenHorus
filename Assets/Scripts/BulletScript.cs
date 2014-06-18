@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 public class BulletScript : MonoBehaviour {
     public static int BulletCollisionLayers {
@@ -64,7 +63,7 @@ public class BulletScript : MonoBehaviour {
 			{
                 // Another way of notifying owner of hit
                 //if (networkView.isMine) {
-                    audio.Play(); //Hitreg Sound
+                audio.Play(); //Hitreg Sound
                 //}
                 health.DoDamage(damage, Player);
                 return true;

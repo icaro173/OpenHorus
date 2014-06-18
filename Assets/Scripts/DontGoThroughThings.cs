@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 public class DontGoThroughThings : MonoBehaviour {
     public LayerMask layerMask; //make sure we aren't in this layer 
@@ -11,8 +10,6 @@ public class DontGoThroughThings : MonoBehaviour {
     private Vector3 previousPosition;
     private Rigidbody myRigidbody;
 
-
-    //initialize values 
     void Awake() {
         myRigidbody = rigidbody;
         previousPosition = myRigidbody.position;

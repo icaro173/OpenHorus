@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 class PlayerRegistry : MonoBehaviour {
-    
+
     public class PlayerInfo {
         public string Username;
         public string GUID;

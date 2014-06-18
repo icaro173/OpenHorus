@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 public class AutoDestructScript : MonoBehaviour {
     public float timeToLive = 1.0f;

@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 
 public class Spin : MonoBehaviour {
     public float Speed = 1.0f;

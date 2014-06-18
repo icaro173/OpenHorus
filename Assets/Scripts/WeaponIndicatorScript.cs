@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 public class WeaponIndicatorScript : MonoBehaviour {
@@ -116,8 +114,7 @@ public class WeaponIndicatorScript : MonoBehaviour {
     IEnumerator OnPostRender() {
         yield return new WaitForEndOfFrame();
 
-        if (!RoundScript.Instance.roundStopped && !ServerScript.Spectating)
-        {
+        if (!RoundScript.Instance.roundStopped && !ServerScript.Spectating) {
             // Circle around
             float opacity = Mathf.Lerp(lastOpacity, CooldownStep < 1 ? 1 : 0.3f, 0.1f);
             lastOpacity = opacity;
