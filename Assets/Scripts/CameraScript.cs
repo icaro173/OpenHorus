@@ -7,6 +7,7 @@ public class CameraScript : MonoBehaviour {
     public float smoothing = 0.1f;
 
     bool aimingAtPlayer;
+    bool resetDone;
     PlayerScript player;
 
     Camera mainCamera;
@@ -18,6 +19,7 @@ public class CameraScript : MonoBehaviour {
         if (player.networkView.isMine) {
             mainCamera = Camera.main;
         }
+        resetDone = false;
     }
 
     void FixedUpdate() {
@@ -35,9 +37,14 @@ public class CameraScript : MonoBehaviour {
 
     void LateUpdate() {
         if (player.paused && mainCamera != null) {
-            FindObjectOfType<CameraSpin>().ResetTransforms();
+            if (!resetDone) {
+                FindObjectOfType<CameraSpin>().ResetTransforms();
+            }
+            resetDone = true;
             return;
         }
+
+        if (resetDone) resetDone = false;
 
         if (player.networkView.isMine) {
 
@@ -52,7 +59,6 @@ public class CameraScript : MonoBehaviour {
 
             mainCamera.transform.position = cameraPosition;
             mainCamera.transform.rotation = actualCameraRotation;
-
 
             Camera.main.GetComponent<WeaponIndicatorScript>()
                 .CrosshairPosition = GetCrosshairPosition();
