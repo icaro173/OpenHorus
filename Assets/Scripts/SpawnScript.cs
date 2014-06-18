@@ -15,13 +15,16 @@ public class SpawnScript : MonoBehaviour {
         ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player, "connected", true, false);
     }
 
+    [RPC]
     public void CreatePlayer() {
-        if (ServerScript.Spectating || PlayerRegistry.Has(Network.player)) return;
+        if (ServerScript.Spectating || (PlayerRegistry.Has(Network.player) && PlayerRegistry.Get(Network.player).Player != null)) return;
 
         Debug.Log("Creating new player for self");
         Network.Instantiate(PlayerTemplate, RespawnZone.GetRespawnPoint(), Quaternion.identity, 0);
         Debug.Log("Registering self");
         PlayerRegistry.RegisterCurrentPlayer(chosenUsername);
+
+        NetworkSync.sync("RegisterPlayer");
     }
 
     void OnPlayerDisconnected(NetworkPlayer player) {

@@ -163,6 +163,7 @@ Transform:
   - {fileID: 1763971421}
   - {fileID: 844585324}
   - {fileID: 1568228816}
+  - {fileID: 1759282777}
   m_Father: {fileID: 0}
   m_RootOrder: 2
 --- !u!114 &502558919
@@ -180,6 +181,7 @@ MonoBehaviour:
   lanMode: 0
   peerType: 0
   guiSkin: {fileID: 11400000, guid: ca3d138dd65c2564f9ccc4895664196a, type: 2}
+  logo: {fileID: 0}
 --- !u!114 &502558920
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -854,6 +856,58 @@ MonoBehaviour:
   - pi_ven
   - pi_gho
   currentLevel: 
+--- !u!1 &1759282776
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 1759282777}
+  - 114: {fileID: 1759282779}
+  - 148: {fileID: 1759282778}
+  m_Layer: 0
+  m_Name: NetworkSync
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1759282777
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1759282776}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 502558918}
+  m_RootOrder: 6
+--- !u!148 &1759282778
+NetworkView:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1759282776}
+  m_Enabled: 1
+  m_StateSynchronization: 1
+  m_Observed: {fileID: 1759282777}
+  m_ViewID:
+    m_ID: 7
+    m_Type: 1
+--- !u!114 &1759282779
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1759282776}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 700f9f2e05fa41c4db5605aa164d4afe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1763971420
 GameObject:
   m_ObjectHideFlags: 0

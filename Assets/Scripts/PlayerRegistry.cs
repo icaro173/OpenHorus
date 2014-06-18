@@ -13,6 +13,7 @@ class PlayerRegistry : MonoBehaviour {
 
     private readonly Dictionary<NetworkPlayer, PlayerInfo> registry = new Dictionary<NetworkPlayer, PlayerInfo>();
     public static PlayerRegistry Instance;
+    private static Event registerySynced;
 
     void Awake() {
         DontDestroyOnLoad(this);
@@ -21,6 +22,10 @@ class PlayerRegistry : MonoBehaviour {
 
     public static void Clear() {
         Instance.registry.Clear();
+    }
+
+    public static Dictionary<NetworkPlayer, PlayerInfo> All() {
+        return Instance.registry;
     }
 
     public static PlayerInfo Get(NetworkPlayer player) {

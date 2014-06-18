@@ -75,6 +75,15 @@ class NetworkLeaderboard : MonoBehaviour {
     }
 
     [RPC]
+    public void resetLeaderboard() {
+        foreach (LeaderboardEntry entry in Entries) {
+            entry.Deaths = 0;
+            entry.Kills = 0;
+            entry.ConsecutiveKills = 0;
+        }
+    }
+
+    [RPC]
     public void RegisterKill(NetworkPlayer shooter, NetworkPlayer victim) {
         if (!Network.isServer) return;
 

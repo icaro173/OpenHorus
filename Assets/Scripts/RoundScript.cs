@@ -9,7 +9,7 @@ public class RoundScript : MonoBehaviour {
     private static int lastLevelPrefix = 0;
 
     // Private
-    private const int roundDuration = 60 * 3;
+    private const int roundDuration = 20 * 1;
     private const int preRoundDuration = 5;
     private const int postRoundDuration = 15;
     private const int roundPerLevel = 2;
@@ -26,12 +26,14 @@ public class RoundScript : MonoBehaviour {
     public static RoundScript Instance { get; private set; }
 
     // Unity Functions
+    //!? CLIENT & SERVER
     void Awake() {
         Instance = this;
         roundsRemaining = roundPerLevel;
         networkView.group = 1;
     }
 
+    //!? CLIENT & SERVER
     void Update() {
         if (Network.isServer) {
             //Increment round time
@@ -43,6 +45,7 @@ public class RoundScript : MonoBehaviour {
     }
 
     // Time Events
+    //? SERVER ONLY
     void handleTimeEvents(float time) {
         if (roundTimeEvents == null) {
             return;
@@ -65,7 +68,8 @@ public class RoundScript : MonoBehaviour {
         }
     }
 
-    void addTimeEvents_DeathMatch() {
+    //? SERVER ONLY
+    void setTimeEvents_DeathMatch() {
         roundTimeEvents = new Dictionary<float, roundTimeCB>();
 
         roundTimeEvents.Add(roundDuration - 60, (time) => announceTimeLeft(60));
@@ -76,13 +80,24 @@ public class RoundScript : MonoBehaviour {
         roundTimeEvents.Add(roundDuration + postRoundDuration + preRoundDuration, (time) => changeRound());
     }
 
+    //? SERVER ONLY
     void announceTimeLeft(int time) {
         ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player, time.ToString() + " seconds remaining...", true, true);
     }
 
+    //? SERVER ONLY
     void postRound() {
-        networkView.RPC("StopRound", RPCMode.All);
+        // Stop the round
+        networkView.RPC("setRoundStopped", RPCMode.All, true);
         roundsRemaining--;
+
+        // Pause all players that have a player object
+        foreach(KeyValuePair<NetworkPlayer, PlayerRegistry.PlayerInfo> pair in PlayerRegistry.All()) {
+            PlayerScript player = pair.Value.Player;
+            if (player != null) {
+                player.networkView.RPC("setPaused", RPCMode.All, true);
+            }
+        }
 
         ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player, "Round over!", true, true);
 
@@ -92,6 +107,7 @@ public class RoundScript : MonoBehaviour {
         }
     }
 
+    //? SERVER ONLY
     void endRound(int timeout) {
         if (roundsRemaining <= 0) {
             // Have the players change level
@@ -102,61 +118,50 @@ public class RoundScript : MonoBehaviour {
         ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player, "Starting game in " + timeout + " seconds!", true, true);
     }
 
+    //? SERVER ONLY
     void changeRound() {
-        networkView.RPC("RestartRound", RPCMode.All);
+        RestartRound();
         ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player, "Game start!", true, true);
     }
 
-    // Remote Protocol Calls
-    [RPC]
-    public void StopRound() {
-        PlayerScript player = PlayerRegistry.Get(Network.player).Player;
-        player.networkView.RPC("setPaused", RPCMode.All, true);
-        roundStopped = true;
-    }
-
-    [RPC]
+    //? SERVER ONLY
     public void RestartRound() {
-        // Get player info
-        PlayerRegistry.PlayerInfo info = PlayerRegistry.Get(Network.player);
+        // Make sure every user has a player
+        SpawnScript.Instance.networkView.RPC("CreatePlayer", RPCMode.All);
 
-        // Respawn own player
-        if (!info.Spectating) {
-            info.Player.networkView.RPC("ImmediateRespawn", RPCMode.All);
-        }
+        // Wait until all players have synced their registry
+        NetworkSync.afterSync("RegisterPlayer", () => {
+            foreach (KeyValuePair<NetworkPlayer, PlayerRegistry.PlayerInfo> pair in PlayerRegistry.All()) {
+                PlayerScript player = pair.Value.Player;
 
-        // Unpause players
-        info.Player.networkView.RPC("setPaused", RPCMode.All, false);
+                // Respawn own player and unpause
+                // TODO setting a player to spectator mode should resolve check itself on spawn
+                if (!pair.Value.Spectating) {
+                    player.networkView.RPC("ImmediateRespawn", RPCMode.All);
+                }
+                player.networkView.RPC("setPaused", RPCMode.All, false);
 
+                // Clean leaderboard
+                NetworkLeaderboard.Instance.networkView.RPC("resetLeaderboard", RPCMode.All);
 
-        // Clean leaderboard
-        // TODO: Check
-        foreach (LeaderboardEntry entry in NetworkLeaderboard.Instance.Entries) {
-            entry.Deaths = 0;
-            entry.Kills = 0;
-            entry.ConsecutiveKills = 0;
-        }
+                // Start round
+                networkView.RPC("setRoundStopped", RPCMode.All, false);
+            }
 
-        // Reset time events
-        if (Network.isServer) {
-            addTimeEvents_DeathMatch();
-        }
-
-        // Hide old chat
-        ChatScript.Instance.ChatLog.ForEach(x => x.Hidden = true);
-
-        // Start round
-        roundTime = 0;
-        roundStopped = false;
+            // Reset time events
+            roundTime = 0;
+            setTimeEvents_DeathMatch();
+        });
     }
 
-    public void ChangeLevelAndRestart(string toLevelName) {
-        // Destroy all old calls
-        Network.RemoveRPCsInGroup(1);
-        networkView.RPC("ChangeLevelAndRestartRPC", RPCMode.AllBuffered, toLevelName, lastLevelPrefix + 1);
+    // Remote Protocol Calls
+    //!? CLIENT & SERVER
+    [RPC]
+    public void setRoundStopped(bool stopped) {
+        roundStopped = stopped;
     }
 
-    // Force map change (used from chat)
+    //!? CLIENT & SERVER
     [RPC]
     private void ChangeLevelAndRestartRPC(string toLevelName, int levelPrefix) {
         roundsRemaining = roundPerLevel;
@@ -164,12 +169,22 @@ public class RoundScript : MonoBehaviour {
     }
 
     // Map loading
+    //? SERVER ONLY
+    public void ChangeLevelAndRestart(string toLevelName) {
+        // Destroy all old calls
+        Network.RemoveRPCsInGroup(1);
+        networkView.RPC("ChangeLevelAndRestartRPC", RPCMode.AllBuffered, toLevelName, lastLevelPrefix + 1);
+    }
+
+
     // Server picks new map and loads
+    //? SERVER ONLY
     public string getRandomMap() {
         return RandomHelper.InEnumerable(allowedLevels.Except(new[] { RoundScript.Instance.currentLevel }));
     }
 
     // Load new map
+    //!? CLIENT & SERVER
     public void ChangeLevel(string newLevel, int levelPrefix) {
         // Use a new prefix for the next level
         lastLevelPrefix = levelPrefix;
@@ -193,6 +208,7 @@ public class RoundScript : MonoBehaviour {
         Application.LoadLevel(newLevel);
     }
 
+    //!? CLIENT & SERVER
     void OnLevelWasLoaded(int id) {
         // Turn networking back on
         Network.isMessageQueueRunning = true;
@@ -204,8 +220,7 @@ public class RoundScript : MonoBehaviour {
         ServerScript.Instance.SetMap(RoundScript.Instance.currentLevel);
 
         // If we are playing, build the player again, register and restart
-        if (Network.peerType != NetworkPeerType.Disconnected) {
-            SpawnScript.Instance.CreatePlayer();
+        if (Network.peerType != NetworkPeerType.Disconnected && Network.isServer) {
             RestartRound();
         }
 
