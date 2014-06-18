@@ -27,22 +27,4 @@ public class MouseSensitivityScript : MonoBehaviour {
         Sensitivity = baseSensitivity *
             Mathf.Pow(2, sensitivityPercentage / 25.0f - 2);
     }
-
-    void OnGUI() {
-        GUILayout.Window(3, new Rect(Screen.width - 200, 0, 200, 40),
-                         OnWindow, "", windowStyle);
-    }
-
-    void OnWindow(int windowId) {
-        GUI.skin = skin;
-        GUILayout.BeginHorizontal(GUILayout.ExpandWidth(true));
-        /*GUILayout.Label("-", GUILayout.ExpandWidth(false));
-        GUILayout.HorizontalSlider(sensitivityPercentage, 0, 100,
-            skin.FindStyle("Sensitivity Slider"),
-            skin.FindStyle("Sensitivity Slider Thumb"),
-            GUILayout.ExpandWidth(true));
-        GUILayout.Label(string.Format("+ {0:d2}", sensitivityPercentage),
-            GUILayout.ExpandWidth(false));*/
-        GUILayout.EndHorizontal();
-    }
 }
