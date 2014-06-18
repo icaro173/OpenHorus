@@ -9,7 +9,7 @@ public class RoundScript : MonoBehaviour {
     private static int lastLevelPrefix = 0;
 
     // Private
-    private const int roundDuration = 60 * 3;
+    private const int roundDuration = 20;
     private const int preRoundDuration = 5;
     private const int postRoundDuration = 15;
     private const int roundPerLevel = 2;
@@ -204,7 +204,7 @@ public class RoundScript : MonoBehaviour {
         ServerScript.Instance.SetMap(RoundScript.Instance.currentLevel);
 
         // If we are playing, build the player again, register and restart
-        if (Network.peerType != NetworkPeerType.Disconnected) {
+        if (Network.peerType != NetworkPeerType.Disconnected && Network.isServer) {
             SpawnScript.Instance.CreatePlayer();
             RestartRound();
         }
