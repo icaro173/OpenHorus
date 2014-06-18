@@ -175,13 +175,13 @@ public class RoundScript : MonoBehaviour {
         // Use a new prefix for the next level
         lastLevelPrefix = levelPrefix;
 
-        // Clean old player object (load is async and we dont want it to update while loading)
-        if (PlayerRegistry.Has(Network.player)) {
-            Destroy(PlayerRegistry.Get(Network.player).Player.gameObject);
-        }
-
         // Clean the player register, it will be rebuild when the level is loaded
         PlayerRegistry.Clear();
+
+        // Remove al non-leveloading rpcs from the buffers, just in case
+        if (Network.isServer) {
+            Network.RemoveRPCsInGroup(0);
+        }
 
         // Disable sending
         // Stop recieving
@@ -189,11 +189,6 @@ public class RoundScript : MonoBehaviour {
         Network.SetSendingEnabled(0, false);
         Network.isMessageQueueRunning = false;
         Network.SetLevelPrefix(levelPrefix);
-
-        // Remove al non-leveloading rpcs from the buffers, just in case
-        if (Network.isServer) {
-            Network.RemoveRPCsInGroup(0);
-        }
 
         // Load the actual level
         if (Application.loadedLevelName != newLevel) {
