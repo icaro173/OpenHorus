@@ -1194,7 +1194,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 2300000, guid: 19f885b5ce1e6489881106bef5962bc5, type: 3}
       propertyPath: m_ReceiveShadows
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2300000, guid: 19f885b5ce1e6489881106bef5962bc5, type: 3}
       propertyPath: m_LightmapTilingOffset.z
@@ -1239,6 +1239,10 @@ Prefab:
     - target: {fileID: 100002, guid: 19f885b5ce1e6489881106bef5962bc5, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: 19f885b5ce1e6489881106bef5962bc5, type: 3}
+      propertyPath: m_UseLightProbes
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 19f885b5ce1e6489881106bef5962bc5, type: 3}
@@ -11126,7 +11130,7 @@ Renderer:
   m_GameObject: {fileID: 497257505}
   m_Enabled: 1
   m_CastShadows: 0
-  m_ReceiveShadows: 0
+  m_ReceiveShadows: 1
   m_LightmapIndex: 0
   m_LightmapTilingOffset: {x: .232421875, y: .232421875, z: .590888977, w: .230537415}
   m_Materials:
@@ -15768,7 +15772,7 @@ Transform:
   m_Children:
   - {fileID: 933499039}
   m_Father: {fileID: 842673440}
-  m_RootOrder: 0
+  m_RootOrder: 1
 --- !u!1001 &654067880
 Prefab:
   m_ObjectHideFlags: 0
@@ -20118,9 +20122,9 @@ Transform:
   m_LocalPosition: {x: -81.9297333, y: 209.982285, z: 133.759979}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 1095873432}
   - {fileID: 650058545}
   - {fileID: 1808792540}
-  - {fileID: 1095873432}
   m_Father: {fileID: 1116832696}
   m_RootOrder: 5
 --- !u!1001 &845927224
@@ -22231,7 +22235,7 @@ Renderer:
   m_GameObject: {fileID: 959411450}
   m_Enabled: 1
   m_CastShadows: 0
-  m_ReceiveShadows: 0
+  m_ReceiveShadows: 1
   m_LightmapIndex: 0
   m_LightmapTilingOffset: {x: .232421875, y: .232421875, z: .590888977, w: -.000907897949}
   m_Materials:
@@ -25107,7 +25111,7 @@ Transform:
   m_Children:
   - {fileID: 913637326}
   m_Father: {fileID: 842673440}
-  m_RootOrder: 2
+  m_RootOrder: 0
 --- !u!1 &1095959630
 GameObject:
   m_ObjectHideFlags: 0
@@ -30587,7 +30591,7 @@ Renderer:
   m_GameObject: {fileID: 1361583809}
   m_Enabled: 1
   m_CastShadows: 0
-  m_ReceiveShadows: 0
+  m_ReceiveShadows: 1
   m_LightmapIndex: 1
   m_LightmapTilingOffset: {x: .4140625, y: .4140625, z: -.00161743164, w: .426116943}
   m_Materials:
@@ -38741,7 +38745,7 @@ Transform:
   - {fileID: 2066073959}
   - {fileID: 372180160}
   m_Father: {fileID: 842673440}
-  m_RootOrder: 1
+  m_RootOrder: 2
 --- !u!1 &1810874297
 GameObject:
   m_ObjectHideFlags: 0

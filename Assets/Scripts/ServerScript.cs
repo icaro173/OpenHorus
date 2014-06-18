@@ -11,7 +11,7 @@ public class ServerScript : MonoBehaviour {
 
     //Public
     public const int port = 31414;
-    public const string buildVersion = "18062014";
+    public const string buildVersion = "19062014";
     public const string MasterServerUri = "http://ohs.padrepio.in/";
 
     //public GameObject PlayerRegistryPrefab;
@@ -19,6 +19,7 @@ public class ServerScript : MonoBehaviour {
     public NetworkPeerType peerType;
     public GUISkin guiSkin;
     public List<LeaderboardEntry> SavedLeaderboardEntries = new List<LeaderboardEntry>();
+    public Texture2D logo;
 
     public static bool Spectating;
     public static HostingState hostState {
@@ -289,6 +290,9 @@ public class ServerScript : MonoBehaviour {
 
         if (peerType == NetworkPeerType.Disconnected || peerType == NetworkPeerType.Connecting) {
             GUI.skin = guiSkin;
+
+            // WFH Logo
+            GUI.DrawTexture(new Rect(Screen.width / 2 - 64, Screen.height / 2 - 64, 128, 128), logo);
 
             // Animated dots
             string dots = "...".Substring(0, (int)Math.Floor(Time.time * 2) % 4);
