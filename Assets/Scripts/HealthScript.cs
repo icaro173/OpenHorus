@@ -38,7 +38,7 @@ public class HealthScript : MonoBehaviour {
 
     void Update() {
         if (networkView.isMine && transform.position.y < LevelSettings.instance.killZ) {
-            DoDamage(999, (NetworkPlayer)GetComponent<PlayerScript>().owner);
+            DoDamage(999, GetComponent<PlayerScript>().owner);
         }
 
         if (!firstSet && shieldRenderer != null) {

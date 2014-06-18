@@ -66,33 +66,6 @@ class PlayerRegistry : MonoBehaviour {
         Debug.Log("Unregistering player : " + player + " left)");
     }
 
-    [RPC]
-    public void RegisteryRequestedRPC(NetworkPlayer player) {
-        Debug.Log("Propagating player registry to player " + player);
-
-        foreach (NetworkPlayer otherPlayer in registry.Keys) {
-            if (otherPlayer != player) {
-                PlayerInfo info = registry[otherPlayer];
-
-                networkView.RPC("RegisterPlayer",
-                                player,
-                                otherPlayer,
-                                info.Username,
-                                info.GUID,
-                                new Vector3(info.Color.r, info.Color.g, info.Color.b),
-                                info.Spectating);
-
-                if (info.Spectating) {
-                    foreach (PlayerScript p in FindObjectsOfType<PlayerScript>()) {
-                        if (p.networkView.owner == otherPlayer) {
-                            p.GetComponent<HealthScript>().networkView.RPC("ToggleSpectate", player, true);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     public void OnPlayerDisconnected(NetworkPlayer player) {
         networkView.RPC("UnregisterPlayer", RPCMode.All, player);
     }

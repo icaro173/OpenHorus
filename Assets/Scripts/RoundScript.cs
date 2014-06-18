@@ -10,7 +10,7 @@ public class RoundScript : MonoBehaviour {
     // Private
     private const int roundDuration = 60 * 3;
     private const int preRoundDuration = 5;
-    private const int postRoundDuration = 20;
+    private const int postRoundDuration = 15;
     private const int roundPerLevel = 2;
 
     float roundTime;
@@ -109,9 +109,8 @@ public class RoundScript : MonoBehaviour {
     // Remote Protocol Calls
     [RPC]
     public void StopRound() {
-        foreach (PlayerScript player in FindObjectsOfType<PlayerScript>()) {
-            player.networkView.RPC("setPaused", RPCMode.All, true);
-        }
+        PlayerScript player = PlayerRegistry.Get(Network.player).Player;
+        player.networkView.RPC("setPaused", RPCMode.All, true);
         roundStopped = true;
     }
 
