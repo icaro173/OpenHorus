@@ -58,7 +58,10 @@ public class ChatScript : MonoBehaviour {
         }
 
         int height = 36 + ChatLog.Count(x => !x.Hidden || forceVisible) * 36;
+        // Message list
         GUILayout.Window(1, new Rect(35, Screen.height - height, 247, height), Chat, string.Empty);
+        // Text control
+        GUILayout.Window(2, new Rect(35, Screen.height - 36, 247, height), ChatControl, string.Empty);
 
         if (enteredChat) {
             GUI.FocusWindow(1);
@@ -66,30 +69,31 @@ public class ChatScript : MonoBehaviour {
             ignoreT = Event.current.keyCode == KeyCode.T;
         }
     }
-
     void Chat(int windowId) {
-        try {
 
-            foreach (ChatMessage log in ChatLog) {
 
-                if (log.Life > 15) {
-                    log.Hidden = true;
-                }
+        foreach (ChatMessage log in ChatLog) {
 
-                if (log.Hidden && !forceVisible) {
-                    continue;
-                }
-
-                //GUIStyle rowStyle = new GUIStyle(Skin.box) { fixedWidth = 200 };
-
-                GUILayout.BeginHorizontal();
-
-                String message = (log.IsSourceless ? "" : (log.Player.ToUpper() + ": ")) + log.Message;
-
-                GUILayout.Box(message);
-                GUILayout.EndHorizontal();
+            if (log.Life > 15) {
+                log.Hidden = true;
             }
 
+            if (log.Hidden && !forceVisible) {
+                continue;
+            }
+
+            GUIStyle rowStyle = new GUIStyle(Skin.box) { fixedWidth = 246 };
+
+            GUILayout.BeginHorizontal();
+
+            String message = (log.IsSourceless ? "" : (log.Player.ToUpper() + ": ")) + log.Message;
+
+            GUILayout.Box(message, rowStyle);
+            GUILayout.EndHorizontal();
+        }
+    }
+    void ChatControl(int windowId) {
+        try {
             GUILayout.BeginHorizontal();
 
             if (showChat) {
@@ -215,10 +219,12 @@ public class ChatScript : MonoBehaviour {
                     Screen.lockCursor = true;
                 }
 
-                GUI.FocusControl("ChatInput");
+                if (GUI.GetNameOfFocusedControl() != "ChatInput") {
+                    GUI.FocusControl("ChatInput");
+                }
             }
 
-            GUILayout.Box("", new GUIStyle(Skin.box) { fixedWidth = showChat ? 1 : 184 });
+            GUILayout.Box("", new GUIStyle(Skin.box) { fixedWidth = showChat ? 1 : 181 });
             if (GUILayout.Button("Disconnect")) {
                 GlobalSoundsScript.PlayButtonPress();
                 Network.Disconnect();

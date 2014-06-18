@@ -44,7 +44,6 @@ public class MouseSensitivityScript : MonoBehaviour {
             GUILayout.ExpandWidth(true));
         GUILayout.Label(string.Format("+ {0:d2}", sensitivityPercentage),
             GUILayout.ExpandWidth(false));*/
-        //GUILayout.TextField( Network.player.guid );
         GUILayout.EndHorizontal();
     }
 }
