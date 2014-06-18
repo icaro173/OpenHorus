@@ -35,9 +35,6 @@ public class CameraScript : MonoBehaviour {
 
     void LateUpdate() {
         if (player.paused && mainCamera != null) {
-            //todo Level-specific cameras
-            mainCamera.transform.localPosition = new Vector3(-85.77416f, 32.8305f, -69.88891f);
-            mainCamera.transform.localRotation = Quaternion.Euler(16.48679f, 21.83607f, 6.487632f);
             return;
         }
 

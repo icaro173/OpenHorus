@@ -1,16 +1,13 @@
 using UnityEngine;
 
 public class MouseSensitivityScript : MonoBehaviour {
-    public GUISkin skin;
     public float baseSensitivity = 3;
 
     public static float Sensitivity { get; private set; }
 
     int sensitivityPercentage = 50;
-    GUIStyle windowStyle;
 
     void Awake() {
-        windowStyle = new GUIStyle(skin.window) { normal = { background = null } };
         sensitivityPercentage = PlayerPrefs.GetInt("sensitivity", 50);
     }
 
