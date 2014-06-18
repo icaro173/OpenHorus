@@ -35,8 +35,8 @@ public class CameraScript : MonoBehaviour {
 
     void LateUpdate() {
         if (player.paused && mainCamera != null) {
-            mainCamera.transform.localPosition = LevelSettings.instance.spectatorCameraPosition.position;
-            mainCamera.transform.localRotation = LevelSettings.instance.spectatorCameraPosition.rotation;
+            mainCamera.transform.position = LevelSettings.instance.spectatorCameraPosition.position;
+            mainCamera.transform.rotation = LevelSettings.instance.spectatorCameraPosition.rotation;
             return;
         }
 
