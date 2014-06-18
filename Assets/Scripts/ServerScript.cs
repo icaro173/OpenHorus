@@ -74,6 +74,7 @@ public class ServerScript : MonoBehaviour {
     private string lastLevelName;
     private string currentStatus = "";
     private bool masterIsDown = false;
+    private WebClient web;
 
     class ServerList {
         public string Message = null;
@@ -135,6 +136,9 @@ public class ServerScript : MonoBehaviour {
 
         // Setup state changes
         createStateChangeCallbacks();
+
+        // Create web client for communication with Master Server
+        web = new WebClient();
     }
 
     void Start() {
@@ -341,7 +345,7 @@ public class ServerScript : MonoBehaviour {
 
     // Get list of servers from the master server
     void QueryServerList() {
-        // If we're in LAN-only mode we all the fetching
+        // If we're in LAN-only mode we skip all the fetching
         if (lanMode) { hostState = HostingState.WaitingForInput; }
 
         // Create server blacklist (remove servers we failed to connect to)
@@ -358,34 +362,32 @@ public class ServerScript : MonoBehaviour {
         // Grab new server list
         if (ThreadPool.Instance != null) {
             ThreadPool.Instance.Fire(() => {
-                using (WebClient client = new WebClient()) {
-                    // HTTP GET
-                    try {
-                        string response = client.DownloadString(MasterServerUri + "/" + buildVersion);
+                // HTTP GET
+                try {
+                    string response = web.DownloadString(MasterServerUri + "/" + buildVersion);
 
-                        // Master is up, hooray
-                        masterIsDown = false;
+                    // Master is up, hooray
+                    masterIsDown = false;
 
-                        ServerList servers = JsonConvert.DeserializeObject<ServerList>(response, jsonSettings);
+                    ServerList servers = JsonConvert.DeserializeObject<ServerList>(response, jsonSettings);
 
-                        // Blacklist things that failed before
-                        if (blackList != null && blackList.Length > 0) {
-                            foreach (ServerInfo s in servers.Servers) {
-                                s.ConnectionFailed = blackList.Contains(s.GUID);
-                            }
+                    // Blacklist things that failed before
+                    if (blackList != null && blackList.Length > 0) {
+                        foreach (ServerInfo s in servers.Servers) {
+                            s.ConnectionFailed = blackList.Contains(s.GUID);
                         }
-
-                        serverList = servers;
-                        hostState = HostingState.WaitingForInput;
-                    } catch (WebException) {
-                        // Master server is down, everybody panics
-                        Debug.Log("Master server has gone down");
-                        masterIsDown = true;
-                        hostState = HostingState.WaitingForInput;
-                    } catch (Exception ex) {
-                        Debug.LogWarning(ex.ToString());
-                        throw ex;
                     }
+
+                    serverList = servers;
+                    hostState = HostingState.WaitingForInput;
+                } catch (WebException) {
+                    // Master server is down, everybody panics
+                    Debug.Log("Master server has gone down");
+                    masterIsDown = true;
+                    hostState = HostingState.WaitingForInput;
+                } catch (Exception ex) {
+                    Debug.LogWarning(ex.ToString());
+                    throw ex;
                 }
             });
         }
@@ -396,17 +398,15 @@ public class ServerScript : MonoBehaviour {
         // Do nothing on LAN-only mode
         if (lanMode) { serverToken = ""; }
         if (!masterIsDown && !lanMode) {
-            using (WebClient client = new WebClient()) {
-                try {
-                    // Serialize server info to JSON
-                    string currentServerJSON = JsonConvert.SerializeObject(currentServer);
+            try {
+                // Serialize server info to JSON
+                string currentServerJSON = JsonConvert.SerializeObject(currentServer);
 
-                    // then add new server
-                    serverToken = client.UploadString(MasterServerUri + "/add", currentServerJSON);
-                } catch (WebException) {
-                    Debug.Log("Master server has gone down");
-                    masterIsDown = true;
-                }
+                // then add new server
+                serverToken = web.UploadString(MasterServerUri + "/add", currentServerJSON);
+            } catch (WebException) {
+                Debug.Log("Master server has gone down");
+                masterIsDown = true;
             }
         }
 
@@ -431,18 +431,12 @@ public class ServerScript : MonoBehaviour {
         // Create JSON string
         string serverItemJSON = JsonConvert.SerializeObject(serverItem);
 
-        // TODO: Maby replace with UploadStringAsync?
-        // Has to be Async, as a slow server response would block the game thread
-        ThreadPool.Instance.Fire(() => {
-            using (WebClient client = new WebClient()) {
-                try {
-                    client.UploadString(MasterServerUri + "/update", serverItemJSON);
-                } catch (WebException) {
-                    Debug.Log("Master server has gone down");
-                    masterIsDown = true;
-                }
-            }
-        });
+        try {
+            web.UploadStringAsync(new Uri(MasterServerUri + "/update"), serverItemJSON);
+        } catch (WebException) {
+            Debug.Log("Master server has gone down");
+            masterIsDown = true;
+        }
     }
 
     // Delete our server from the list
@@ -450,9 +444,7 @@ public class ServerScript : MonoBehaviour {
         // Do nothing on LAN-only mode
         if (lanMode || masterIsDown) { return; }
 
-        using (WebClient client = new WebClient()) {
-            client.UploadString(MasterServerUri + "/delete", serverToken);
-        }
+        web.UploadString(MasterServerUri + "/delete", serverToken);
     }
 
     bool CreateServer() {

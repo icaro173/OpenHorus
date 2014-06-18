@@ -42,7 +42,7 @@ public class SpawnScript : MonoBehaviour {
             if (info == NetworkDisconnection.LostConnection) {
                 Debug.Log("Lost connection to the server");
             } else {
-                Debug.Log("Successfully diconnected from the server");
+                Debug.Log("Successfully disconnected from the server");
             }
         }
     }
