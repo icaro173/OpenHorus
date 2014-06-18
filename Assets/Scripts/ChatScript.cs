@@ -136,8 +136,8 @@ public class ChatScript : MonoBehaviour {
                                             true, true);
                                 } else if (!RoundScript.Instance.allowedLevels.Contains(messageParts[1])) {
                                     LogChat(Network.player,
-                                            "Level " + messageParts[1] + " does not exist. " +
-                                            StringHelper.DeepToString(RoundScript.Instance.allowedLevels), true, true);
+                                            "Level " + messageParts[1] + " does not exist. {" +
+                                            String.Join(", ",RoundScript.Instance.allowedLevels)+"}", true, true);
                                 } else {
                                     RoundScript.Instance.ChangeLevelAndRestart(messageParts[1]);
                                 }

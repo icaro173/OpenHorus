@@ -141,12 +141,12 @@ public class PlayerShootingScript : MonoBehaviour {
                 Vector3 position = ps.transform.position;
                 Vector3 screenPos = Camera.main.WorldToScreenPoint(position);
 
-                if (health.Health > 0 && screenPos.z > 0 && (screenPos.XY() - screenCenter).magnitude < allowedDistance) {
+                if (health.Health > 0 && screenPos.z > 0 && (new Vector2(screenPos.x, screenPos.y) - screenCenter).magnitude < allowedDistance) {
                     WeaponIndicatorScript.PlayerData data;
                     if ((data = targets.FirstOrDefault(x => x.Script == ps)) == null)
                         targets.Add(data = new WeaponIndicatorScript.PlayerData { Script = ps, WasLocked = false });
 
-                    data.ScreenPosition = screenPos.XY();
+                    data.ScreenPosition = new Vector2(screenPos.x,screenPos.y);
                     data.SinceInCrosshair += Time.deltaTime;
                     data.Found = true;
 
