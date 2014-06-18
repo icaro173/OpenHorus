@@ -9,6 +9,8 @@ public class BulletScript : MonoBehaviour {
     }
 
     public GameObject bulletCasingPrefab;
+    public float casingForce = 500.0f;
+    public float casingTorque = 5.0f;
     public float speed = 900;
     public float lifetime = 2;
     public int damage = 1;
@@ -40,8 +42,8 @@ public class BulletScript : MonoBehaviour {
 
         // Create bullet casing effect
         GameObject casing = (GameObject)Instantiate(bulletCasingPrefab, transform.position, transform.rotation);
-        casing.rigidbody.AddRelativeForce(new Vector3(1 + Random.value, Random.value + 1, 0), ForceMode.Impulse);
-        casing.rigidbody.AddTorque(5 * new Vector3(-0.5f - Random.value, -Random.value * 0.1f, -0.5f - Random.value), ForceMode.Impulse);
+        casing.rigidbody.AddRelativeForce(new Vector3(1 + Random.value, Random.value + 1, 0) * casingForce, ForceMode.Impulse);
+        casing.rigidbody.AddTorque(new Vector3(-0.5f - Random.value, -Random.value * 0.1f, -0.5f - Random.value) * casingTorque, ForceMode.Impulse);
         casing.rigidbody.useGravity = true;
 
         // Set random brightness

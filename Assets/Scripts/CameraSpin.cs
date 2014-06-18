@@ -38,7 +38,6 @@ public class CameraSpin : MonoBehaviour {
     }
 
     public void ResetTransforms() {
-        Debug.Log("Resetting transforms");
         transform.position = LevelSettings.instance.spectatorCameraPosition.position;
         transform.rotation = LevelSettings.instance.spectatorCameraPosition.rotation;
 

@@ -33,6 +33,7 @@ Transform:
   m_LocalScale: {x: .425000012, y: .425000012, z: 2.25}
   m_Children: []
   m_Father: {fileID: 0}
+  m_RootOrder: 0
 --- !u!23 &2300000
 Renderer:
   m_ObjectHideFlags: 1
@@ -51,9 +52,8 @@ Renderer:
   m_UseLightProbes: 0
   m_LightProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
-  m_SortingLayer: 0
-  m_SortingOrder: 0
   m_SortingLayerID: 0
+  m_SortingOrder: 0
 --- !u!33 &3300000
 MeshFilter:
   m_ObjectHideFlags: 1
@@ -152,9 +152,8 @@ TrailRenderer:
   m_UseLightProbes: 0
   m_LightProbeAnchor: {fileID: 0}
   m_ScaleInLightmap: 1
-  m_SortingLayer: 0
-  m_SortingOrder: 0
   m_SortingLayerID: 0
+  m_SortingOrder: 0
   m_Time: 2
   m_StartWidth: 1
   m_EndWidth: .5
@@ -188,6 +187,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bulletCasingPrefab: {fileID: 100000, guid: 0c0f4137b2b770140abfda1e828f053f, type: 2}
+  casingForce: 200
+  casingTorque: 100
   speed: 7
   lifetime: 1
   damage: 1
