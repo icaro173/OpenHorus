@@ -37,8 +37,7 @@ public class HealthScript : MonoBehaviour {
     }
 
     void Update() {
-        //todo This should be level dependant
-        if (networkView.isMine && transform.position.y < -104) {
+        if (networkView.isMine && transform.position.y < LevelSettings.instance.killZ) {
             DoDamage(999, (NetworkPlayer)GetComponent<PlayerScript>().owner);
         }
 
