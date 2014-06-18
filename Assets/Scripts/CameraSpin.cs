@@ -6,7 +6,7 @@ public class CameraSpin : MonoBehaviour {
 
     Vector3 camPosOrigin, transPosOrigin;
     Quaternion camRotOrigin, transRotOrigin;
-    bool wasSpectating;
+    bool wasSpectating = true;
 
     void Start() {
         DontDestroyOnLoad(gameObject);
@@ -26,15 +26,11 @@ public class CameraSpin : MonoBehaviour {
 
         transform.Rotate(0, rotateSpeed * Time.deltaTime * sign, 0);
 
-        if (ServerScript.Spectating) {
-            if (!wasSpectating) {
-                ResetTransforms();
-                wasSpectating = true;
-            }
-        } else {
-            wasSpectating = false;
+        if (ServerScript.Spectating && !wasSpectating) {
+            ResetTransforms();
         }
-
+        
+        wasSpectating = ServerScript.Spectating;
     }
 
     void OnDisconnectedFromServer(NetworkDisconnection mode) {
