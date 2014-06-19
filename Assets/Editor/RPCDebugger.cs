@@ -39,8 +39,8 @@ public class RPCDebugger : EditorWindow {
     }
 
     void OnGUI() {
-        GUIStyle addStyle = new GUIStyle() { normal = { textColor = Color.green } };
-        GUIStyle removeStyle = new GUIStyle() { normal = { textColor = Color.red } };
+        GUIStyle addStyle = new GUIStyle() { normal = { textColor = Color.black } };
+        GUIStyle removeStyle = new GUIStyle() { normal = { textColor = Color.black } };
 
         EditorGUILayout.BeginVertical();
         showCount = EditorGUILayout.Foldout(showCount, "RPC Count");
@@ -59,7 +59,11 @@ public class RPCDebugger : EditorWindow {
 
         scollView = EditorGUILayout.BeginScrollView(scollView, false, true);
         foreach (BufferedRPC rpc in rpcBuffer) {
-            EditorGUILayout.LabelField(rpc.name, rpc.added ? addStyle : removeStyle);
+            if (rpc.added) {
+                EditorGUILayout.LabelField("+ " + rpc.name, addStyle);
+            } else {
+                EditorGUILayout.LabelField("- " + rpc.name, removeStyle);
+            }
             EditorGUILayout.Space();
         }
         EditorGUILayout.EndScrollView();
