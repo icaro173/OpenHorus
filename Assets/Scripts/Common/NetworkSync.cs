@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 
+[RequireComponent(typeof(NetworkView))]
 public class NetworkSync : MonoBehaviour {
     private static NetworkSync instance;
 
@@ -15,6 +16,8 @@ public class NetworkSync : MonoBehaviour {
 
         public syncInfo() {
             syncedPlayers = new Dictionary<NetworkPlayer, bool>();
+
+            // Add all currently connected players
             foreach (NetworkPlayer player in Network.connections) {
                 syncedPlayers.Add(player, false);
             }
@@ -28,6 +31,7 @@ public class NetworkSync : MonoBehaviour {
 	}
 
     private static void runSynced() {
+        Debug.LogWarning("runSynced");
         Dictionary<string, syncInfo> completedSyncDict = new Dictionary<string, syncInfo>();
 
         // Check for completion
@@ -49,15 +53,6 @@ public class NetworkSync : MonoBehaviour {
         }
     }
 
-    void OnPlayerConnected(NetworkPlayer player) {
-        foreach (KeyValuePair<string, syncInfo> pair in syncDict) {
-            syncInfo info = pair.Value;
-            info.syncedPlayers.Add(player, false);
-        }
-
-        runSynced();
-    }
-
     void OnPlayerDisconnected(NetworkPlayer player) {
         foreach (KeyValuePair<string, syncInfo> pair in syncDict) {
             syncInfo info = pair.Value;
@@ -70,7 +65,8 @@ public class NetworkSync : MonoBehaviour {
     }
 
     [RPC]
-    private void syncRPC(string key, NetworkMessageInfo msgInfo) {
+    public void syncRPC(string key, NetworkMessageInfo msgInfo) {
+        Debug.LogWarning("syncRPC [" + key + "] from " + msgInfo.sender);
         // Create or lookup an dictionary on the key
         syncInfo info = null;
         if (syncDict.ContainsKey(key)) {
@@ -91,12 +87,16 @@ public class NetworkSync : MonoBehaviour {
             Debug.LogError("afterSync called in client code");
             return;
         }
+
+        Debug.LogWarning("afterSync [" + key + "]");
+
         // Create or lookup an dictionary on the key
         syncInfo info = null;
         if (syncDict.ContainsKey(key)) {
             info = syncDict[key];
         } else {
             info = new syncInfo();
+            info.cb = cb;
             syncDict.Add(key, info);
         }
 

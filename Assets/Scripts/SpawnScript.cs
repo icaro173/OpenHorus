@@ -17,12 +17,12 @@ public class SpawnScript : MonoBehaviour {
 
     [RPC]
     public void CreatePlayer() {
-        if (ServerScript.Spectating || (PlayerRegistry.Has(Network.player) && PlayerRegistry.Get(Network.player).Player != null)) return;
-
-        Debug.Log("Creating new player for self");
-        Network.Instantiate(PlayerTemplate, RespawnZone.GetRespawnPoint(), Quaternion.identity, 0);
-        Debug.Log("Registering self");
-        PlayerRegistry.RegisterCurrentPlayer(chosenUsername);
+        if (!ServerScript.Spectating && (!PlayerRegistry.Has(Network.player) || PlayerRegistry.Get(Network.player).Player == null)) {
+            Debug.Log("Creating new player for self");
+            Network.Instantiate(PlayerTemplate, RespawnZone.GetRespawnPoint(), Quaternion.identity, 0);
+            Debug.Log("Registering self");
+            PlayerRegistry.RegisterCurrentPlayer(chosenUsername);
+        }
 
         NetworkSync.sync("RegisterPlayer");
     }

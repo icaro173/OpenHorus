@@ -74,14 +74,6 @@ public class PlayerScript : MonoBehaviour {
         characterAnimation["backward"].speed = 1.75f;
         characterAnimation["strafeLeft"].speed = 1.5f;
         characterAnimation["strafeRight"].speed = 1.5f;
-
-        // Tag materials
-        /*foreach (Renderer r in GetComponentsInChildren<Renderer>()) {
-            if (!r.material.HasProperty("_Color")) continue;
-            if (r.gameObject.name == "TextBubble") continue;
-            if (r.gameObject.name == "flag_flag001") continue;
-            r.tag = "PlayerMaterial";
-        }*/
     }
 
     void OnDestroy() {

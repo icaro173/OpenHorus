@@ -9,7 +9,7 @@ public class RoundScript : MonoBehaviour {
     private static int lastLevelPrefix = 0;
 
     // Private
-    private const int roundDuration = 20 * 1;
+    private const int roundDuration = 60 * 2;
     private const int preRoundDuration = 5;
     private const int postRoundDuration = 15;
     private const int roundPerLevel = 2;
@@ -41,6 +41,14 @@ public class RoundScript : MonoBehaviour {
 
             //Trigger round events
             handleTimeEvents(roundTime);
+        }
+    }
+
+    IEnumerator OnPlayerConnected(NetworkPlayer player) {
+        // If the first player connects, wait a frame and restart the game
+        if (Network.connections.Length == 1) {
+            yield return 0;
+            changeRound();
         }
     }
 
@@ -131,6 +139,7 @@ public class RoundScript : MonoBehaviour {
 
         // Wait until all players have synced their registry
         NetworkSync.afterSync("RegisterPlayer", () => {
+            Debug.LogWarning("sync RegisterPlayer");
             foreach (KeyValuePair<NetworkPlayer, PlayerRegistry.PlayerInfo> pair in PlayerRegistry.All()) {
                 PlayerScript player = pair.Value.Player;
 
