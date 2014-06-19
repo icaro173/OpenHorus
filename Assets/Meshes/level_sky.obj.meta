@@ -5,12 +5,22 @@ ModelImporter:
   fileIDToRecycleName:
     100000: Null_Object-Cube_5
     100002: //RootNode
+    100004: Null_Object-Cube_5_default
+    100006: Clouds_default
     400000: Null_Object-Cube_5
     400002: //RootNode
+    400004: Null_Object-Cube_5_default
+    400006: Clouds_default
     2300000: Null_Object-Cube_5
+    2300002: Null_Object-Cube_5_default
+    2300004: Clouds_default
     3300000: Null_Object-Cube_5
+    3300002: Null_Object-Cube_5_default
+    3300004: Clouds_default
     4300000: Sphere
     4300002: Null_Object-Cube_5
+    4300004: Null_Object-Cube_5_default
+    4300006: Clouds_default
     11100000: //RootNode
   materials:
     importMaterials: 0
