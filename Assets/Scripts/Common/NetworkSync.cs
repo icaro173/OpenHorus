@@ -31,7 +31,6 @@ public class NetworkSync : MonoBehaviour {
 	}
 
     private static void runSynced() {
-        Debug.LogWarning("runSynced");
         Dictionary<string, syncInfo> completedSyncDict = new Dictionary<string, syncInfo>();
 
         // Check for completion
@@ -49,6 +48,7 @@ public class NetworkSync : MonoBehaviour {
             syncDict.Remove(pair.Key);
 
             // Call cb
+            Debug.LogWarning("runSynced " + pair.Key);
             pair.Value.cb();
         }
     }
@@ -66,6 +66,11 @@ public class NetworkSync : MonoBehaviour {
 
     [RPC]
     public void syncRPC(string key, NetworkMessageInfo msgInfo) {
+        if (!Network.isServer) {
+            Debug.LogError("syncRPC called in client code");
+            return;
+        }
+
         Debug.LogWarning("syncRPC [" + key + "] from " + msgInfo.sender);
         // Create or lookup an dictionary on the key
         syncInfo info = null;
