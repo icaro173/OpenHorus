@@ -195,6 +195,7 @@ public class ChatScript : MonoBehaviour {
                         break;
                     }
                     healthscript.networkView.RPC("ToggleSpectate", RPCMode.All, true);
+                    player.networkView.RPC("setPaused", RPCMode.All, true);
 
                     ServerScript.Spectating = true;
                     networkView.RPC("LogChat", RPCMode.All, Network.player, "went in spectator mode.", true, false);
@@ -206,6 +207,7 @@ public class ChatScript : MonoBehaviour {
             case "/join":
                 if (ServerScript.Spectating) {
                     PlayerScript player = PlayerRegistry.Get(Network.player).Player;
+                    player.networkView.RPC("setPaused", RPCMode.All, false);
                     player.GetComponent<HealthScript>().Respawn(RespawnZone.GetRespawnPoint());
 
                     networkView.RPC("LogChat", RPCMode.All, Network.player, "rejoined the game.", true, false);

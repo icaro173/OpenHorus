@@ -6,7 +6,7 @@ public class HealthScript : MonoBehaviour {
     public float shieldRegenTime = 5;
     public float invulnerabilityTime = 2;
     public GameObject deathPrefab;
-    bool dead;
+    public bool dead;
 
     readonly static Color DefaultShieldColor = new Color(110 / 255f, 190 / 255f, 255 / 255f, 30f / 255f);
     readonly static Color HitShieldColor = new Color(1, 1, 1, 1f);
@@ -166,8 +166,10 @@ public class HealthScript : MonoBehaviour {
 
         Health = 0;
         dead = true;
+        
         foreach (Renderer r in GetComponentsInChildren<Renderer>()) r.enabled = false;
         foreach (Collider r in GetComponentsInChildren<Collider>()) r.enabled = false;
+
         foreach (PlayerShootingScript r in GetComponentsInChildren<PlayerShootingScript>()) {
             r.CheckTargets();
             r.targets.Clear();
