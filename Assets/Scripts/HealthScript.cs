@@ -9,7 +9,7 @@ public class HealthScript : MonoBehaviour {
     bool dead;
 
     readonly static Color DefaultShieldColor = new Color(110 / 255f, 190 / 255f, 255 / 255f, 30f / 255f);
-    readonly static Color HitShieldColor = new Color(1, 1, 1, 1f); // new Color(1, 0, 0, 1f);
+    readonly static Color HitShieldColor = new Color(1, 1, 1, 1f);
     readonly static Color RecoverShieldColor = new Color(1, 1, 1, 1f);
 
     public int Shield { get; private set; }
@@ -21,6 +21,7 @@ public class HealthScript : MonoBehaviour {
     float timeSinceRespawn;
     public float timeUntilRespawn = 5;
 
+    bool suicided;
     bool invulnerable;
     bool firstSet;
 
@@ -30,6 +31,7 @@ public class HealthScript : MonoBehaviour {
     void Awake() {
         Shield = maxShield;
         Health = maxHealth;
+        suicided = false;
 
         GameObject graphics = gameObject.FindChild("Animated Mesh Fixed");
         bigCell = graphics.FindChild("healthsphere_rear").GetComponentInChildren<Renderer>();
@@ -117,6 +119,7 @@ public class HealthScript : MonoBehaviour {
             }
             if (Health <= 0) {
                 if (Network.player == shootingPlayer) {
+                    suicided = GetComponent<PlayerScript>().owner == shootingPlayer;
                     NetworkLeaderboard.Instance.networkView.RPC("RegisterKill", RPCMode.All, shootingPlayer, GetComponent<PlayerScript>().owner);
                     networkView.RPC("ScheduleRespawn", RPCMode.All, RespawnZone.GetRespawnPoint());
                 }
@@ -138,7 +141,11 @@ public class HealthScript : MonoBehaviour {
     [RPC]
     void ScheduleRespawn(Vector3 position) {
         Hide();
-        Instantiate(deathPrefab, transform.position, transform.rotation);
+        GameObject death = (GameObject)Instantiate(deathPrefab, transform.position, transform.rotation);
+        PlayerDeathScript dscript = death.GetComponent<PlayerDeathScript>();
+        death.audio.PlayOneShot(suicided ? dscript.waterDeath : dscript.death);
+        suicided = false;
+
         object thisLock = new object();
         respawnLock = thisLock;
         TaskManager.Instance.WaitFor(timeUntilRespawn).Then(() => {
