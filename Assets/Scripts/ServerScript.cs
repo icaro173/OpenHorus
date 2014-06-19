@@ -69,6 +69,7 @@ public class ServerScript : MonoBehaviour {
     private string lastLevelName;
     private string currentStatus = "";
     private bool masterIsDown = false;
+    private bool justLeft = false;
     private WebClient web;
 
     class ServerList {
@@ -172,7 +173,7 @@ public class ServerScript : MonoBehaviour {
             } else if (masterIsDown) {
                 currentStatus = "The master server is down";
             } else if (serverList != null) {
-                currentStatus = "Server activity : " + serverList.Connections + " players in " + serverList.Activegames + " games.";
+                currentStatus = "Server activity : " + serverList.Connections + " players in " + serverList.Activegames + " games";
             }
         });
         hostStateCallbacks.Add(HostingState.WaitingForInitialServers, (old, current) => currentStatus = "Waiting for servers...");
@@ -197,7 +198,7 @@ public class ServerScript : MonoBehaviour {
 
         if (currentServer == null) {
             // TODO: Somehow put this on screen
-            Debug.Log("Tried to find server, failed. Returning to startup state.");
+            Debug.Log("Tried to find server, failed. Returning to startup state");
             serverList = null;
             // Failed to find a server, restart the search
             hostState = HostingState.Startup;
@@ -280,6 +281,13 @@ public class ServerScript : MonoBehaviour {
                     sinceRefreshedPlayers = RefreshTime;
                     lastPlayerCount = Network.connections.Length;
                     lastLevelName = RoundScript.Instance.currentLevel;
+                }
+                break;
+            // Can't do this on the callbacks because of thread stuff
+            case HostingState.WaitingForInput:
+                if (justLeft) {
+                    FindObjectOfType<CameraSpin>().ResetTransforms();
+                    justLeft = false;
                 }
                 break;
         }
@@ -530,8 +538,8 @@ public class ServerScript : MonoBehaviour {
     }
 
     void OnServerInitialized() {
-        Debug.Log("GUID is " + Network.player.guid + ". Use this on clients to connect with NAT punchthrough.");
-        Debug.Log("Local IP/port is " + Network.player.ipAddress + "/" + Network.player.port + ". Use this on clients to connect directly.");
+        Debug.Log("GUID is " + Network.player.guid + ". Use this on clients to connect with NAT punchthrough");
+        Debug.Log("Local IP/port is " + Network.player.ipAddress + "/" + Network.player.port + ". Use this on clients to connect directly");
         RoundScript.Instance.ChangeLevelAndRestart(Application.loadedLevelName);
         NetworkLeaderboard.Instance.OnPlayerConnected(Network.player);
     }
@@ -579,14 +587,12 @@ public class ServerScript : MonoBehaviour {
 
         PlayerRegistry.Clear();
 
-        // Put camera back to spectate
-        FindObjectOfType<CameraSpin>().ResetTransforms();
-
         // Clear players
         foreach (PlayerScript o in FindObjectsOfType<PlayerScript>()) {
             Destroy(o.gameObject);
         }
 
+        justLeft = true;
         hostState = HostingState.Startup;
     }
 }
