@@ -586,6 +586,7 @@ public class ServerScript : MonoBehaviour {
         }
 
         PlayerRegistry.Clear();
+        NetworkLeaderboard.Instance.Clear();
 
         // Clear players
         foreach (PlayerScript o in FindObjectsOfType<PlayerScript>()) {

@@ -136,4 +136,8 @@ class NetworkLeaderboard : MonoBehaviour {
     void OnPlayerDisconnected(NetworkPlayer player) {
         Entries.RemoveAll(x => x.NetworkPlayer == player);
     }
+
+    public void Clear() {
+        Entries.Clear();
+    }
 }
