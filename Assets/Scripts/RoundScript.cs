@@ -45,14 +45,14 @@ public class RoundScript : MonoBehaviour {
         }
     }
 
-    void OnPlayerConnected(NetworkPlayer player) {
+    IEnumerator OnPlayerConnected(NetworkPlayer player) {
         // If the first player connects, notify and wait a couple second then restart
         if (Network.connections.Length == 1) {
+            yield return 0;
             ChatScript.Instance.LogChat(Network.player, "Another player has joined", true, true);
             ChatScript.Instance.LogChat(Network.player, "Starting round in 5 seconds", true, true);
-            TaskManager.Instance.WaitFor(readyDuration).Then(() => {
-                changeRound();
-            });
+            yield return new WaitForSeconds(readyDuration);
+            changeRound();
         }
     }
 
