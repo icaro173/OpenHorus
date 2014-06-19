@@ -28,7 +28,7 @@ public class SpawnScript : MonoBehaviour {
     }
 
     void OnPlayerDisconnected(NetworkPlayer player) {
-        ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player, "disconnected", true, false);
+        ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, player, "disconnected", true, false);
         Debug.Log("Clean up after player " + player);
         Network.RemoveRPCs(player);
         Network.DestroyPlayerObjects(player);

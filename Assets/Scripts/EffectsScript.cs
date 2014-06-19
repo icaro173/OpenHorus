@@ -14,7 +14,6 @@ public class EffectsScript : MonoBehaviour {
 
     public static void Explosion(Vector3 position, Quaternion rotation) {
         GameObject exp = (GameObject)Instantiate(Instance.explosionPrefab, position, rotation);
-
         exp.GetComponent<AudioSource>().mute = false;
 
         int count = RandomHelper.Random.Next(1, 4);

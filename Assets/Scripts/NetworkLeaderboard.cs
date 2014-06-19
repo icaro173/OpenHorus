@@ -115,7 +115,7 @@ class NetworkLeaderboard : MonoBehaviour {
         }
 
         if (victim == shooter)
-            ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, shooter, "commited suicide", true, false);
+            ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, shooter, "committed suicide", true, false);
         else
             ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, shooter, "killed " + (endedSpree ? "and stopped " : "") + PlayerRegistry.Get(victim).Username.ToUpper(), true, false);
 
@@ -135,5 +135,9 @@ class NetworkLeaderboard : MonoBehaviour {
     }
     void OnPlayerDisconnected(NetworkPlayer player) {
         Entries.RemoveAll(x => x.NetworkPlayer == player);
+    }
+
+    public void Clear() {
+        Entries.Clear();
     }
 }

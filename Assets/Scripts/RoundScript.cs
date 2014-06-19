@@ -13,6 +13,7 @@ public class RoundScript : MonoBehaviour {
     private const int preRoundDuration = 5;
     private const int postRoundDuration = 15;
     private const int roundPerLevel = 2;
+    private const int readyDuration = 5;
 
     float roundTime;
     public bool roundStopped { get; private set; }
@@ -45,9 +46,12 @@ public class RoundScript : MonoBehaviour {
     }
 
     IEnumerator OnPlayerConnected(NetworkPlayer player) {
-        // If the first player connects, wait a frame and restart the game
+        // If the first player connects, notify and wait a couple second then restart
         if (Network.connections.Length == 1) {
             yield return 0;
+            ChatScript.Instance.LogChat(Network.player, "Another player has joined", true, true);
+            ChatScript.Instance.LogChat(Network.player, "Starting round in 5 seconds", true, true);
+            yield return new WaitForSeconds(readyDuration);
             changeRound();
         }
     }
@@ -100,7 +104,7 @@ public class RoundScript : MonoBehaviour {
         roundsRemaining--;
 
         // Pause all players that have a player object
-        foreach(KeyValuePair<NetworkPlayer, PlayerRegistry.PlayerInfo> pair in PlayerRegistry.All()) {
+        foreach (KeyValuePair<NetworkPlayer, PlayerRegistry.PlayerInfo> pair in PlayerRegistry.All()) {
             PlayerScript player = pair.Value.Player;
             if (player != null) {
                 player.networkView.RPC("setPaused", RPCMode.All, true);
@@ -111,7 +115,7 @@ public class RoundScript : MonoBehaviour {
 
         // Was this the last round on this map? announce change
         if (roundsRemaining <= 0) {
-            ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player, "Level will change on the next round.", true, true);
+            ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player, "Level will change on the next round", true, true);
         }
     }
 
@@ -224,7 +228,7 @@ public class RoundScript : MonoBehaviour {
         Network.SetSendingEnabled(0, true);
 
         // Notify and change
-        ChatScript.Instance.LogChat(Network.player, "Changed level to " + Application.loadedLevelName + ".", true, true);
+        ChatScript.Instance.LogChat(Network.player, "Changed level to " + Application.loadedLevelName, true, true);
         RoundScript.Instance.currentLevel = Application.loadedLevelName;
         ServerScript.Instance.SetMap(RoundScript.Instance.currentLevel);
 
