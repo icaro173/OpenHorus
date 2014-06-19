@@ -790,12 +790,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   allowedLevels:
-  - pi_jsf
+  - pi_gho
   - pi_rah
   - pi_mar
   - pi_set
   - pi_ven
-  - pi_gho
   currentLevel: 
 --- !u!1 &1759282776
 GameObject:
