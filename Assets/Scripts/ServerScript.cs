@@ -128,7 +128,7 @@ public class ServerScript : MonoBehaviour {
         DontDestroyOnLoad(gameObject);
 
         // Set target frame rate for the game
-        Application.targetFrameRate = 60;
+        Application.targetFrameRate = -1;
 
         // Setup state changes
         createStateChangeCallbacks();
