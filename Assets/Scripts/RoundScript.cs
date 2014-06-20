@@ -152,13 +152,13 @@ public class RoundScript : MonoBehaviour {
                     player.networkView.RPC("ImmediateRespawn", RPCMode.All);
                 }
                 player.networkView.RPC("setPaused", RPCMode.All, false);
-
-                // Clean leaderboard
-                NetworkLeaderboard.Instance.networkView.RPC("resetLeaderboard", RPCMode.All);
-
-                // Start round
-                networkView.RPC("setRoundStopped", RPCMode.All, false);
             }
+
+            // Clean leaderboard
+            NetworkLeaderboard.Instance.networkView.RPC("resetLeaderboard", RPCMode.All);
+
+            // Start round
+            networkView.RPC("setRoundStopped", RPCMode.All, false);
 
             // Reset time events
             roundTime = 0;
@@ -232,8 +232,14 @@ public class RoundScript : MonoBehaviour {
         ServerScript.Instance.SetMap(RoundScript.Instance.currentLevel);
 
         // If we are playing, build the player again, register and restart
-        if (Network.peerType != NetworkPeerType.Disconnected && Network.isServer) {
-            RestartRound();
+        if (Network.peerType != NetworkPeerType.Disconnected) {
+            if (Network.isServer) {
+                NetworkSync.afterSync("OnLevelWasLoaded", () => {
+                    RestartRound();
+                });
+            } else {
+                NetworkSync.sync("OnLevelWasLoaded");
+            }
         }
 
     }
