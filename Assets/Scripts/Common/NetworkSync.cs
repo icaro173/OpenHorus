@@ -37,7 +37,7 @@ public class NetworkSync : MonoBehaviour {
         foreach (KeyValuePair<string, syncInfo> pair in syncDict) {
             syncInfo info = pair.Value;
 
-            foreach (NetworkPlayer player in info.syncedPlayers.Where(x => !x.Value).Select(x => x.Key) {
+            foreach (NetworkPlayer player in info.syncedPlayers.Where(x => !x.Value).Select(x => x.Key)) {
                 Debug.LogWarning("Waiting for player " + player);
             }
 
