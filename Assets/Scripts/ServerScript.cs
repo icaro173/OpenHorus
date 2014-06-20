@@ -454,7 +454,7 @@ public class ServerScript : MonoBehaviour {
     }
 
     bool CreateServer() {
-        NetworkConnectionError result = Network.InitializeServer(MaxPlayers, port, true);
+        NetworkConnectionError result = Network.InitializeServer(MaxPlayers, port, !lanMode);
         if (result == NetworkConnectionError.NoError) {
             currentServer = new ServerInfo {
                 GUID = Network.player.guid,

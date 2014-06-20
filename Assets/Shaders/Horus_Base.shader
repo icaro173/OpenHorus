@@ -26,7 +26,6 @@ Shader "Horus_Base"
         ZTest LEqual   
 
 		CGPROGRAM
-		//#pragma target 3.0 
 		#pragma surface surf Simple noforwardadd dualforward approxview halfasview
         sampler2D _MainTex;
         

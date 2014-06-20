@@ -42,6 +42,8 @@ public class WeaponIndicatorScript : MonoBehaviour {
     void Render(Color color, float opacity, Vector2 size) {
         const float Segments = 32;
 
+        color.a = opacity;
+
         GL.PushMatrix();
         GL.LoadPixelMatrix();
 
@@ -51,7 +53,7 @@ public class WeaponIndicatorScript : MonoBehaviour {
 
         Vector2 ssPos;
 
-        GL.Color(new Color(color.r, color.g, color.b, opacity));
+        GL.Color(color);
         Vector2 radius = size * Screen.height / 1500f;
         ssPos = CrosshairPosition;
         //ssPos = new Vector2(Screen.width, Screen.height) / 2f;
@@ -66,7 +68,7 @@ public class WeaponIndicatorScript : MonoBehaviour {
         }
 
         // Targets
-        GL.Color(new Color(1, 1, 1, 1));
+        GL.Color(Color.white);
         float edge = 20 * Screen.height / 1500f;
         float offsetSize = 5;
         float spacing = 0.8f;
@@ -82,13 +84,17 @@ public class WeaponIndicatorScript : MonoBehaviour {
 
             ssPos = t.ScreenPosition;
 
-            Vector2 p1o = step * new Vector2(-edge / 2f, -diag / 2f);
-            Vector2 p2o = step * new Vector2(edge / 2f, -diag / 2f);
-            Vector2 p3o = step * new Vector2(0, diag / 2f);
+            Vector2 c1 = new Vector2(-edge / 2f, -diag / 2f);
+            Vector2 c2 = new Vector2(edge / 2f, -diag / 2f);
+            Vector2 c3 = new Vector2(0, diag / 2f);
 
-            Vector2 p1 = ssPos + new Vector2(-edge / 2f, -diag / 2f);
-            Vector2 p2 = ssPos + new Vector2(edge / 2f, -diag / 2f);
-            Vector2 p3 = ssPos + new Vector2(0, diag / 2f);
+            Vector2 p1o = step * c1;
+            Vector2 p2o = step * c2;
+            Vector2 p3o = step * c3;
+
+            Vector2 p1 = ssPos + c1;
+            Vector2 p2 = ssPos + c2;
+            Vector2 p3 = ssPos + c3;
 
             GL.Vertex3(p1.x + p1o.x, p1.y + p1o.y, 0);
             GL.Vertex3(p1.x + edge / 2f * spacing + p1o.x, p1.y + p1o.y, 0);
