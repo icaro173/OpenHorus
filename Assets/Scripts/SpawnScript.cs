@@ -24,7 +24,9 @@ public class SpawnScript : MonoBehaviour {
             PlayerRegistry.RegisterCurrentPlayer(chosenUsername);
         }
 
-        NetworkSync.sync("RegisterPlayer");
+        if (Network.isClient) {
+            NetworkSync.sync("RegisterPlayer");
+        }
     }
 
     void OnPlayerDisconnected(NetworkPlayer player) {

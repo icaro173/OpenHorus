@@ -143,7 +143,6 @@ public class RoundScript : MonoBehaviour {
 
         // Wait until all players have synced their registry
         NetworkSync.afterSync("RegisterPlayer", () => {
-            Debug.LogWarning("sync RegisterPlayer");
             foreach (KeyValuePair<NetworkPlayer, PlayerRegistry.PlayerInfo> pair in PlayerRegistry.All()) {
                 PlayerScript player = pair.Value.Player;
 

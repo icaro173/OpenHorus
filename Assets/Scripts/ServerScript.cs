@@ -576,7 +576,7 @@ public class ServerScript : MonoBehaviour {
     void OnFailedToConnect(NetworkConnectionError error) {
         // TODO: Inform player that it failed and why
         currentServer.ConnectionFailed = true;
-        Debug.LogWarning("Couldn't connect, will try choosing another server");
+        Debug.LogWarning("Couldn't connect, will try choosing another server: " + error);
         hostState = HostingState.Startup;
     }
 
