@@ -233,8 +233,8 @@ Transform:
   m_PrefabParentObject: {fileID: 400010, guid: c96dbb7712a004beb84ace25193b3eae, type: 2}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 656731828}
-  m_LocalRotation: {x: .151164412, y: .179181039, z: .0278737042, w: .971733809}
-  m_LocalPosition: {x: -85.7741623, y: 32.8305016, z: -69.8889084}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1198184570}
@@ -522,7 +522,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1198184569}
   m_LocalRotation: {x: 0, y: .866025448, z: 0, w: .49999997}
-  m_LocalPosition: {x: -257.05484, y: -3.65491486, z: 124.428604}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 656731829}
@@ -540,8 +540,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28cf5f66524ca6149acfed6d02941eac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotateSpeed: .200000003
+  rotateSpeed: .699999988
   sign: 1
+  center: {fileID: 0}
+  axis: {x: 0, y: 1, z: 0}
 --- !u!1001 &1234180104
 Prefab:
   m_ObjectHideFlags: 0
@@ -790,9 +792,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   allowedLevels:
-  - pi_gho
-  - pi_rah
   - pi_mar
+  - pi_rah
+  - pi_gho
   - pi_set
   - pi_ven
   currentLevel: 

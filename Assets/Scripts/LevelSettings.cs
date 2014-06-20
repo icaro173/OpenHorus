@@ -5,8 +5,9 @@ public class LevelSettings : MonoBehaviour {
     public static LevelSettings instance;
 
     // Level properties
-    public Transform spectatorCameraPosition { get { return transform; } }
     public float killZ;
+    public Vector3 orbitPositionOffset;
+    public Vector3 orbitRotationOffset;
 
     void Awake() {
         instance = this;

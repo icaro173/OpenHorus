@@ -4,32 +4,35 @@ public class CameraSpin : MonoBehaviour {
     public float rotateSpeed = 0.2f;
     public int sign = 1;
 
-    Vector3 camPosOrigin, transPosOrigin;
-    Quaternion camRotOrigin, transRotOrigin;
     bool wasSpectating = true;
+
+    public Transform center;
+    public Vector3 axis = Vector3.up;
 
     void Start() {
         DontDestroyOnLoad(gameObject);
         Camera.main.depthTextureMode = DepthTextureMode.DepthNormals;
+
+        // If we're hand-tuning the orbit
+        if (Application.isEditor && ServerScript.Instance == null)
+            ResetTransforms();
     }
 
     void OnLevelWasLoaded() {
+        ResetTransforms();
         if (ServerScript.hostState == ServerScript.HostingState.WaitingForInput) {
             ResetTransforms();
         }
     }
 
     void Update() {
-        //todo This is not how you do lerping, change it to a proper, nice transition
-        if (transform.localEulerAngles.y > 150) sign *= -1;
-        if (transform.localEulerAngles.y < 100) sign *= -1;
-
-        transform.Rotate(0, rotateSpeed * Time.deltaTime * sign, 0);
+        if (center == null) return;
+        transform.RotateAround(center.position, axis, rotateSpeed * Time.deltaTime);
 
         if (ServerScript.Spectating && !wasSpectating) {
             ResetTransforms();
         }
-        
+
         wasSpectating = ServerScript.Spectating;
     }
 
@@ -38,11 +41,11 @@ public class CameraSpin : MonoBehaviour {
     }
 
     public void ResetTransforms() {
-        transform.position = LevelSettings.instance.spectatorCameraPosition.position;
-        transform.rotation = LevelSettings.instance.spectatorCameraPosition.rotation;
-
-        Camera.main.transform.localPosition = new Vector3(-85.77416f, 32.8305f, -69.88891f);
-        Camera.main.transform.localRotation = Quaternion.Euler(16.48679f, 21.83607f, 6.487632f);
+        if (LevelSettings.instance == null) return;
+        center = LevelSettings.instance.transform;
+        transform.position = center.position;
+        transform.rotation = center.rotation;
+        Camera.main.transform.localPosition = LevelSettings.instance.orbitPositionOffset;
+        Camera.main.transform.localRotation = Quaternion.Euler(LevelSettings.instance.orbitRotationOffset);
     }
-
 }
