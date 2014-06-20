@@ -76,10 +76,6 @@ public class PlayerScript : MonoBehaviour {
         characterAnimation["strafeRight"].speed = 1.5f;
     }
 
-    void OnDestroy() {
-        Network.RemoveRPCs(networkView.viewID);
-    }
-
     void OnNetworkInstantiate(NetworkMessageInfo info) {
         if (!networkView.isMine) {
             owner = networkView.owner;

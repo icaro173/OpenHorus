@@ -201,12 +201,21 @@ public class RoundScript : MonoBehaviour {
         // Use a new prefix for the next level
         lastLevelPrefix = levelPrefix;
 
+        // Destroy all players
+        if (Network.isServer) {
+            foreach (KeyValuePair<NetworkPlayer, PlayerRegistry.PlayerInfo> pair in PlayerRegistry.All()) {
+                PlayerScript player = pair.Value.Player;
+                Network.Destroy(player.gameObject);
+                //Network.RemoveRPCs(pair.Key);
+            }
+        }
+
         // Clean the player register, it will be rebuild when the level is loaded
         PlayerRegistry.Clear();
 
         // Remove al non-leveloading rpcs from the buffers, just in case
         if (Network.isServer) {
-            Network.RemoveRPCsInGroup(0);
+            //Network.RemoveRPCsInGroup(0);
         }
 
         // Disable sending

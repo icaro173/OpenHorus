@@ -37,6 +37,10 @@ public class NetworkSync : MonoBehaviour {
         foreach (KeyValuePair<string, syncInfo> pair in syncDict) {
             syncInfo info = pair.Value;
 
+            foreach (NetworkPlayer player in info.syncedPlayers.Where(x => !x.Value).Select(x => x.Key) {
+                Debug.LogWarning("Waiting for player " + player);
+            }
+
             // If all players are synced add to completed list
             if (info.cb != null && !info.syncedPlayers.Any(x => !x.Value)) {
                 completedSyncDict.Add(pair.Key, info);
