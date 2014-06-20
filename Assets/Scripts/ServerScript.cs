@@ -14,6 +14,9 @@ public class ServerScript : MonoBehaviour {
     public const string buildVersion = "19062014";
     public const string MasterServerUri = "http://ohs.padrepio.in/";
 
+    public const string natFacilitatorIP = "108.61.103.200"; // Padrepio.in
+    public const int natFacilitatorPort = 50005;
+
     //public GameObject PlayerRegistryPrefab;
     public bool lanMode = false;
     public NetworkPeerType peerType;
@@ -129,6 +132,10 @@ public class ServerScript : MonoBehaviour {
 
         // Set target frame rate for the game
         Application.targetFrameRate = -1;
+
+        // Set NAT Facilitator data
+        Network.natFacilitatorIP = natFacilitatorIP;
+        Network.natFacilitatorPort = natFacilitatorPort;
 
         // Setup state changes
         createStateChangeCallbacks();
