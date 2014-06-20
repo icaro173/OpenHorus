@@ -4037,7 +4037,7 @@ Light:
   serializedVersion: 3
   m_Type: 1
   m_Color: {r: 1, g: .926943004, b: .874509811, a: 1}
-  m_Intensity: .699999988
+  m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
   m_CookieSize: 10
@@ -11446,7 +11446,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 10800000, guid: 3a19978f0907d6d409c4b4dc5e829bfa, type: 2}
       propertyPath: m_Intensity
-      value: .699999988
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 10800000, guid: 3a19978f0907d6d409c4b4dc5e829bfa, type: 2}
       propertyPath: m_Enabled

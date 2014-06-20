@@ -4652,7 +4652,7 @@ Light:
   serializedVersion: 3
   m_Type: 1
   m_Color: {r: 1, g: .926943004, b: .874509811, a: 1}
-  m_Intensity: .400000006
+  m_Intensity: .800000012
   m_Range: 10
   m_SpotAngle: 30
   m_CookieSize: 10
@@ -5145,7 +5145,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   killZ: -104
-  orbitRadius: 100
   orbitPositionOffset: {x: 7.26462804e-06, y: 29.5523701, z: -164.428207}
   orbitRotationOffset: {x: 21.5808392, y: 0, z: 0}
 --- !u!4 &1552537741

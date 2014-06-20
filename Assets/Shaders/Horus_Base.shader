@@ -27,7 +27,7 @@ Shader "Horus_Base"
 
 		CGPROGRAM
 		//#pragma target 3.0 
-		#pragma surface surf Simple
+		#pragma surface surf Simple noforwardadd dualforward approxview halfasview
         sampler2D _MainTex;
         
 		float3 ContrastSaturationBrightness( float3 color, float brt, float sat, float con )
