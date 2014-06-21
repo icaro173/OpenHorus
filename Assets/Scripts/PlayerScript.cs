@@ -80,6 +80,10 @@ public class PlayerScript : MonoBehaviour {
         characterAnimation["strafeRight"].speed = 1.5f;
     }
 
+    void OnDestroy() {
+        PlayerRegistry.Instance.UnregisterPlayer(owner);
+    }
+
     void OnNetworkInstantiate(NetworkMessageInfo info) {
         Debug.Log("Player object instantiated by " + info.sender);
 
