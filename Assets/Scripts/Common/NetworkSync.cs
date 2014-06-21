@@ -18,6 +18,7 @@ public class NetworkSync : MonoBehaviour {
             syncedPlayers = new Dictionary<NetworkPlayer, bool>();
 
             // Add all currently connected players
+            Debug.LogWarning("Creating sync with " + Network.connections.Length + " players");
             foreach (NetworkPlayer player in Network.connections) {
                 syncedPlayers.Add(player, false);
             }
@@ -37,9 +38,7 @@ public class NetworkSync : MonoBehaviour {
         foreach (KeyValuePair<string, syncInfo> pair in syncDict) {
             syncInfo info = pair.Value;
 
-            foreach (NetworkPlayer player in info.syncedPlayers.Where(x => !x.Value).Select(x => x.Key)) {
-                Debug.LogWarning("Waiting for player " + player);
-            }
+            Debug.LogWarning("Waiting for players " + info.syncedPlayers.Count(x => !x.Value));
 
             // If all players are synced add to completed list
             if (info.cb != null && !info.syncedPlayers.Any(x => !x.Value)) {
@@ -49,7 +48,7 @@ public class NetworkSync : MonoBehaviour {
 
         foreach (KeyValuePair<string, syncInfo> pair in completedSyncDict) {
             // Remove from list to check
-            syncDict.Remove(pair.Key);
+            stopSync(pair.Key);
 
             // Call cb
             Debug.LogWarning("runSynced " + pair.Key);
@@ -89,6 +88,13 @@ public class NetworkSync : MonoBehaviour {
         info.syncedPlayers[msgInfo.sender] = true;
 
         runSynced();
+    }
+
+    public static void stopSync(string key) {
+        Debug.LogWarning("stopSync [" + key + "]");
+        if (syncDict.ContainsKey(key)) {
+            syncDict.Remove(key);
+        }
     }
 
     public static void afterSync(string key, syncedDelegate cb) {
