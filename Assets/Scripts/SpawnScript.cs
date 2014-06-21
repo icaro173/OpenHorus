@@ -8,6 +8,7 @@ public class SpawnScript : MonoBehaviour {
 
     void Awake() {
         Instance = this;
+        networkView.group = 1;
     }
 
     // TODO: Move

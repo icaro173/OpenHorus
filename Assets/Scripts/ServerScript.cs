@@ -337,7 +337,7 @@ public class ServerScript : MonoBehaviour {
             GUILayout.BeginHorizontal();
             chosenUsername = RemoveSpecialCharacters(GUILayout.TextField(chosenUsername));
             PlayerPrefs.SetString("username", chosenUsername.Trim());
-            SendMessage("SetChosenUsername", chosenUsername.Trim());
+            SpawnScript.Instance.SetChosenUsername(chosenUsername.Trim());
 
             GUILayout.Box("", new GUIStyle(guiSkin.box) { fixedWidth = 1 });
             if (GUILayout.Button("HOST")) {

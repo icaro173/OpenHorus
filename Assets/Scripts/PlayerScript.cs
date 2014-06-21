@@ -29,6 +29,7 @@ public class PlayerScript : MonoBehaviour {
     public CharacterController controller;
     public GameObject warningSphereFab;
     public NetworkPlayer owner;
+    public HealthScript health;
 
     //Audio
     public AudioSource warningSound;
@@ -68,6 +69,7 @@ public class PlayerScript : MonoBehaviour {
         characterAnimation.Play(currentAnim = "idle");
         textBubble = gameObject.FindChild("TextBubble");
         textBubble.renderer.material.color = new Color(1, 1, 1, 0);
+        health = gameObject.GetComponent<HealthScript>();
 
         // Set animation speeds
         characterAnimation["run"].speed = 1.25f;

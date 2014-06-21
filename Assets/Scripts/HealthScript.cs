@@ -17,6 +17,7 @@ public class HealthScript : MonoBehaviour {
 
     public Renderer shieldRenderer;
 
+    PlayerScript player;
     float timeUntilShieldRegen;
     float timeSinceRespawn;
     public float timeUntilRespawn = 5;
@@ -36,6 +37,7 @@ public class HealthScript : MonoBehaviour {
         GameObject graphics = gameObject.FindChild("Animated Mesh Fixed");
         bigCell = graphics.FindChild("healthsphere_rear").GetComponentInChildren<Renderer>();
         smallCells = new[] { graphics.FindChild("healthsphere_left").GetComponentInChildren<Renderer>(), graphics.FindChild("healthsphere_right").GetComponentInChildren<Renderer>() };
+        player = gameObject.GetComponent<PlayerScript>();
     }
 
     void Update() {
@@ -65,7 +67,7 @@ public class HealthScript : MonoBehaviour {
         }
     }
 
-    void ShotFired() {
+    public void ShotFired() {
         invulnerable = false;
     }
 
@@ -207,8 +209,8 @@ public class HealthScript : MonoBehaviour {
 
         networkView.RPC("ToggleSpectate", RPCMode.All, false);
 
-        SendMessage("ResetAnimation");
-        SendMessage("ResetWarnings");
+        player.ResetAnimation();
+        player.ResetWarnings();
 
         transform.position = position;
     }
