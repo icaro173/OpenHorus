@@ -59,6 +59,8 @@ public class PlayerScript : MonoBehaviour {
     private Quaternion smoothLookRotation;
     private float smoothYaw;
     private List<GameObject> warningSpheres;
+    private VectorInterpolator iPosition;
+    private Vector3 lastNetworkFramePosition;
 
     void Awake() {
         warningSpheres = new List<GameObject>();
@@ -83,6 +85,7 @@ public class PlayerScript : MonoBehaviour {
             owner = networkView.owner;
             StartCoroutine(WaitAndLabel());
             enabled = false;
+            iPosition = new VectorInterpolator();
         } else {
             owner = Network.player;
             gameObject.layer = LayerMask.NameToLayer("LocalPlayer");
@@ -209,15 +212,10 @@ public class PlayerScript : MonoBehaviour {
             smoothYaw = lookRotationEuler.y;
             smoothLookRotation = Quaternion.Euler(lookRotationEuler);
 
-            //Copy
-            Vector3 euler = transform.rotation.eulerAngles;
-            euler.y = smoothYaw;
-            transform.rotation = Quaternion.Euler(euler);
-            cameraPivot.rotation = smoothLookRotation;
         } else {
-            //if (iPosition.IsRunning) {
-            //transform.position += iPosition.Update();
-            //}
+            if (iPosition.IsRunning) {
+                transform.position += iPosition.Update();
+            }
 
             smoothYaw = Mathf.LerpAngle(smoothYaw, lookRotationEuler.y, 0.4f);
             smoothLookRotation = Quaternion.Slerp(smoothLookRotation, Quaternion.Euler(lookRotationEuler), 0.3f);
@@ -236,6 +234,12 @@ public class PlayerScript : MonoBehaviour {
         }
         textBubble.transform.LookAt(Camera.main.transform);
         textBubble.transform.localRotation = textBubble.transform.localRotation * Quaternion.Euler(90, 0, 0);
+
+        // sync up actual player and camera transforms
+        Vector3 euler = transform.rotation.eulerAngles;
+        euler.y = smoothYaw;
+        transform.rotation = Quaternion.Euler(euler);
+        cameraPivot.rotation = smoothLookRotation;
 
         // dash animation
         Color color = dashEffectRenderer.material.GetColor("_TintColor");
@@ -372,9 +376,11 @@ public class PlayerScript : MonoBehaviour {
         NetworkPlayer pOwner = owner;
         stream.Serialize(ref pOwner);
         if (stream.isReading) owner = pOwner;
+
         Vector3 pPosition = stream.isWriting ? transform.position : Vector3.zero;
 
         stream.Serialize(ref pPosition);
+        stream.Serialize(ref lookRotationEuler);
         stream.Serialize(ref inputVelocity);
         stream.Serialize(ref fallingVelocity);
         stream.Serialize(ref activelyJumping);
@@ -384,9 +390,15 @@ public class PlayerScript : MonoBehaviour {
         stream.Serialize(ref playJumpSound);
 
         if (stream.isReading) {
+            if (lastNetworkFramePosition == pPosition)
+                transform.position = pPosition;
+
+            if (!iPosition.Start(pPosition - transform.position))
+                transform.position = pPosition;
             // Play sounds
             if (playDashSound) dashSound.Play();
             if (playJumpSound) jumpSound.Play();
+            lastNetworkFramePosition = pPosition;
         }
 
         playJumpSound = playDashSound = false;

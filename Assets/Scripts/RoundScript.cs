@@ -52,9 +52,9 @@ public class RoundScript : MonoBehaviour {
             ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player, "Another player has joined", true, true);
             ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, Network.player, "Starting round in 5 seconds", true, true);
             yield return new WaitForSeconds(readyDuration);
-            NetworkSync.afterSync("OnLevelWasLoaded", () => {
+            //NetworkSync.afterSync("OnLevelWasLoaded", () => {
                 RestartRound();
-            });
+            //});
         }
     }
 
