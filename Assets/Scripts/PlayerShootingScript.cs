@@ -132,7 +132,9 @@ public class PlayerShootingScript : MonoBehaviour {
             foreach (WeaponIndicatorScript.PlayerData v in targets) v.Found = false;
 
             // Test for players in crosshair
-            foreach (PlayerScript player in FindObjectsOfType(typeof(PlayerScript))) {
+            foreach (KeyValuePair<NetworkPlayer, PlayerRegistry.PlayerInfo> info in PlayerRegistry.All()) {
+                PlayerScript player = info.Value.Player;
+
                 // Is targeting self?
                 if (player == playerScript) continue;
 
@@ -238,7 +240,8 @@ public class PlayerShootingScript : MonoBehaviour {
 
         PlayerScript targetScript;
         try {
-            targetScript = FindObjectsOfType<PlayerScript>()
+            targetScript = PlayerRegistry.All()
+                .Select(x => x.Value.Player)
                 .Where(x => x.owner == target)
                 .OrderBy(x => Vector3.Distance(x.transform.position, lastKnownPosition))
                 .FirstOrDefault();

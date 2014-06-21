@@ -49,9 +49,9 @@ class PlayerRegistry : MonoBehaviour {
         }
 
         PlayerScript playerData = null;
-        foreach (PlayerScript p in FindObjectsOfType<PlayerScript>()) {
-            if (p.owner == player) {
-                playerData = p;
+        foreach (PlayerScript otherPlayer in FindObjectsOfType<PlayerScript>()) {
+            if (otherPlayer.owner == player) {
+                playerData = otherPlayer;
             }
         }
         playerData.enabled = true;

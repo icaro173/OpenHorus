@@ -36,7 +36,10 @@ public class HealthScript : MonoBehaviour {
 
         GameObject graphics = gameObject.FindChild("Animated Mesh Fixed");
         bigCell = graphics.FindChild("healthsphere_rear").GetComponentInChildren<Renderer>();
-        smallCells = new[] { graphics.FindChild("healthsphere_left").GetComponentInChildren<Renderer>(), graphics.FindChild("healthsphere_right").GetComponentInChildren<Renderer>() };
+        smallCells = new[] {
+            graphics.FindChild("healthsphere_left").GetComponentInChildren<Renderer>(),
+            graphics.FindChild("healthsphere_right").GetComponentInChildren<Renderer>()
+        };
         player = gameObject.GetComponent<PlayerScript>();
     }
 
