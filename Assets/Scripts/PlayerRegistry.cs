@@ -37,12 +37,12 @@ class PlayerRegistry : MonoBehaviour {
     }
 
     public static void RegisterCurrentPlayer(string username) {
-        Instance.networkView.RPC("RegisterPlayer", RPCMode.OthersBuffered, Network.player, username, Network.player.guid, new Vector3(1, 1, 1), false);
-        Instance.RegisterPlayer(Network.player, username, Network.player.guid, new Vector3(1, 1, 1), false);
+        Instance.networkView.RPC("RegisterPlayer", RPCMode.AllBuffered, Network.player, username, Network.player.guid, new Vector3(1, 1, 1), false);
     }
 
     [RPC]
     public void RegisterPlayer(NetworkPlayer player, string username, string guid, Vector3 color, bool isSpectating = false) {
+        Debug.Log("Registered player : " + player + " = " + username + " now");
         if (registry.ContainsKey(player)) {
             Debug.Log("Tried to register player " + player + " but was already registered. Current username : " + registry[player].Username + " | wanted username : " + username + " (removing...)");
             registry.Remove(player);
@@ -57,7 +57,6 @@ class PlayerRegistry : MonoBehaviour {
         playerData.enabled = true;
 
         registry.Add(player, new PlayerInfo { Username = username, Color = new Color(color.x, color.y, color.z), Spectating = isSpectating, Player = playerData, GUID = guid });
-        Debug.Log("Registered other player : " + player + " = " + username + " now");
     }
 
     [RPC]
