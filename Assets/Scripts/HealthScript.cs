@@ -17,7 +17,7 @@ public class HealthScript : MonoBehaviour {
 
     public Renderer shieldRenderer;
 
-    PlayerScript player;
+    public PlayerScript player;
     float timeUntilShieldRegen;
     float timeSinceRespawn;
     public float timeUntilRespawn = 5;
@@ -42,7 +42,7 @@ public class HealthScript : MonoBehaviour {
 
     void Update() {
         if (networkView.isMine && transform.position.y < LevelSettings.Instance.killZ) {
-            DoDamage(999, player.networkView.owner);
+            DoDamage(999, player.owner);
         }
 
         if (!firstSet && shieldRenderer != null) {
@@ -121,8 +121,8 @@ public class HealthScript : MonoBehaviour {
             }
             if (Health <= 0) {
                 if (Network.player == shootingPlayer) {
-                    suicided = player.networkView.owner == shootingPlayer;
-                    NetworkLeaderboard.Instance.networkView.RPC("RegisterKill", RPCMode.All, shootingPlayer, player.networkView.owner);
+                    suicided = player.owner == shootingPlayer;
+                    NetworkLeaderboard.Instance.networkView.RPC("RegisterKill", RPCMode.All, shootingPlayer, player.owner);
                     networkView.RPC("ScheduleRespawn", RPCMode.All, RespawnZone.GetRespawnPoint());
                 }
 
@@ -200,7 +200,7 @@ public class HealthScript : MonoBehaviour {
         if (isSpectating) Hide();
         else UnHide();
 
-        PlayerRegistry.Get(networkView.owner).Spectating = isSpectating;
+        PlayerRegistry.Get(player.owner).Spectating = isSpectating;
     }
 
     public void Respawn(Vector3 position) {

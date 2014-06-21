@@ -37,6 +37,7 @@ public class PlayerScript : MonoBehaviour {
     public AudioSource jumpSound;
 
     //Private
+    public NetworkPlayer owner;
     private GameObject textBubble;
     private Vector3 fallingVelocity;
     private Vector3 lastFallingVelocity;
@@ -82,8 +83,10 @@ public class PlayerScript : MonoBehaviour {
     void OnNetworkInstantiate(NetworkMessageInfo info) {
         Debug.Log("Player object instantiated by " + info.sender);
 
+        // Invalidate owner
+        owner = new NetworkPlayer();
+
         if (!networkView.isMine) {
-            StartCoroutine(WaitAndLabel());
             enabled = false;
             iPosition = new VectorInterpolator();
         } else {
@@ -92,15 +95,27 @@ public class PlayerScript : MonoBehaviour {
     }
 
     IEnumerator WaitAndLabel() {
-        while (!PlayerRegistry.Has(networkView.owner))
+        while (!PlayerRegistry.Has(owner))
             yield return new WaitForSeconds(1 / 30f);
-        UpdateLabel(PlayerRegistry.Get(networkView.owner).Username);
+        UpdateLabel(PlayerRegistry.Get(owner).Username);
     }
 
     void OnGUI() {
         if (Event.current.type == EventType.KeyDown &&
            Event.current.keyCode == KeyCode.Escape) {
             Screen.lockCursor = false;
+        }
+    }
+
+    [RPC]
+    private void setOwner(NetworkPlayer player) {
+        Debug.Log("Player object owned by " + player);
+        owner = player;
+
+        // Since we now have a valid owner id for this object, start checking the label
+        // TODO replace with a callback when the object is registered
+        if (!networkView.isMine) {
+            StartCoroutine(WaitAndLabel());
         }
     }
 

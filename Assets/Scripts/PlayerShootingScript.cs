@@ -132,33 +132,30 @@ public class PlayerShootingScript : MonoBehaviour {
             foreach (WeaponIndicatorScript.PlayerData v in targets) v.Found = false;
 
             // Test for players in crosshair
-            foreach (PlayerScript p in FindObjectsOfType(typeof(PlayerScript))) {
-                PlayerScript ps = p;
-                if (p == gameObject.GetComponent<PlayerScript>()) // Is targeting self?
-                    continue;
+            foreach (PlayerScript player in FindObjectsOfType(typeof(PlayerScript))) {
+                // Is targeting self?
+                if (player == playerScript) continue;
 
-                HealthScript health = ps.gameObject.GetComponent<HealthScript>();
-                Vector3 position = ps.transform.position;
+                HealthScript health = player.GetComponent<HealthScript>();
+                Vector3 position = player.transform.position;
                 Vector3 screenPos = Camera.main.WorldToScreenPoint(position);
 
                 if (health.Health > 0 && screenPos.z > 0 && (new Vector2(screenPos.x, screenPos.y) - screenCenter).magnitude < allowedDistance) {
                     WeaponIndicatorScript.PlayerData data;
-                    if ((data = targets.FirstOrDefault(x => x.Script == ps)) == null)
-                        targets.Add(data = new WeaponIndicatorScript.PlayerData { Script = ps, WasLocked = false });
+                    if ((data = targets.FirstOrDefault(x => x.Script == player)) == null) {
+                        targets.Add(data = new WeaponIndicatorScript.PlayerData { Script = player, WasLocked = false });
+                    }
 
                     data.ScreenPosition = new Vector2(screenPos.x,screenPos.y);
                     data.SinceInCrosshair += Time.deltaTime;
                     data.Found = true;
 
-                    if (!data.WasLocked && data.Locked) // Send target notification
-					{
+                    if (!data.WasLocked && data.Locked) { // Send target notification
                         targetSound.Play();
-
-                        data.Script.networkView.RPC("Targeted", RPCMode.All, gameObject.networkView.owner);
+                        data.Script.networkView.RPC("Targeted", RPCMode.All, playerScript.owner);
                     }
                 }
             }
-
             CheckTargets();
         }
     }
@@ -172,7 +169,7 @@ public class PlayerShootingScript : MonoBehaviour {
             for (int i = 0; i < targets.Count; i++) {
                 if (targets[i].Script != null) {
                     if (targets[i].WasLocked && !targets[i].Found)
-                        targets[i].Script.networkView.RPC("Untargeted", RPCMode.All, gameObject.networkView.owner);
+                        targets[i].Script.networkView.RPC("Untargeted", RPCMode.All, playerScript.owner);
                     targets[i].WasLocked = targets[i].Locked;
 
                     if (!targets[i].Found || gameObject.GetComponent<HealthScript>().Health < 1 || targets[i].Script == null) // Is player in target list dead, or unseen? Am I dead?
@@ -218,7 +215,7 @@ public class PlayerShootingScript : MonoBehaviour {
         Vector3 lastKnownPosition = Vector3.zero;
         NetworkPlayer targetOwner = Network.player;
         if (target != null) {
-            targetOwner = target.networkView.owner;
+            targetOwner = target.owner;
             lastKnownPosition = target.transform.position;
         }
 
@@ -231,7 +228,6 @@ public class PlayerShootingScript : MonoBehaviour {
     void Shoot(Vector3 position, Quaternion rotation, NetworkPlayer player) {
         BulletScript bullet = (BulletScript)Instantiate(bulletPrefab, position, rotation);
         bullet.Player = player;
-
         burstGunSound.Play();
     }
 
@@ -243,7 +239,7 @@ public class PlayerShootingScript : MonoBehaviour {
         PlayerScript targetScript;
         try {
             targetScript = FindObjectsOfType<PlayerScript>()
-                .Where(x => x.networkView.owner == target)
+                .Where(x => x.owner == target)
                 .OrderBy(x => Vector3.Distance(x.transform.position, lastKnownPosition))
                 .FirstOrDefault();
         } catch (Exception) {

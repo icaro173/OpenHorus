@@ -20,7 +20,8 @@ public class SpawnScript : MonoBehaviour {
     public void CreatePlayer() {
         if (!ServerScript.Spectating && (!PlayerRegistry.Has(Network.player) || PlayerRegistry.Get(Network.player).Player == null)) {
             Debug.Log("Creating player object for: " + Network.player);
-            Network.Instantiate(PlayerTemplate, RespawnZone.GetRespawnPoint(), Quaternion.identity, 0);
+            GameObject obj = Network.Instantiate(PlayerTemplate, RespawnZone.GetRespawnPoint(), Quaternion.identity, 0) as GameObject;
+            obj.networkView.RPC("setOwner", RPCMode.AllBuffered, Network.player);
             PlayerRegistry.RegisterCurrentPlayer(chosenUsername);
         }
 

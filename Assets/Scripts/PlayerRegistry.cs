@@ -50,7 +50,7 @@ class PlayerRegistry : MonoBehaviour {
 
         PlayerScript playerData = null;
         foreach (PlayerScript p in FindObjectsOfType<PlayerScript>()) {
-            if (p.networkView.owner == player) {
+            if (p.owner == player) {
                 playerData = p;
             }
         }

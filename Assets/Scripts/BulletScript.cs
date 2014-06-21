@@ -61,12 +61,9 @@ public class BulletScript : MonoBehaviour {
         }
 
         if (health != null) {
-            if (health.networkView.owner != Player) // No Friendly Fire
+            if (health.player.owner != Player) // No Friendly Fire
 			{
-                // Another way of notifying owner of hit
-                //if (networkView.isMine) {
                 audio.Play(); //Hitreg Sound
-                //}
                 health.DoDamage(damage, Player);
                 return true;
             }
