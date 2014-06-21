@@ -372,7 +372,9 @@ public class PlayerScript : MonoBehaviour {
         NetworkPlayer pOwner = owner;
         stream.Serialize(ref pOwner);
         if (stream.isReading) owner = pOwner;
+        Vector3 pPosition = stream.isWriting ? transform.position : Vector3.zero;
 
+        stream.Serialize(ref pPosition);
         stream.Serialize(ref inputVelocity);
         stream.Serialize(ref fallingVelocity);
         stream.Serialize(ref activelyJumping);
