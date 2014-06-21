@@ -14532,11 +14532,11 @@ Prefab:
     - target: {fileID: 2300000, guid: 1744aa5f38b24442c8a33a08819c4e1f, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 35b6e756b86a34e0484cb642e52a7598, type: 2}
+      objectReference: {fileID: 2100000, guid: c8dafa1b85798fb4494613f41febecc7, type: 2}
     - target: {fileID: 2300002, guid: 1744aa5f38b24442c8a33a08819c4e1f, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: c8dafa1b85798fb4494613f41febecc7, type: 2}
+      objectReference: {fileID: 2100000, guid: 35b6e756b86a34e0484cb642e52a7598, type: 2}
     - target: {fileID: 100004, guid: 1744aa5f38b24442c8a33a08819c4e1f, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 4294967295
@@ -29541,7 +29541,7 @@ Renderer:
   m_LightmapIndex: 0
   m_LightmapTilingOffset: {x: .0087890625, y: .0087890625, z: .65328598, w: .870082855}
   m_Materials:
-  - {fileID: 2100000, guid: c8dafa1b85798fb4494613f41febecc7, type: 2}
+  - {fileID: 2100000, guid: 35b6e756b86a34e0484cb642e52a7598, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -64532,7 +64532,7 @@ Renderer:
   m_LightmapIndex: 1
   m_LightmapTilingOffset: {x: .0654296875, y: .0654296875, z: .916992188, w: .255859375}
   m_Materials:
-  - {fileID: 2100000, guid: c8dafa1b85798fb4494613f41febecc7, type: 2}
+  - {fileID: 2100000, guid: 822f18e58c2373543b3ceaaa6e8b5e45, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
@@ -76447,7 +76447,7 @@ Prefab:
     - target: {fileID: 2300000, guid: 2c7d07428e35a4e38b6fbab0d74fad0f, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: c8dafa1b85798fb4494613f41febecc7, type: 2}
+      objectReference: {fileID: 2100000, guid: 822f18e58c2373543b3ceaaa6e8b5e45, type: 2}
     - target: {fileID: 100000, guid: 2c7d07428e35a4e38b6fbab0d74fad0f, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 4294967295
@@ -89665,7 +89665,7 @@ Renderer:
   m_LightmapIndex: 2
   m_LightmapTilingOffset: {x: .041015625, y: .041015625, z: .478515625, w: .125976562}
   m_Materials:
-  - {fileID: 2100000, guid: 35b6e756b86a34e0484cb642e52a7598, type: 2}
+  - {fileID: 2100000, guid: c8dafa1b85798fb4494613f41febecc7, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_UseLightProbes: 0
