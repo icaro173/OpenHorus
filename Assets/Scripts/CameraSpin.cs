@@ -41,11 +41,11 @@ public class CameraSpin : MonoBehaviour {
     }
 
     public void ResetTransforms() {
-        if (LevelSettings.instance == null) return;
-        center = LevelSettings.instance.transform;
+        if (LevelSettings.Instance == null) return;
+        center = LevelSettings.Instance.transform;
         transform.position = center.position;
         transform.rotation = center.rotation;
-        Camera.main.transform.localPosition = LevelSettings.instance.orbitPositionOffset;
-        Camera.main.transform.localRotation = Quaternion.Euler(LevelSettings.instance.orbitRotationOffset);
+        Camera.main.transform.localPosition = LevelSettings.Instance.orbitPositionOffset;
+        Camera.main.transform.localRotation = Quaternion.Euler(LevelSettings.Instance.orbitRotationOffset);
     }
 }

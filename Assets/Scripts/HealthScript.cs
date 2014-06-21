@@ -39,7 +39,7 @@ public class HealthScript : MonoBehaviour {
     }
 
     void Update() {
-        if (networkView.isMine && transform.position.y < LevelSettings.instance.killZ) {
+        if (networkView.isMine && transform.position.y < LevelSettings.Instance.killZ) {
             DoDamage(999, GetComponent<PlayerScript>().owner);
         }
 

@@ -2,7 +2,7 @@
 
 public class LevelSettings : MonoBehaviour {
     // Instance
-    public static LevelSettings instance;
+    public static LevelSettings Instance { get; private set; }
 
     // Level properties
     public float killZ;
@@ -10,11 +10,11 @@ public class LevelSettings : MonoBehaviour {
     public Vector3 orbitRotationOffset;
 
     void Awake() {
-        instance = this;
+        Instance = this;
     }
 
     void OnDestroy() {
-        if (instance == this)
-            instance = null;
+        if (Instance == this)
+            Instance = null;
     }
 }

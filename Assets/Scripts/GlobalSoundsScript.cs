@@ -7,7 +7,7 @@ public class GlobalSoundsScript : MonoBehaviour {
     }
     public AudioSource buttonPressSound;
 
-    static GlobalSoundsScript Instance;
+    public static GlobalSoundsScript Instance { get; private set; }
     static bool playing = false;
 
     public int lastSongId = -1;
