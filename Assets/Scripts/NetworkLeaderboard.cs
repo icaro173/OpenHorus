@@ -12,15 +12,17 @@ public class LeaderboardEntry {
 
 class NetworkLeaderboard : MonoBehaviour {
     public List<LeaderboardEntry> Entries = new List<LeaderboardEntry>();
-
-    static NetworkLeaderboard instance;
-    public static NetworkLeaderboard Instance {
-        get { return instance; }
-    }
+    public static NetworkLeaderboard instance { get; private set; }
+    private Dictionary<int, string> killStreakMessages = null;
 
     void Awake() {
         DontDestroyOnLoad(gameObject);
         instance = this;
+        killStreakMessages = new Dictionary<int, string>();
+
+        killStreakMessages.Add(3, "is threatening!");
+        killStreakMessages.Add(6, "is dangerous!");
+        killStreakMessages.Add(9, "is merciless!");
     }
 
     void Update() {
@@ -101,24 +103,13 @@ class NetworkLeaderboard : MonoBehaviour {
             ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, shooter, "committed suicide", true, false);
         } else {
             ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, shooter, "killed " + (endedSpree ? "and stopped " : "") + PlayerRegistry.Get(victim).Username.ToUpper(), true, false);
-        }
-
-        if (shooter != victim) {
             entry = Entries.FirstOrDefault(x => x.NetworkPlayer == shooter);
             if (entry != null) {
                 entry.Kills++;
                 entry.ConsecutiveKills++;
-
-                if (entry.ConsecutiveKills == 3)
-                    ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, shooter, "is threatening!", true, false);
-                if (entry.ConsecutiveKills == 6)
-                    ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, shooter, "is dangerous!", true, false);
-                if (entry.ConsecutiveKills == 9)
-                    ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, shooter, "is merciless!", true, false);
+                KillStreak(shooter, entry.ConsecutiveKills);
             }
         }
-
-        
     }
 
     public void OnPlayerConnected(NetworkPlayer player) {
@@ -133,5 +124,11 @@ class NetworkLeaderboard : MonoBehaviour {
 
     public void Clear() {
         Entries.Clear();
+    }
+
+    public void KillStreak(NetworkPlayer player, int streakCount) {
+        if (killStreakMessages != null && killStreakMessages.ContainsKey(streakCount)) {
+            ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, player, killStreakMessages[streakCount], true, false);
+        }
     }
 }

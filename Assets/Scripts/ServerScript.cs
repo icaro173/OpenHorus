@@ -428,7 +428,7 @@ public class ServerScript : MonoBehaviour {
         Debug.Log("GUID is " + Network.player.guid + ". Use this on clients to connect with NAT punchthrough");
         Debug.Log("Local IP/port is " + Network.player.ipAddress + "/" + Network.player.port + ". Use this on clients to connect directly");
         RoundScript.Instance.ChangeLevelAndRestart(Application.loadedLevelName);
-        NetworkLeaderboard.Instance.OnPlayerConnected(Network.player);
+        NetworkLeaderboard.instance.OnPlayerConnected(Network.player);
     }
 
     void OnApplicationQuit() {
@@ -456,7 +456,7 @@ public class ServerScript : MonoBehaviour {
         }
 
         PlayerRegistry.Clear();
-        NetworkLeaderboard.Instance.Clear();
+        NetworkLeaderboard.instance.Clear();
 
         // Clear players
         foreach (PlayerScript o in FindObjectsOfType<PlayerScript>()) {

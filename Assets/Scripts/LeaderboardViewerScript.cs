@@ -24,13 +24,13 @@ class LeaderboardViewerScript : MonoBehaviour {
         GUI.skin = Skin;
 
         if (visible) {
-            int height = NetworkLeaderboard.Instance.Entries.Count(x => PlayerRegistry.Has(x.NetworkPlayer) && PlayerRegistry.Get(x.NetworkPlayer).Spectating) * 32;
+            int height = NetworkLeaderboard.instance.Entries.Count(x => PlayerRegistry.Has(x.NetworkPlayer) && PlayerRegistry.Get(x.NetworkPlayer).Spectating) * 32;
             GUILayout.Window(3, new Rect(Screen.width - 445, (40) - height / 2, 376, height), BoardWindow, string.Empty, MultiRowWindowStyle);
         }
     }
 
     void BoardRow(int windowId) {
-        LeaderboardEntry log = NetworkLeaderboard.Instance.Entries.FirstOrDefault(x => x.NetworkPlayer == Network.player);
+        LeaderboardEntry log = NetworkLeaderboard.instance.Entries.FirstOrDefault(x => x.NetworkPlayer == Network.player);
         if (log == null || !PlayerRegistry.Has(Network.player))
             return;
 
@@ -50,7 +50,7 @@ class LeaderboardViewerScript : MonoBehaviour {
     }
 
     void BoardWindow(int windowId) {
-        foreach (LeaderboardEntry log in NetworkLeaderboard.Instance.Entries.OrderByDescending(x => x.Kills)) {
+        foreach (LeaderboardEntry log in NetworkLeaderboard.instance.Entries.OrderByDescending(x => x.Kills)) {
             if (!PlayerRegistry.Has(Network.player))
                 continue;
             if (!PlayerRegistry.Has(log.NetworkPlayer) || PlayerRegistry.Get(log.NetworkPlayer).Spectating)

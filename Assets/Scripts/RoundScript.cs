@@ -160,7 +160,7 @@ public class RoundScript : MonoBehaviour {
             }
 
             // Clean leaderboard
-            NetworkLeaderboard.Instance.networkView.RPC("resetLeaderboard", RPCMode.All);
+            NetworkLeaderboard.instance.networkView.RPC("resetLeaderboard", RPCMode.All);
 
             // Start round
             networkView.RPC("setRoundStopped", RPCMode.All, false);
