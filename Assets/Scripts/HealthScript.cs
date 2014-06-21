@@ -22,7 +22,6 @@ public class HealthScript : MonoBehaviour {
     float timeSinceRespawn;
     public float timeUntilRespawn = 5;
 
-    bool suicided;
     bool invulnerable;
     bool firstSet;
 
@@ -32,7 +31,6 @@ public class HealthScript : MonoBehaviour {
     void Awake() {
         Shield = maxShield;
         Health = maxHealth;
-        suicided = false;
 
         GameObject graphics = gameObject.FindChild("Animated Mesh Fixed");
         bigCell = graphics.FindChild("healthsphere_rear").GetComponentInChildren<Renderer>();
@@ -107,11 +105,8 @@ public class HealthScript : MonoBehaviour {
             r.enabled = health >= 2;
     }
 
-    //[RPC]
-    public void DoDamage(int damage, NetworkPlayer shootingPlayer) //, NetworkPlayer hitPlayer 
-    {
-        if (!dead)  //!networkView.isMine &&
-        {
+    public void DoDamage(int damage, NetworkPlayer shootingPlayer) {
+        if (!dead) {
             if (invulnerable)
                 return;
 
@@ -124,9 +119,8 @@ public class HealthScript : MonoBehaviour {
             }
             if (Health <= 0) {
                 if (Network.player == shootingPlayer) {
-                    suicided = player.owner == shootingPlayer;
                     NetworkLeaderboard.Instance.networkView.RPC("RegisterKill", RPCMode.All, shootingPlayer, player.owner);
-                    networkView.RPC("ScheduleRespawn", RPCMode.All, RespawnZone.GetRespawnPoint());
+                    networkView.RPC("ScheduleRespawn", RPCMode.All, RespawnZone.GetRespawnPoint(), shootingPlayer == player.owner);
                 }
 
                 Health = 0;
@@ -144,12 +138,11 @@ public class HealthScript : MonoBehaviour {
 
     object respawnLock;
     [RPC]
-    void ScheduleRespawn(Vector3 position) {
+    void ScheduleRespawn(Vector3 position, bool suicided) {
         Hide();
         GameObject death = (GameObject)Instantiate(deathPrefab, transform.position, transform.rotation);
         PlayerDeathScript dscript = death.GetComponent<PlayerDeathScript>();
         death.audio.PlayOneShot(suicided ? dscript.waterDeath : dscript.death);
-        suicided = false;
 
         object thisLock = new object();
         respawnLock = thisLock;
@@ -171,7 +164,7 @@ public class HealthScript : MonoBehaviour {
 
         Health = 0;
         dead = true;
-        
+
         foreach (Renderer r in GetComponentsInChildren<Renderer>()) r.enabled = false;
         foreach (Collider r in GetComponentsInChildren<Collider>()) r.enabled = false;
 

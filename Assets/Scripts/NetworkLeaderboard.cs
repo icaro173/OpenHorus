@@ -87,24 +87,7 @@ class NetworkLeaderboard : MonoBehaviour {
     public void RegisterKill(NetworkPlayer shooter, NetworkPlayer victim) {
         if (!Network.isServer) return;
 
-        int scheduledMessage = 0;
-
         LeaderboardEntry entry;
-        if (shooter != victim) {
-            entry = Entries.FirstOrDefault(x => x.NetworkPlayer == shooter);
-            if (entry != null) {
-                entry.Kills++;
-                entry.ConsecutiveKills++;
-
-                if (entry.ConsecutiveKills == 3)
-                    scheduledMessage = 1;
-                if (entry.ConsecutiveKills == 6)
-                    scheduledMessage = 2;
-                if (entry.ConsecutiveKills == 9)
-                    scheduledMessage = 3;
-            }
-        }
-
         entry = Entries.FirstOrDefault(x => x.NetworkPlayer == victim);
         bool endedSpree = false;
         if (entry != null) {
@@ -114,17 +97,28 @@ class NetworkLeaderboard : MonoBehaviour {
             entry.ConsecutiveKills = 0;
         }
 
-        if (victim == shooter)
+        if (victim == shooter) {
             ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, shooter, "committed suicide", true, false);
-        else
+        } else {
             ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, shooter, "killed " + (endedSpree ? "and stopped " : "") + PlayerRegistry.Get(victim).Username.ToUpper(), true, false);
+        }
 
-        if (scheduledMessage == 1)
-            ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, shooter, "is threatening!", true, false);
-        if (scheduledMessage == 2)
-            ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, shooter, "is dangerous!", true, false);
-        if (scheduledMessage == 3)
-            ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, shooter, "is merciless!", true, false);
+        if (shooter != victim) {
+            entry = Entries.FirstOrDefault(x => x.NetworkPlayer == shooter);
+            if (entry != null) {
+                entry.Kills++;
+                entry.ConsecutiveKills++;
+
+                if (entry.ConsecutiveKills == 3)
+                    ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, shooter, "is threatening!", true, false);
+                if (entry.ConsecutiveKills == 6)
+                    ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, shooter, "is dangerous!", true, false);
+                if (entry.ConsecutiveKills == 9)
+                    ChatScript.Instance.networkView.RPC("LogChat", RPCMode.All, shooter, "is merciless!", true, false);
+            }
+        }
+
+        
     }
 
     public void OnPlayerConnected(NetworkPlayer player) {
