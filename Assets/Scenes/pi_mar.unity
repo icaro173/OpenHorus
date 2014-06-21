@@ -1102,6 +1102,10 @@ Prefab:
       propertyPath: m_LightmapTilingOffset.w
       value: .874458313
       objectReference: {fileID: 0}
+    - target: {fileID: 400006, guid: 93511da7f6bc444b8b1bdb6819b76493, type: 2}
+      propertyPath: m_RootOrder
+      value: 49
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 93511da7f6bc444b8b1bdb6819b76493, type: 2}
   m_RootGameObject: {fileID: 283630339}
@@ -5873,7 +5877,12 @@ Prefab:
       propertyPath: m_LightmapTilingOffset.w
       value: .874458313
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 400006, guid: 93511da7f6bc444b8b1bdb6819b76493, type: 2}
+      propertyPath: m_RootOrder
+      value: 50
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 11400002, guid: 93511da7f6bc444b8b1bdb6819b76493, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: 93511da7f6bc444b8b1bdb6819b76493, type: 2}
   m_RootGameObject: {fileID: 890381217}
   m_IsPrefabParent: 0
@@ -7218,6 +7227,7 @@ GameObject:
   - 4: {fileID: 1137303180}
   - 33: {fileID: 1137303182}
   - 23: {fileID: 1137303181}
+  - 114: {fileID: 1137303183}
   m_Layer: 0
   m_Name: hologram
   m_TagString: Untagged
@@ -7266,6 +7276,19 @@ MeshFilter:
   m_PrefabInternal: {fileID: 777418797}
   m_GameObject: {fileID: 1137303179}
   m_Mesh: {fileID: 4300004, guid: 36e307e052fcd43bdbeaed5195435c83, type: 3}
+--- !u!114 &1137303183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1137303179}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec40258f89c21424abdb77943e55ee61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Speed: 20
+  Axis: {x: 0, y: 1, z: 0}
 --- !u!1 &1140964811
 GameObject:
   m_ObjectHideFlags: 0
@@ -12224,6 +12247,10 @@ Prefab:
       propertyPath: m_LightmapTilingOffset.w
       value: .867622375
       objectReference: {fileID: 0}
+    - target: {fileID: 400006, guid: 93511da7f6bc444b8b1bdb6819b76493, type: 2}
+      propertyPath: m_RootOrder
+      value: 51
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 93511da7f6bc444b8b1bdb6819b76493, type: 2}
   m_RootGameObject: {fileID: 1468650160}
@@ -12395,6 +12422,7 @@ GameObject:
   - 4: {fileID: 1814874964}
   - 33: {fileID: 1814874966}
   - 23: {fileID: 1814874965}
+  - 114: {fileID: 1814874967}
   m_Layer: 0
   m_Name: hologram
   m_TagString: Untagged
@@ -12443,6 +12471,20 @@ MeshFilter:
   m_PrefabInternal: {fileID: 133790441}
   m_GameObject: {fileID: 1814874963}
   m_Mesh: {fileID: 4300004, guid: 36e307e052fcd43bdbeaed5195435c83, type: 3}
+--- !u!114 &1814874967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 11400002, guid: 93511da7f6bc444b8b1bdb6819b76493,
+    type: 2}
+  m_PrefabInternal: {fileID: 133790441}
+  m_GameObject: {fileID: 1814874963}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec40258f89c21424abdb77943e55ee61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Speed: 20
+  Axis: {x: 0, y: 1, z: 0}
 --- !u!1 &1820515817
 GameObject:
   m_ObjectHideFlags: 0
@@ -13463,6 +13505,7 @@ GameObject:
   - 4: {fileID: 1977255290}
   - 33: {fileID: 1977255292}
   - 23: {fileID: 1977255291}
+  - 114: {fileID: 1977255293}
   m_Layer: 0
   m_Name: hologram
   m_TagString: Untagged
@@ -13511,6 +13554,20 @@ MeshFilter:
   m_PrefabInternal: {fileID: 1761397458}
   m_GameObject: {fileID: 1977255289}
   m_Mesh: {fileID: 4300004, guid: 36e307e052fcd43bdbeaed5195435c83, type: 3}
+--- !u!114 &1977255293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 11400002, guid: 93511da7f6bc444b8b1bdb6819b76493,
+    type: 2}
+  m_PrefabInternal: {fileID: 1761397458}
+  m_GameObject: {fileID: 1977255289}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec40258f89c21424abdb77943e55ee61, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Speed: 20
+  Axis: {x: 0, y: 1, z: 0}
 --- !u!1 &1983266106
 GameObject:
   m_ObjectHideFlags: 0
