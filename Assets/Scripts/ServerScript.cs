@@ -11,17 +11,14 @@ public class ServerScript : MonoBehaviour {
 
     //Public
     public const int port = 31414;
-    public const string buildVersion = "19062014";
+    public const string buildVersion = "21062014";
     public const string MasterServerUri = "http://ohs.padrepio.in/";
 
     public const string natFacilitatorIP = "108.61.103.200"; // Padrepio.in
     public const int natFacilitatorPort = 50005;
 
-    //public GameObject PlayerRegistryPrefab;
     public bool lanMode = false;
-    public NetworkPeerType peerType;
     public GUISkin guiSkin;
-    public List<LeaderboardEntry> SavedLeaderboardEntries = new List<LeaderboardEntry>();
     public Texture2D logo;
 
     public static bool Spectating;
@@ -38,7 +35,6 @@ public class ServerScript : MonoBehaviour {
     private const int MaxPlayers = 6;
     private const int RefreshTime = 15;
 
-    private IFuture<string> wanIp;
     private ServerList serverList = null;
     private string serverToken;
     private ServerInfo currentServer;
@@ -53,23 +49,7 @@ public class ServerScript : MonoBehaviour {
         PreserveReferencesHandling = PreserveReferencesHandling.None
     };
 
-    private enum MappingStatus {
-        InProgress,
-        Success,
-        Failure
-    }
-
-    class MappingResult {
-        public INatDevice Device;
-        public MappingStatus Status = MappingStatus.InProgress;
-        public Mapping Mapping;
-    }
-    List<MappingResult> mappingResults = new List<MappingResult>();
-
-    private bool natDiscoveryStarted;
     private float sinceRefreshedPlayers;
-    private int lastPlayerCount;
-    private string lastLevelName;
     private string currentStatus = "";
     private bool masterIsDown = false;
     private bool justLeft = false;
@@ -108,9 +88,7 @@ public class ServerScript : MonoBehaviour {
         WaitingForInitialServers,
         WaitingForInput,
         ChoosingServer,
-        DiscoveringNAT,
         Connecting,
-        WaitingForNat,
         ReadyToHost,
         AttemptingToHost,
         Hosting,
@@ -168,12 +146,10 @@ public class ServerScript : MonoBehaviour {
         hostStateCallbacks.Add(HostingState.Startup, (old, current) => QueryServerList());
         hostStateCallbacks.Add(HostingState.ChoosingServer, onChoosingServer);
         hostStateCallbacks.Add(HostingState.Connecting, onConnecting);
-        hostStateCallbacks.Add(HostingState.DiscoveringNAT, onDiscoveringNAT);
         hostStateCallbacks.Add(HostingState.ReadyToHost, onReadyToHost);
 
         // UI messages
         hostStateCallbacks.Add(HostingState.AttemptingToHost, (old, current) => currentStatus = "Attempting to host...");
-        hostStateCallbacks.Add(HostingState.WaitingForNat, (old, current) => currentStatus = "Waiting for NAT...");
         hostStateCallbacks.Add(HostingState.WaitingForInput, (old, current) => {
             if (lanMode) {
                 currentStatus = "Lan Mode - Master server is disabled";
@@ -227,20 +203,10 @@ public class ServerScript : MonoBehaviour {
         }
     }
 
-    void onDiscoveringNAT(HostingState oldstate, HostingState currentstate) {
-        currentStatus = "Discovering NAT...";
-        if (!natDiscoveryStarted) {
-            StartNatDiscovery();
-        }
-        hostState = lanMode ? HostingState.ReadyToHost : HostingState.WaitingForNat;
-    }
-
     void onReadyToHost(HostingState oldstate, HostingState currentstate) {
         if (CreateServer()) {
             hostState = HostingState.AttemptingToHost;
             AddServerToList();
-            lastPlayerCount = 0;
-            lastLevelName = RoundScript.Instance.currentLevel;
             sinceRefreshedPlayers = 0;
         } else {
             Debug.LogWarning("Failed to create error");
@@ -251,26 +217,6 @@ public class ServerScript : MonoBehaviour {
     void Update() {
         // Automatic host/connect logic follows
         switch (hostState) {
-            case HostingState.WaitingForNat:
-                // No mapping results or anything still in progress? Stop
-                if (mappingResults.Count == 0 || mappingResults.Any(x => x.Status == MappingStatus.InProgress))
-                    break;
-
-                // We mapped everything succesfully!
-                if (mappingResults.All(x => x.Status == MappingStatus.Success)) {
-                    hostState = HostingState.ReadyToHost;
-
-                    // We failed mapping all or some
-                } else {
-                    if (mappingResults.Any(x => x.Status == MappingStatus.Success)) {
-                        Debug.Log("Some mapping attempts failed, but will proceed with hosting anyway");
-                    } else {
-                        Debug.Log("Can't map UPnP ports, but will proceed with hosting anyway");
-                    }
-                    hostState = HostingState.ReadyToHost;
-                }
-                break;
-
             case HostingState.Hosting:
                 if (!Network.isServer) {
                     Debug.LogError("Hosting but is not the server...?");
@@ -279,15 +225,9 @@ public class ServerScript : MonoBehaviour {
                 }
 
                 sinceRefreshedPlayers -= Time.deltaTime;
-
-                if (lastPlayerCount != Network.connections.Length ||
-                    lastLevelName != RoundScript.Instance.currentLevel ||
-                    sinceRefreshedPlayers <= 0
-                ) {
+                if (sinceRefreshedPlayers <= 0) {
                     UpdateServer();
                     sinceRefreshedPlayers = RefreshTime;
-                    lastPlayerCount = Network.connections.Length;
-                    lastLevelName = RoundScript.Instance.currentLevel;
                 }
                 break;
             // Can't do this on the callbacks because of thread stuff
@@ -301,7 +241,7 @@ public class ServerScript : MonoBehaviour {
     }
 
     void OnGUI() {
-        peerType = Network.peerType;
+        NetworkPeerType peerType = Network.peerType;
 
         if (peerType == NetworkPeerType.Disconnected || peerType == NetworkPeerType.Connecting) {
             GUI.skin = guiSkin;
@@ -333,7 +273,7 @@ public class ServerScript : MonoBehaviour {
     }
 
     void Login(int windowId) {
-        if (peerType == NetworkPeerType.Disconnected) {
+        if (Network.peerType == NetworkPeerType.Disconnected) {
             GUILayout.BeginHorizontal();
             chosenUsername = RemoveSpecialCharacters(GUILayout.TextField(chosenUsername));
             PlayerPrefs.SetString("username", chosenUsername.Trim());
@@ -343,7 +283,7 @@ public class ServerScript : MonoBehaviour {
             if (GUILayout.Button("HOST")) {
                 PlayerPrefs.Save();
                 GlobalSoundsScript.PlayButtonPress();
-                hostState = HostingState.DiscoveringNAT;
+                hostState = HostingState.ReadyToHost;
             }
             GUILayout.Box("", new GUIStyle(guiSkin.box) { fixedWidth = 1 });
             if (GUILayout.Button("JOIN")) {
@@ -477,71 +417,11 @@ public class ServerScript : MonoBehaviour {
 
     bool Connect() {
         Debug.Log("Connecting to " + currentServer.GUID);
-        //peerType = NetworkPeerType.Connecting;
         NetworkConnectionError result = Network.Connect(currentServer.GUID);
         if (result != NetworkConnectionError.NoError) {
             return false;
         }
         return true;
-    }
-
-    void StartNatDiscovery() {
-        natDiscoveryStarted = true;
-
-        // Do nothing on LAN-only mode
-        if (lanMode) { return; }
-
-        // Add discovery callbacks
-        NatUtility.DeviceFound += (s, ea) => {
-            mappingResults.AddRange(MapPort(ea.Device));
-        };
-        NatUtility.DeviceLost += (s, ea) => {
-            mappingResults.RemoveAll(x => x.Device == ea.Device);
-        };
-
-        // Start discovery
-        NatUtility.StartDiscovery();
-    }
-
-    AsyncCallback getMappingCallback(INatDevice device, Mapping mapping, MappingResult result, Protocol protocol) {
-        return state => {
-            if (state.IsCompleted) {
-                try {
-                    Mapping m = device.GetSpecificMapping(protocol, port);
-                    // Mapping failed, throw
-                    if (m == null) {
-                        throw new InvalidOperationException("Mapping not found");
-                    } else if (m.PrivatePort != port || m.PublicPort != port) {
-                        throw new InvalidOperationException("Mapping invalid");
-                    }
-
-                    result.Status = MappingStatus.Success;
-                } catch (Exception ex) {
-                    Debug.LogWarning("Failed to validate mapping :\n" + ex.ToString());
-                    result.Status = MappingStatus.Failure;
-                }
-            }
-        };
-    }
-
-    IEnumerable<MappingResult> MapPort(INatDevice device) {
-        // Create mappings for both udp and tcp
-        Mapping udpMapping = new Mapping(Protocol.Udp, port, port) { Description = "Horus (UDP)" };
-        MappingResult udpResult = new MappingResult { Device = device, Mapping = udpMapping };
-        Mapping tcpMapping = new Mapping(Protocol.Tcp, port, port) { Description = "Horus (TCP)" };
-        MappingResult tcpResult = new MappingResult { Device = device, Mapping = tcpMapping };
-
-        // create delegates from factory for the mapping results
-        AsyncCallback mapUdp = getMappingCallback(device, udpMapping, udpResult, Protocol.Udp);
-        AsyncCallback mapTcp = getMappingCallback(device, tcpMapping, tcpResult, Protocol.Tcp);
-
-        // try mapping
-        device.BeginCreatePortMap(udpMapping, mapUdp, null);
-        device.BeginCreatePortMap(tcpMapping, mapTcp, null);
-
-        // wait for results
-        yield return udpResult;
-        yield return tcpResult;
     }
 
     void OnServerInitialized() {
@@ -552,39 +432,22 @@ public class ServerScript : MonoBehaviour {
     }
 
     void OnApplicationQuit() {
-        // Delete all mappings
-        foreach (MappingResult result in mappingResults) {
-            if (result.Device != null && result.Mapping != null) {
-                try {
-                    result.Device.DeletePortMap(result.Mapping);
-                } catch (Exception) {
-                    if (result.Status == MappingStatus.Failure) {
-                        Debug.LogWarning("Tried to delete invalid port mapping and failed");
-                    } else {
-                        Debug.LogWarning("Failed to delete port mapping : " + result.Mapping);
-                    }
-                }
-            }
-        }
-
-        // Release mapping results from memory
-        mappingResults.Clear();
-
-        //Disable discovery if enabled
-        if (natDiscoveryStarted) {
-            NatUtility.StopDiscovery();
-            natDiscoveryStarted = false;
-        }
-
         // Disconnect
         Network.Disconnect();
     }
 
     void OnFailedToConnect(NetworkConnectionError error) {
         // TODO: Inform player that it failed and why
-        currentServer.ConnectionFailed = true;
-        Debug.LogWarning("Couldn't connect, will try choosing another server: " + error);
-        hostState = HostingState.Startup;
+        if (Network.isClient) {
+            currentServer.ConnectionFailed = true;
+            currentStatus = "Couldn't connect to server";
+            Debug.LogWarning("Couldn't connect, will try choosing another server: " + error);
+            hostState = HostingState.Startup;
+        } else {
+            // TODO: Not Tested
+            currentStatus = "Unable to host, NAT Facilitator offline";
+            OnDisconnectedFromServer(new NetworkDisconnection());
+        }
     }
 
     void OnDisconnectedFromServer(NetworkDisconnection info) {
