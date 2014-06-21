@@ -138,11 +138,10 @@ public class PlayerShootingScript : MonoBehaviour {
                 // Is targeting self?
                 if (player == playerScript) continue;
 
-                HealthScript health = player.GetComponent<HealthScript>();
                 Vector3 position = player.transform.position;
                 Vector3 screenPos = Camera.main.WorldToScreenPoint(position);
 
-                if (health.Health > 0 && screenPos.z > 0 && (new Vector2(screenPos.x, screenPos.y) - screenCenter).magnitude < allowedDistance) {
+                if (player.health.Health > 0 && screenPos.z > 0 && (new Vector2(screenPos.x, screenPos.y) - screenCenter).magnitude < allowedDistance) {
                     WeaponIndicatorScript.PlayerData data;
                     if ((data = targets.FirstOrDefault(x => x.Script == player)) == null) {
                         targets.Add(data = new WeaponIndicatorScript.PlayerData { Script = player, WasLocked = false });
@@ -174,7 +173,7 @@ public class PlayerShootingScript : MonoBehaviour {
                         targets[i].Script.networkView.RPC("Untargeted", RPCMode.All, playerScript.owner);
                     targets[i].WasLocked = targets[i].Locked;
 
-                    if (!targets[i].Found || gameObject.GetComponent<HealthScript>().Health < 1 || targets[i].Script == null) // Is player in target list dead, or unseen? Am I dead?
+                    if (!targets[i].Found || playerScript.health.Health < 1 || targets[i].Script == null) // Is player in target list dead, or unseen? Am I dead?
                         targets.RemoveAt(i);
                 } else {
                     targets.RemoveAt(i);

@@ -11,6 +11,8 @@ public class CameraScript : MonoBehaviour {
     PlayerScript player;
 
     Camera mainCamera;
+    WeaponIndicatorScript weaponIndicator;
+    CameraSpin orbitCamera;
 
     Quaternion actualCameraRotation;
 
@@ -20,6 +22,8 @@ public class CameraScript : MonoBehaviour {
             mainCamera = Camera.main;
         }
         resetDone = false;
+        weaponIndicator = Camera.main.GetComponent<WeaponIndicatorScript>();
+        orbitCamera = FindObjectOfType<CameraSpin>();
     }
 
     void FixedUpdate() {
@@ -40,7 +44,7 @@ public class CameraScript : MonoBehaviour {
     void LateUpdate() {
         if (player.paused && mainCamera != null) {
             if (!resetDone) {
-                FindObjectOfType<CameraSpin>().ResetTransforms();
+                orbitCamera.ResetTransforms();
             }
             resetDone = true;
             return;
@@ -62,8 +66,7 @@ public class CameraScript : MonoBehaviour {
             mainCamera.transform.position = cameraPosition;
             mainCamera.transform.rotation = actualCameraRotation;
 
-            Camera.main.GetComponent<WeaponIndicatorScript>()
-                .CrosshairPosition = GetCrosshairPosition();
+            weaponIndicator.CrosshairPosition = GetCrosshairPosition();
         }
     }
 
