@@ -28,7 +28,6 @@ public class PlayerScript : MonoBehaviour {
     public Renderer dashEffectRenderer;
     public CharacterController controller;
     public GameObject warningSphereFab;
-    public NetworkPlayer owner;
     public HealthScript health;
 
     //Audio
@@ -82,20 +81,18 @@ public class PlayerScript : MonoBehaviour {
 
     void OnNetworkInstantiate(NetworkMessageInfo info) {
         if (!networkView.isMine) {
-            owner = networkView.owner;
             StartCoroutine(WaitAndLabel());
             enabled = false;
             iPosition = new VectorInterpolator();
         } else {
-            owner = Network.player;
             gameObject.layer = LayerMask.NameToLayer("LocalPlayer");
         }
     }
 
     IEnumerator WaitAndLabel() {
-        while (!PlayerRegistry.Has(owner))
+        while (!PlayerRegistry.Has(networkView.owner))
             yield return new WaitForSeconds(1 / 30f);
-        UpdateLabel(PlayerRegistry.Get(owner).Username);
+        UpdateLabel(PlayerRegistry.Get(networkView.owner).Username);
     }
 
     void OnGUI() {
@@ -373,10 +370,6 @@ public class PlayerScript : MonoBehaviour {
     }
 
     void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info) {
-        NetworkPlayer pOwner = owner;
-        stream.Serialize(ref pOwner);
-        if (stream.isReading) owner = pOwner;
-
         Vector3 pPosition = stream.isWriting ? transform.position : Vector3.zero;
 
         stream.Serialize(ref pPosition);

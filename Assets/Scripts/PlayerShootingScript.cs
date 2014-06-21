@@ -218,7 +218,7 @@ public class PlayerShootingScript : MonoBehaviour {
         Vector3 lastKnownPosition = Vector3.zero;
         NetworkPlayer targetOwner = Network.player;
         if (target != null) {
-            targetOwner = target.owner;
+            targetOwner = target.networkView.owner;
             lastKnownPosition = target.transform.position;
         }
 
@@ -243,7 +243,7 @@ public class PlayerShootingScript : MonoBehaviour {
         PlayerScript targetScript;
         try {
             targetScript = FindObjectsOfType<PlayerScript>()
-                .Where(x => x.owner == target)
+                .Where(x => x.networkView.owner == target)
                 .OrderBy(x => Vector3.Distance(x.transform.position, lastKnownPosition))
                 .FirstOrDefault();
         } catch (Exception) {

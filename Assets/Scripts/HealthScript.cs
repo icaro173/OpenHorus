@@ -42,7 +42,7 @@ public class HealthScript : MonoBehaviour {
 
     void Update() {
         if (networkView.isMine && transform.position.y < LevelSettings.Instance.killZ) {
-            DoDamage(999, GetComponent<PlayerScript>().owner);
+            DoDamage(999, player.networkView.owner);
         }
 
         if (!firstSet && shieldRenderer != null) {
@@ -121,8 +121,8 @@ public class HealthScript : MonoBehaviour {
             }
             if (Health <= 0) {
                 if (Network.player == shootingPlayer) {
-                    suicided = GetComponent<PlayerScript>().owner == shootingPlayer;
-                    NetworkLeaderboard.Instance.networkView.RPC("RegisterKill", RPCMode.All, shootingPlayer, GetComponent<PlayerScript>().owner);
+                    suicided = player.networkView.owner == shootingPlayer;
+                    NetworkLeaderboard.Instance.networkView.RPC("RegisterKill", RPCMode.All, shootingPlayer, player.networkView.owner);
                     networkView.RPC("ScheduleRespawn", RPCMode.All, RespawnZone.GetRespawnPoint());
                 }
 
