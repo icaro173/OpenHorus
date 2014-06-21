@@ -74,49 +74,63 @@ public class NetworkSync : MonoBehaviour {
             return;
         }
 
-        Debug.LogWarning("syncRPC [" + key + "] from " + msgInfo.sender);
-        // Create or lookup an dictionary on the key
-        syncInfo info = null;
-        if (syncDict.ContainsKey(key)) {
-            info = syncDict[key];
-        } else {
-            info = new syncInfo();
-            syncDict.Add(key, info);
+        if (!syncDict.ContainsKey(key)) {
+            Debug.LogError("syncRPC recieved on non-existent key [" + key + "] from " + msgInfo.sender);
+            return;
         }
 
+        Debug.LogWarning("syncRPC [" + key + "] from " + msgInfo.sender);
+
         // Update info
+        syncInfo info = syncDict[key];
         info.syncedPlayers[msgInfo.sender] = true;
 
+        // Check for completion
         runSynced();
+    }
+
+    public static void createSync(string key) {
+        if (!Network.isServer) {
+            Debug.LogError("afterSync called in client code");
+            return;
+        }
+
+        if (syncDict.ContainsKey(key)) {
+            Debug.LogError("createSync: sync [" + key + "] already exists");
+        } else {
+            Debug.LogWarning("createSync [" + key + "]");
+            syncInfo info = new syncInfo();
+            syncDict.Add(key, info);
+        }
     }
 
     public static void stopSync(string key) {
         Debug.LogWarning("stopSync [" + key + "]");
         if (syncDict.ContainsKey(key)) {
             syncDict.Remove(key);
+        } else {
+            Debug.LogError("stopSync: sync [" + key + "] does not exist");
         }
     }
 
     public static void afterSync(string key, syncedDelegate cb) {
         if (!Network.isServer) {
-            Debug.LogError("afterSync called in client code");
+            Debug.LogError("afterSync: called in client code");
+            return;
+        }
+
+        if (!syncDict.ContainsKey(key)) {
+            Debug.LogError("afterSync: sync [" + key + "] does not exist");
             return;
         }
 
         Debug.LogWarning("afterSync [" + key + "]");
 
-        // Create or lookup an dictionary on the key
-        syncInfo info = null;
-        if (syncDict.ContainsKey(key)) {
-            info = syncDict[key];
-        } else {
-            info = new syncInfo();
-            info.cb = cb;
-            syncDict.Add(key, info);
-        }
+        // Set callback
+        syncInfo info = syncDict[key];
+        info.cb = cb;
 
-        // If all players already called Sync on this key, call cb
-        // Else set the cb to be called when the last player called
+        // Check for completion
         runSynced();
     }
 }

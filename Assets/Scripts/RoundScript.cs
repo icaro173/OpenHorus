@@ -140,6 +140,9 @@ public class RoundScript : MonoBehaviour {
 
     //? SERVER ONLY
     public void RestartRound() {
+        // Sync on players registered
+        NetworkSync.createSync("RegisterPlayer");
+
         // Make sure every user has a player
         SpawnScript.Instance.networkView.RPC("CreatePlayer", RPCMode.All);
 
@@ -187,6 +190,9 @@ public class RoundScript : MonoBehaviour {
     public void ChangeLevelAndRestart(string toLevelName) {
         // Destroy all old calls
         Network.RemoveRPCsInGroup(1);
+
+        // Create a sync to ensure a sync when all levels are loaded
+        NetworkSync.createSync("OnLevelWasLoaded");
         networkView.RPC("ChangeLevelAndRestartRPC", RPCMode.AllBuffered, toLevelName, lastLevelPrefix + 1);
     }
 

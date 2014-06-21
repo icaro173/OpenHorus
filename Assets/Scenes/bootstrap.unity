@@ -179,7 +179,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lanMode: 0
-  peerType: 0
   guiSkin: {fileID: 11400000, guid: ca3d138dd65c2564f9ccc4895664196a, type: 2}
   logo: {fileID: 2800000, guid: 1286a0c2bb76745e982081b3989f1ef8, type: 3}
 --- !u!114 &502558920
