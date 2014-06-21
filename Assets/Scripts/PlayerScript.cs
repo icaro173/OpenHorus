@@ -80,6 +80,8 @@ public class PlayerScript : MonoBehaviour {
     }
 
     void OnNetworkInstantiate(NetworkMessageInfo info) {
+        Debug.Log("Player object instantiated by " + info.sender);
+
         if (!networkView.isMine) {
             StartCoroutine(WaitAndLabel());
             enabled = false;
