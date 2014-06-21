@@ -192,19 +192,10 @@ public class RoundScript : MonoBehaviour {
         Network.RemoveRPCsInGroup(1);
         Network.RemoveRPCsInGroup(0);
 
-        // Destroy all players
-        if (Network.isServer) {
-            foreach (KeyValuePair<NetworkPlayer, PlayerRegistry.PlayerInfo> pair in PlayerRegistry.All()) {
-                PlayerScript player = pair.Value.Player;
-                Network.Destroy(player.networkView.viewID);
-            }
-        }
-
         // Create a sync to ensure a sync when all levels are loaded
         NetworkSync.createSync("OnLevelWasLoaded");
         networkView.RPC("ChangeLevelAndRestartRPC", RPCMode.AllBuffered, toLevelName, lastLevelPrefix + 1);
     }
-
 
     // Server picks new map and loads
     //? SERVER ONLY
@@ -237,6 +228,7 @@ public class RoundScript : MonoBehaviour {
         // Turn networking back on
         Network.isMessageQueueRunning = true;
         Network.SetSendingEnabled(0, true);
+
 
         // Notify and change
         ChatScript.Instance.LogChat(Network.player, "Changed level to " + Application.loadedLevelName, true, true);
