@@ -38,11 +38,15 @@ public class PlayerShootingScript : MonoBehaviour {
     float cooldownLeft = 0.0f;
     int bulletsLeft;
 
+    public float GunRotationSmoothingSpeed = 8.0f;
+
     WeaponIndicatorScript weaponIndicator;
     public List<WeaponIndicatorScript.PlayerData> targets;
 
     CameraScript playerCamera;
     PlayerScript playerScript;
+
+    private Vector3 firingDirection;
 
     void Awake() {
         bulletsLeft = BurstCount;
@@ -60,10 +64,15 @@ public class PlayerShootingScript : MonoBehaviour {
     }
 
     void Update() {
-        gun.LookAt(playerCamera.GetTargetPosition());
+        Vector3 actualTargetPosition = playerCamera.GetTargetPosition();
+        firingDirection = (actualTargetPosition - gun.transform.position).normalized;
+        Vector3 gunRotationAngles = Quaternion.FromToRotation(Vector3.forward, firingDirection).eulerAngles;
+        Quaternion desiredGunRotation = Quaternion.Euler(gunRotationAngles.x, gunRotationAngles.y, 0);
+        gun.transform.rotation = Quaternion.Slerp(gun.transform.rotation, desiredGunRotation, Time.deltaTime * GunRotationSmoothingSpeed);
 
-        if (playerScript.paused)
+        if (playerScript.paused) {
             bulletsLeft = BurstCount;
+        }
 
         if (networkView.isMine && Screen.lockCursor && !playerScript.paused) {
             cooldownLeft = Mathf.Max(0, cooldownLeft - Time.deltaTime);
@@ -193,8 +202,10 @@ public class PlayerShootingScript : MonoBehaviour {
             Quaternion.Euler(Random.value * spread, 0, 0) *
             Quaternion.Euler(0, 0, -roll);
 
+        Quaternion firingRotation = Quaternion.FromToRotation(Vector3.forward, firingDirection);
+
         networkView.RPC("Shoot", RPCMode.All,
-            gun.position + gun.forward * 4.0f, gun.rotation * spreadRotation,
+            gun.position + firingDirection * 4.0f, firingRotation * spreadRotation,
             Network.player);
     }
 
@@ -213,6 +224,8 @@ public class PlayerShootingScript : MonoBehaviour {
             Quaternion.Euler(Random.value * spread, 0, 0) *
             Quaternion.Euler(0, 0, -roll);
 
+        Quaternion firingRotation = Quaternion.FromToRotation(Vector3.forward, firingDirection);
+
         Vector3 lastKnownPosition = Vector3.zero;
         NetworkPlayer targetOwner = Network.player;
         if (target != null) {
@@ -221,7 +234,7 @@ public class PlayerShootingScript : MonoBehaviour {
         }
 
         networkView.RPC("ShootHoming", RPCMode.All,
-            gun.position + gun.forward * 4.0f, gun.rotation * spreadRotation,
+            gun.position + firingDirection * 4.0f, firingRotation * spreadRotation,
             Network.player, targetOwner, lastKnownPosition, homing, doSound);
     }
 

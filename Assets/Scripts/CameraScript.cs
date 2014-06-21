@@ -6,6 +6,10 @@ public class CameraScript : MonoBehaviour {
     public float minDistance = 1;
     public float smoothing = 0.1f;
 
+    public bool hasSmoothedRotation = true;
+    public bool usesRaycastCrosshair = true;
+    public float crosshairSmoothingSpeed = 20.0f;
+
     bool aimingAtPlayer;
     bool resetDone;
     PlayerScript player;
@@ -16,6 +20,10 @@ public class CameraScript : MonoBehaviour {
 
     Quaternion actualCameraRotation;
 
+    // Used only for drawing the crosshair on screen. 
+    // Actual aiming raycast will not use this.
+    private Vector2 smoothedCrosshairPosition;
+
     void Start() {
         player = transform.parent.parent.GetComponent<PlayerScript>();
         if (player.networkView.isMine) {
@@ -24,6 +32,7 @@ public class CameraScript : MonoBehaviour {
         resetDone = false;
         weaponIndicator = Camera.main.GetComponent<WeaponIndicatorScript>();
         orbitCamera = FindObjectOfType<CameraSpin>();
+        smoothedCrosshairPosition = GetCrosshairPosition();
     }
 
     void FixedUpdate() {
@@ -54,8 +63,12 @@ public class CameraScript : MonoBehaviour {
 
         if (player.networkView.isMine) {
 
-            actualCameraRotation = Quaternion.Lerp(transform.rotation, actualCameraRotation,
-                Easing.EaseOut(Mathf.Pow(smoothing, Time.deltaTime), EasingType.Quadratic));
+            if (hasSmoothedRotation) {
+                actualCameraRotation = Quaternion.Lerp(transform.rotation, actualCameraRotation,
+                    Easing.EaseOut(Mathf.Pow(smoothing, Time.deltaTime), EasingType.Quadratic));
+            } else {
+                actualCameraRotation = transform.rotation;
+            }
 
             Vector3 scaledLocalPosition = Vector3.Scale(transform.localPosition, transform.lossyScale);
             Vector3 direction = actualCameraRotation * scaledLocalPosition;
@@ -66,14 +79,16 @@ public class CameraScript : MonoBehaviour {
             mainCamera.transform.position = cameraPosition;
             mainCamera.transform.rotation = actualCameraRotation;
 
-            weaponIndicator.CrosshairPosition = GetCrosshairPosition();
+            Vector2 rawCrosshairPosition = GetCrosshairPosition();
+            smoothedCrosshairPosition = Vector2.Lerp(smoothedCrosshairPosition, rawCrosshairPosition, Time.deltaTime * crosshairSmoothingSpeed);
+            weaponIndicator.CrosshairPosition = smoothedCrosshairPosition;
         }
     }
 
     void Render(float size, Color color) {
         float scale = (Screen.height / 1750f) * size;
 
-        Vector2 center = GetCrosshairPosition();
+        Vector2 center = smoothedCrosshairPosition;
         Rect position = new Rect(
             center.x - crosshair.width / 2f * scale,
             Screen.height - center.y - crosshair.height / 2f * scale,
@@ -100,10 +115,12 @@ public class CameraScript : MonoBehaviour {
 
     public Vector3 GetTargetPosition() {
         RaycastHit hitInfo;
-        if (Physics.Raycast(transform.position, transform.forward, out hitInfo,
-                           Mathf.Infinity, 1 << LayerMask.NameToLayer("Default")))
+        Transform origin = usesRaycastCrosshair ? transform : mainCamera.transform;
+        if (Physics.Raycast(origin.position, origin.forward, out hitInfo,
+                           Mathf.Infinity, 1 << LayerMask.NameToLayer("Default"))) {
             return hitInfo.point;
-        else
+        } else {
             return transform.position + transform.forward * 1000;
+        }
     }
 }

@@ -177,6 +177,12 @@ public class PlayerScript : MonoBehaviour {
         recoilVelocity = Vector3.zero;
         fallingVelocity = Vector3.zero;
     }
+    private Vector3 RawAxisMovementDirection {
+        get {
+            return (Input.GetAxisRaw("Strafe") * transform.right +
+                    Input.GetAxisRaw("Thrust") * transform.forward).normalized;
+        }
+    }
 
     public void UpdateLabel(string username) {
         TextMesh label = GetComponentInChildren<TextMesh>();
@@ -305,8 +311,8 @@ public class PlayerScript : MonoBehaviour {
 
                 dashSound.Play();
 
-                Vector3 dashDirection = inputVelocity.normalized;
-                if (dashDirection == Vector3.zero)
+                Vector3 dashDirection = RawAxisMovementDirection;
+                if (dashDirection.magnitude < Mathf.Epsilon)
                     dashDirection = Vector3.up * 0.4f;
 
                 fallingVelocity +=
