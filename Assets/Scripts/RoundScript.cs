@@ -192,6 +192,14 @@ public class RoundScript : MonoBehaviour {
         Network.RemoveRPCsInGroup(1);
         Network.RemoveRPCsInGroup(0);
 
+        // Destroy all players
+        if (Network.isServer) {
+            foreach (KeyValuePair<NetworkPlayer, PlayerRegistry.PlayerInfo> pair in PlayerRegistry.All()) {
+                PlayerScript player = pair.Value.Player;
+                Network.Destroy(player.networkView.viewID);
+            }
+        }
+
         // Create a sync to ensure a sync when all levels are loaded
         NetworkSync.createSync("OnLevelWasLoaded");
         networkView.RPC("ChangeLevelAndRestartRPC", RPCMode.AllBuffered, toLevelName, lastLevelPrefix + 1);
@@ -209,14 +217,6 @@ public class RoundScript : MonoBehaviour {
     public void ChangeLevel(string newLevel, int levelPrefix) {
         // Use a new prefix for the next level
         lastLevelPrefix = levelPrefix;
-
-        // Destroy all players
-        if (Network.isServer) {
-            foreach (KeyValuePair<NetworkPlayer, PlayerRegistry.PlayerInfo> pair in PlayerRegistry.All()) {
-                PlayerScript player = pair.Value.Player;
-                Network.Destroy(player.networkView.viewID);
-            }
-        }
 
         // Clean the player register, it will be rebuild when the level is loaded
         PlayerRegistry.Clear();
