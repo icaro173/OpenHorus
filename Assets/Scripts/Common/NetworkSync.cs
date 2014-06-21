@@ -75,7 +75,7 @@ public class NetworkSync : MonoBehaviour {
         }
 
         if (!syncDict.ContainsKey(key)) {
-            Debug.LogError("syncRPC recieved on non-existent key [" + key + "] from " + msgInfo.sender);
+            Debug.LogWarning("syncRPC recieved on non-existent key [" + key + "] from " + msgInfo.sender);
             return;
         }
 
