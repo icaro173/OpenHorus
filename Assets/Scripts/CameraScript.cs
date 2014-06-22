@@ -8,7 +8,7 @@ public class CameraScript : MonoBehaviour {
 
     public bool hasSmoothedRotation = true;
     public bool usesRaycastCrosshair = true;
-    public float crosshairSmoothingSpeed = 20.0f;
+    public float crosshairSmoothingSpeed = 8.5f;
 
     bool aimingAtPlayer;
     bool resetDone;
@@ -64,8 +64,10 @@ public class CameraScript : MonoBehaviour {
         if (player.networkView.isMine) {
 
             if (hasSmoothedRotation) {
-                actualCameraRotation = Quaternion.Lerp(transform.rotation, actualCameraRotation,
-                    Easing.EaseOut(Mathf.Pow(smoothing, Time.deltaTime), EasingType.Quadratic));
+                //actualCameraRotation = Quaternion.Lerp(transform.rotation, actualCameraRotation,
+                //    Easing.EaseOut(Mathf.Pow(smoothing, Time.deltaTime), EasingType.Quadratic));
+                var amt = Mathf.Pow(0.0000000000001f, Time.deltaTime);
+                actualCameraRotation = Quaternion.Slerp(actualCameraRotation, transform.rotation, 1.0f - amt);
             } else {
                 actualCameraRotation = transform.rotation;
             }
@@ -80,7 +82,8 @@ public class CameraScript : MonoBehaviour {
             mainCamera.transform.rotation = actualCameraRotation;
 
             Vector2 rawCrosshairPosition = GetCrosshairPosition();
-            smoothedCrosshairPosition = Vector2.Lerp(smoothedCrosshairPosition, rawCrosshairPosition, Time.deltaTime * crosshairSmoothingSpeed);
+            smoothedCrosshairPosition = Vector2.Lerp(smoothedCrosshairPosition, rawCrosshairPosition,
+                1.0f - Mathf.Pow(crosshairSmoothingSpeed, -crosshairSmoothingSpeed * Time.deltaTime));
             weaponIndicator.CrosshairPosition = smoothedCrosshairPosition;
         }
     }
