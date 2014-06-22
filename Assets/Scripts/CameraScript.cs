@@ -66,7 +66,7 @@ public class CameraScript : MonoBehaviour {
             if (hasSmoothedRotation) {
                 //actualCameraRotation = Quaternion.Lerp(transform.rotation, actualCameraRotation,
                 //    Easing.EaseOut(Mathf.Pow(smoothing, Time.deltaTime), EasingType.Quadratic));
-                var amt = Mathf.Pow(0.0000000000001f, Time.deltaTime);
+                float amt = Mathf.Pow(0.0000000000001f, Time.deltaTime);
                 actualCameraRotation = Quaternion.Slerp(actualCameraRotation, transform.rotation, 1.0f - amt);
             } else {
                 actualCameraRotation = transform.rotation;

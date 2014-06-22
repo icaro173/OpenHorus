@@ -104,7 +104,9 @@ public class BulletScript : MonoBehaviour {
                 impulse *= 10;
             }
 
-            view.RPC("AddRecoil", RPCMode.All, impulse);
+            if (Network.isServer) {
+                view.RPC("AddRecoil", RPCMode.All, impulse);
+            }
         }
     }
 
