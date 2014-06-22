@@ -57,10 +57,9 @@ public class PlayerShootingScript : MonoBehaviour {
     }
 
     WeaponIndicatorScript.PlayerData GetFirstTarget() {
-        return targets
-               .Where(x => x.SinceInCrosshair >= AimingTime)
-               .OrderBy(x => Guid.NewGuid())
-               .First();
+        return targets.Where(x => x.SinceInCrosshair >= AimingTime)
+                      .OrderBy(x => Guid.NewGuid())
+                      .First();
     }
 
     void Update() {
@@ -197,10 +196,9 @@ public class PlayerShootingScript : MonoBehaviour {
         heat += 0.25f;
 
         float roll = Random.value * 360;
-        Quaternion spreadRotation =
-            Quaternion.Euler(0, 0, roll) *
-            Quaternion.Euler(Random.value * spread, 0, 0) *
-            Quaternion.Euler(0, 0, -roll);
+        Quaternion spreadRotation = Quaternion.Euler(0, 0, roll) *
+                                    Quaternion.Euler(Random.value * spread, 0, 0) *
+                                    Quaternion.Euler(0, 0, -roll);
 
         Quaternion firingRotation = Quaternion.FromToRotation(Vector3.forward, firingDirection);
 
@@ -219,15 +217,15 @@ public class PlayerShootingScript : MonoBehaviour {
         spread *= (ShotgunSpreadBase + homing * 5);
 
         float roll = RandomHelper.Between(homing * 90, 360 - homing * 90);
-        Quaternion spreadRotation =
-            Quaternion.Euler(0, 0, roll) *
-            Quaternion.Euler(Random.value * spread, 0, 0) *
-            Quaternion.Euler(0, 0, -roll);
+        Quaternion spreadRotation = Quaternion.Euler(0, 0, roll) *
+                                    Quaternion.Euler(Random.value * spread, 0, 0) *
+                                    Quaternion.Euler(0, 0, -roll);
 
         Quaternion firingRotation = Quaternion.FromToRotation(Vector3.forward, firingDirection);
 
         Vector3 lastKnownPosition = Vector3.zero;
         NetworkPlayer targetOwner = Network.player;
+
         if (target != null) {
             targetOwner = target.owner;
             lastKnownPosition = target.transform.position;
@@ -253,10 +251,10 @@ public class PlayerShootingScript : MonoBehaviour {
         PlayerScript targetScript;
         try {
             targetScript = PlayerRegistry.All()
-                .Select(x => x.Value.Player)
-                .Where(x => x.owner == target)
-                .OrderBy(x => Vector3.Distance(x.transform.position, lastKnownPosition))
-                .FirstOrDefault();
+                                         .Select(x => x.Value.Player)
+                                         .Where(x => x.owner == target)
+                                         .OrderBy(x => Vector3.Distance(x.transform.position, lastKnownPosition))
+                                         .FirstOrDefault();
         } catch (Exception) {
             targetScript = null;
         }

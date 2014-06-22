@@ -19,7 +19,9 @@ class LeaderboardViewerScript : MonoBehaviour {
     }
 
     void OnGUI() {
-        if (Network.peerType == NetworkPeerType.Disconnected || Network.peerType == NetworkPeerType.Connecting) return;
+        if (Network.peerType == NetworkPeerType.Disconnected || 
+            Network.peerType == NetworkPeerType.Connecting) 
+            return;
 
         GUI.skin = Skin;
 
@@ -30,7 +32,8 @@ class LeaderboardViewerScript : MonoBehaviour {
     }
 
     void BoardRow(int windowId) {
-        LeaderboardEntry log = NetworkLeaderboard.instance.Entries.FirstOrDefault(x => x.NetworkPlayer == Network.player);
+        LeaderboardEntry log = NetworkLeaderboard.instance.Entries
+                                                          .FirstOrDefault(x => x.NetworkPlayer == Network.player);
         if (log == null || !PlayerRegistry.Has(Network.player))
             return;
 
@@ -42,10 +45,9 @@ class LeaderboardViewerScript : MonoBehaviour {
 
         //rowStyle.normal.textColor = Color.white;
 
-        GUILayout.Box(log.Kills.ToString() + " K", rowStyle, GUILayout.MinWidth(90), GUILayout.MaxWidth(90));
+        GUILayout.Box(log.Kills.ToString()  + " K", rowStyle, GUILayout.MinWidth(90), GUILayout.MaxWidth(90));
         GUILayout.Box(log.Deaths.ToString() + " D", rowStyle, GUILayout.MinWidth(90), GUILayout.MaxWidth(90));
-        //GUILayout.Label(log.Ratio.ToString() + " R", rowStyle, GUILayout.MinWidth(90), GUILayout.MaxWidth(90));
-        GUILayout.Box(log.Ping.ToString() + " P", rowStyle, GUILayout.MinWidth(90), GUILayout.MaxWidth(90));
+        GUILayout.Box(log.Ping.ToString()   + " P", rowStyle, GUILayout.MinWidth(90), GUILayout.MaxWidth(90));
         GUILayout.EndHorizontal();
     }
 
@@ -57,8 +59,9 @@ class LeaderboardViewerScript : MonoBehaviour {
                 continue;
 
             GUIStyle rowStyle = RowStyle;
-            if (log.NetworkPlayer == Network.player)
+            if (log.NetworkPlayer == Network.player) {
                 rowStyle = MyRowStyle;
+            }
 
             //rowStyle.normal.textColor = PlayerRegistry.For(log.NetworkPlayer).Color;
 
@@ -67,10 +70,9 @@ class LeaderboardViewerScript : MonoBehaviour {
 
             // rowStyle.normal.textColor = Color.white;
 
-            GUILayout.Box(log.Kills.ToString() + " K", rowStyle, GUILayout.MinWidth(90), GUILayout.MaxWidth(90));
+            GUILayout.Box(log.Kills.ToString()  + " K", rowStyle, GUILayout.MinWidth(90), GUILayout.MaxWidth(90));
             GUILayout.Box(log.Deaths.ToString() + " D", rowStyle, GUILayout.MinWidth(90), GUILayout.MaxWidth(90));
-            //GUILayout.Label(log.Ratio.ToString() + " R", rowStyle, GUILayout.MinWidth(90), GUILayout.MaxWidth(90));
-            GUILayout.Box(log.Ping.ToString() + " P", rowStyle, GUILayout.MinWidth(90), GUILayout.MaxWidth(90));
+            GUILayout.Box(log.Ping.ToString()   + " P", rowStyle, GUILayout.MinWidth(90), GUILayout.MaxWidth(90));
             GUILayout.EndHorizontal();
         }
     }

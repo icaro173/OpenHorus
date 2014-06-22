@@ -20,7 +20,7 @@ public class CameraScript : MonoBehaviour {
 
     Quaternion actualCameraRotation;
 
-    // Used only for drawing the crosshair on screen. 
+    // Used only for drawing the crosshair on screen.
     // Actual aiming raycast will not use this.
     private Vector2 smoothedCrosshairPosition;
 

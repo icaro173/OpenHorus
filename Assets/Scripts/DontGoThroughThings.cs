@@ -1,8 +1,8 @@
 using UnityEngine;
 
 public class DontGoThroughThings : MonoBehaviour {
-    public LayerMask layerMask; //make sure we aren't in this layer 
-    public float skinWidth = 0.1f; //probably doesn't need to be changed 
+    public LayerMask layerMask; //make sure we aren't in this layer
+    public float skinWidth = 0.1f; //probably doesn't need to be changed
 
     private float minimumExtent;
     private float partialExtent;
@@ -19,7 +19,7 @@ public class DontGoThroughThings : MonoBehaviour {
     }
 
     void Update() {
-        //have we moved more than our minimum extent? 
+        //have we moved more than our minimum extent?
         Vector3 movementThisStep = myRigidbody.position - previousPosition;
         float movementSqrMagnitude = movementThisStep.sqrMagnitude;
 
@@ -27,7 +27,7 @@ public class DontGoThroughThings : MonoBehaviour {
             float movementMagnitude = Mathf.Sqrt(movementSqrMagnitude);
             RaycastHit hitInfo;
 
-            //check for obstructions we might have missed 
+            //check for obstructions we might have missed
             if (Physics.Raycast(previousPosition, movementThisStep, out hitInfo, movementMagnitude, layerMask.value))
                 myRigidbody.position = hitInfo.point - (movementThisStep / movementMagnitude) * partialExtent;
         }

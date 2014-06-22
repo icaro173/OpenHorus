@@ -25,8 +25,8 @@ public class BulletScript : MonoBehaviour {
 
     public NetworkPlayer Player { get; set; }
 
-    public LayerMask layerMask; //make sure we aren't in this layer 
-    public float skinWidth = 0.1f; //probably doesn't need to be changed 
+    public LayerMask layerMask; //make sure we aren't in this layer
+    public float skinWidth = 0.1f; //probably doesn't need to be changed
 
     private float minimumExtent;
     private float partialExtent;
@@ -161,7 +161,7 @@ public class BulletScript : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        //have we moved more than our minimum extent? 
+        //have we moved more than our minimum extent?
         Vector3 movementThisStep = rigidbody.position - previousPosition;
         float movementSqrMagnitude = movementThisStep.sqrMagnitude;
 
@@ -169,7 +169,7 @@ public class BulletScript : MonoBehaviour {
             float movementMagnitude = Mathf.Sqrt(movementSqrMagnitude);
             RaycastHit hitInfo;
 
-            //check for obstructions we might have missed 
+            //check for obstructions we might have missed
             if (Physics.Raycast(previousPosition, movementThisStep, out hitInfo, movementMagnitude, layerMask.value)) {
                 rigidbody.position = hitInfo.point - (movementThisStep / movementMagnitude) * partialExtent;
                 Collide(hitInfo.transform, hitInfo.point, hitInfo.normal);
