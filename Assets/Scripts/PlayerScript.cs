@@ -69,7 +69,7 @@ public class PlayerScript : MonoBehaviour {
         controller = GetComponent<CharacterController>();
         characterAnimation = transform.Find("Animated Mesh Fixed").animation;
         characterAnimation.Play(currentAnim = "idle");
-        textBubble = gameObject.FindChild("TextBubble");
+        textBubble = gameObject.transform.Find("TextBubble").gameObject;
         textBubble.renderer.material.color = new Color(1, 1, 1, 0);
         health = gameObject.GetComponent<HealthScript>();
 
@@ -129,8 +129,6 @@ public class PlayerScript : MonoBehaviour {
 
         warningSound.Play();
 
-        print("Targeted by: " + PlayerRegistry.Get(aggressor).Username);
-
         GameObject sphere = (GameObject)Instantiate(warningSphereFab, transform.position, transform.rotation);
         sphere.transform.parent = gameObject.transform;
         sphere.GetComponent<Billboard>().target = PlayerRegistry.Get(aggressor).Player.transform;
@@ -141,8 +139,6 @@ public class PlayerScript : MonoBehaviour {
     [RPC]
     public void Untargeted(NetworkPlayer aggressor) {
         if (!networkView.isMine) return;
-
-        print("Untargeted by: " + PlayerRegistry.Get(aggressor).Username);
 
         int id = -1;
         id = warningSpheres.FindIndex(a => a.GetComponent<Billboard>().target == PlayerRegistry.Get(aggressor).Player.transform);
@@ -164,7 +160,6 @@ public class PlayerScript : MonoBehaviour {
         warningSpheres.Clear();
     }
 
-    [RPC]
     public void AddRecoil(Vector3 impulse) {
         recoilVelocity += impulse;
         if (impulse.y > 0)
@@ -176,6 +171,7 @@ public class PlayerScript : MonoBehaviour {
         recoilVelocity = Vector3.zero;
         fallingVelocity = Vector3.zero;
     }
+
     private Vector3 RawAxisMovementDirection {
         get {
             return (Input.GetAxisRaw("Strafe") * transform.right +

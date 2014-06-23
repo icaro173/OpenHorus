@@ -37,9 +37,7 @@ public class CameraScript : MonoBehaviour {
 
     void FixedUpdate() {
         int layerMask = (1 << LayerMask.NameToLayer("Player Hit"));
-        bool rayHit = Physics.Raycast(transform.position, transform.forward, Mathf.Infinity, layerMask);
-
-        aimingAtPlayer = rayHit;
+        aimingAtPlayer = Physics.Raycast(transform.position, transform.forward, Mathf.Infinity, layerMask);
     }
 
     void LateUpdate() {
