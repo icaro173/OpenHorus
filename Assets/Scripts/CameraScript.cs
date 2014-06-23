@@ -36,18 +36,10 @@ public class CameraScript : MonoBehaviour {
     }
 
     void FixedUpdate() {
-        RaycastHit hitInfo;
+        int layerMask = (1 << LayerMask.NameToLayer("Player Hit"));
+        bool rayHit = Physics.Raycast(transform.position, transform.forward, Mathf.Infinity, layerMask);
 
-        //todo We shouldn't be playing with colliders on a CameraScript
-        bool isColliding = player.gameObject.FindChild("PlayerHit").collider.enabled;
-        player.gameObject.FindChild("PlayerHit").collider.enabled = false;
-
-        aimingAtPlayer = Physics.Raycast(transform.position, transform.forward, out hitInfo,
-                                             Mathf.Infinity, (1 << LayerMask.NameToLayer("Default")) |
-                                                             (1 << LayerMask.NameToLayer("Player Hit"))) &&
-                             hitInfo.transform.gameObject.layer == LayerMask.NameToLayer("Player Hit");
-
-        player.gameObject.FindChild("PlayerHit").collider.enabled = isColliding;
+        aimingAtPlayer = rayHit;
     }
 
     void LateUpdate() {
