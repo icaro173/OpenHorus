@@ -166,7 +166,6 @@ public class PlayerScript : MonoBehaviour {
 
     [RPC]
     public void AddRecoil(Vector3 impulse) {
-        if (!networkView.isMine) return;
         recoilVelocity += impulse;
         if (impulse.y > 0)
             sinceNotGrounded = 0.25f;

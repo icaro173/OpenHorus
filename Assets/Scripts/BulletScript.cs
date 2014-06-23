@@ -75,38 +75,25 @@ public class BulletScript : MonoBehaviour {
     void DoRecoil(Vector3 point, bool playerWasHit) {
         Collider[] colliders = Physics.OverlapSphere(point, 15, (1 << LayerMask.NameToLayer("Player Hit")));
         foreach (Collider c in colliders) {
-            if (c.gameObject.name != "PlayerHit") {
-                continue;
-            }
+            // Get player affected, if a player
+            PlayerScript p = c.GetComponentInParent<PlayerScript>();
+            if (p == null) continue;
 
-            Transform t = c.transform;
-            NetworkView view = t.networkView;
-            while (view == null) {
-                t = t.parent;
-                view = t.networkView;
-            }
+            // We apply recoil per-client
+            if (!p.gameObject.networkView.isMine) continue;
 
-            t = t.FindChild("mecha_gun");
-            Vector3 endpoint = t.position + t.forward;
+            Vector3 playerPosition = p.gameObject.transform.position;
+            Vector3 positionDifference = playerPosition - point;
 
-            Vector3 direction = endpoint - point;
-            float dist = Mathf.Max(direction.magnitude, 0.5f);
-            direction.Normalize();
+            float dist = Mathf.Max(positionDifference.magnitude, 0.5f);
 
-            Vector3 impulse = direction * (45 / dist);
-            if (impulse.y > 0) {
-                impulse.y *= 2.25f;
-            } else {
-                impulse.y = 0;
-            }
+            Vector3 impulse = positionDifference.normalized * (45 / dist);
+            // Boost vertical acceleration
+            impulse.y *= (impulse.y > 0) ? 2.25f : 0;
+            // Superboost if we were hit
+            if (playerWasHit) impulse *= 10;
 
-            if (playerWasHit) {
-                impulse *= 10;
-            }
-
-            if (Network.isServer) {
-                view.RPC("AddRecoil", RPCMode.All, impulse);
-            }
+            p.AddRecoil(impulse);
         }
     }
 
