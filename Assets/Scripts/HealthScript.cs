@@ -32,11 +32,11 @@ public class HealthScript : MonoBehaviour {
         Shield = maxShield;
         Health = maxHealth;
 
-        GameObject graphics = gameObject.FindChild("Animated Mesh Fixed");
-        bigCell = graphics.FindChild("healthsphere_rear").GetComponentInChildren<Renderer>();
+        GameObject graphics = gameObject.transform.Find("Animated Mesh Fixed").gameObject;
+        bigCell = graphics.transform.Find("healthsphere_rear").GetComponentInChildren<Renderer>();
         smallCells = new[] {
-            graphics.FindChild("healthsphere_left").GetComponentInChildren<Renderer>(),
-            graphics.FindChild("healthsphere_right").GetComponentInChildren<Renderer>()
+            graphics.transform.Find("healthsphere_left").GetComponentInChildren<Renderer>(),
+            graphics.transform.Find("healthsphere_right").GetComponentInChildren<Renderer>()
         };
         player = gameObject.GetComponent<PlayerScript>();
     }

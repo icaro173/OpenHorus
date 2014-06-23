@@ -105,8 +105,6 @@ public class PlayerShootingScript : MonoBehaviour {
                     recoilImpulse *= playerScript.controller.isGrounded ? 25 : 87.5f;
                     recoilImpulse.y *= playerScript.controller.isGrounded ? 0.1f : 0.375f;
                     playerScript.AddRecoil(recoilImpulse);
-
-                    //cannonChargeCountdown = CannonChargeTime;
                 }
 
                 // Burst

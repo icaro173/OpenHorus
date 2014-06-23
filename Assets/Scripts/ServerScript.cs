@@ -10,7 +10,7 @@ public class ServerScript : MonoBehaviour {
 
     //Public
     public const int port = 31414;
-    public const string buildVersion = "21062014";
+    public const string buildVersion = "23062014";
     public const string MasterServerUri = "http://ohs.padrepio.in/";
 
     public const string natFacilitatorIP = "108.61.103.200"; // Padrepio.in

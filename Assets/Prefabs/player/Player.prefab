@@ -2713,6 +2713,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
   heat: 0
+  GunRotationSmoothingSpeed: 8
 --- !u!114 &11400006
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2728,6 +2729,9 @@ MonoBehaviour:
   collisionRadius: 4
   minDistance: 2
   smoothing: 1.00000002e-35
+  hasSmoothedRotation: 1
+  usesRaycastCrosshair: 1
+  crosshairSmoothingSpeed: 8.5
 --- !u!114 &11400008
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2746,6 +2750,7 @@ MonoBehaviour:
   deathPrefab: {fileID: 100000, guid: 44f7ec49704fd0f47a7e2a94bd9c0fe2, type: 2}
   dead: 0
   shieldRenderer: {fileID: 2300000}
+  player: {fileID: 0}
   timeUntilRespawn: 5
 --- !u!114 &11400010
 MonoBehaviour:
